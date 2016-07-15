@@ -1,0 +1,23 @@
+{% extends 'layout.html' %}
+
+{% block title %}{% endblock %}
+
+
+{% block content %}
+
+  <div class="container">
+
+    <h1>{{ title }}</h1>
+    <p>Welcome! Please Login.</p>
+    <hr><br>
+    <a href="/auth/linkedin" class="btn btn-default">LinkedIn</a>
+    <a href="/auth/github" class="btn btn-default">Github</a>
+    <a href="/auth/twitter" class="btn btn-default">Twitter</a>
+  
+    <a href="/auth/tumblr" class="btn btn-default">Tumblr</a>
+    <a href="/auth/yahoo" class="btn btn-default">Yahoo</a>
+
+
+  </div>
+
+{% endblock %}
