@@ -17,12 +17,12 @@ var validateToken = function(req, res, next){
   var token = req.body.token || req.params.token || req.headers['x-access-token'];
   if (token) {
     // verifies secret and checks expiration of token
-    jwt.verify(token, config.applicationSecretKey, function(err, decoded) {      
+    jwt.verify(token, config.applicationSecretKey, function(err, decoded) {
       if (err) {
-        return res.json({ success: false, message: 'Failed to authenticate token.' });    
+        return res.json({ success: false, message: 'Failed to authenticate token.' });
       } else {
         // if everything is good, save to request for use in other routes
-        req.decoded = decoded;    
+        req.decoded = decoded;
         next();
       }
     });
@@ -31,107 +31,110 @@ var validateToken = function(req, res, next){
 
     // if there is no token
     // return an error
-    return res.status(403).send({ 
-        success: false, 
-        message: 'No token provided.' 
+    return res.status(403).send({
+        success: false,
+        message: 'No token provided.'
     });
-    
+
   }
+}
+
+var callbackResponse = function(req, res) {
+  if(!req.user){
+    return res.redirect(config.applicationStartpoint + '?failure=Unauthorized');
+  }
+  var queryUserString = encodeURIComponent(JSON.stringify(req.user));
+  return res.redirect(config.applicationEndpoint + '?user=' + queryUserString);
+  //return res.send(req.user);
 }
 
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Node-Passport' });
 });
 router.get('/login', function(req, res, next) {
-  res.send('Go back and register!');
+  res.redirect(config.applicationStartpoint + '?failure=Go back and register!');
+  //res.send('Go back and register!');
 });
 
-router.get('/auth/linkedin', passportLinkedIn.authenticate('linkedin'));
-
+//=================== linkedin =================
 router.get('/auth/linkedin/callback',
   passportLinkedIn.authenticate('linkedin', { failureRedirect: '/login' }),
-  function(req, res) {
-    // Successful authentication
-    res.json(req.user);
-  });
+  callbackResponse);
 
-router.get('/auth/github', passportGithub.authenticate('github', { scope: [ 'user:email' ] }));
+router.get('/auth/linkedin/:token',
+  validateToken,
+  passportLinkedIn.authenticate('linkedin'));
 
+//===================== github =================
 router.get('/auth/github/callback',
   passportGithub.authenticate('github', { failureRedirect: '/login' }),
-  function(req, res) {
-    // Successful authentication
-    res.json(req.user);
-  });
+  callbackResponse);
 
+router.get('/auth/github/:token',
+  validateToken,
+  passportGithub.authenticate('github', { scope: [ 'user:email' ] }));
 
-router.use('/auth/twitter/callback',passportTwitter.authenticate('twitter'),
-  function(req, res) {
-    var queryUserString = encodeURIComponent(JSON.stringify(req.user));
-    res.redirect(config.applicationEndpoint + '?user=' + queryUserString);
-  } );
+//==================== twitter =================
+router.use('/auth/twitter/callback',
+  passportTwitter.authenticate('twitter', { failureRedirect: '/login' }),
+  callbackResponse);
 
-router.get('/auth/twitter/:token', 
+router.get('/auth/twitter/:token',
+  validateToken,
   passportTwitter.authenticate('twitter'));
 
-
-router.get('/auth/facebook', passportFacebook.authenticate('facebook'));
-
+//==================== facebook ================
 router.get('/auth/facebook/callback',
   passportFacebook.authenticate('facebook', { failureRedirect: '/login' }),
-  function(req, res) {
-    // Successful authentication
-    res.json(req.user);
-  });
-  
-router.get('/auth/tumblr', passportTumblr.authenticate('tumblr'));
+  callbackResponse);
 
+router.get('/auth/facebook/:token',
+  validateToken,
+  passportFacebook.authenticate('facebook', { scope: [ 'email' ] }));
+
+//===================== tumblr =================
 router.get('/auth/tumblr/callback',
   passportTumblr.authenticate('tumblr', { failureRedirect: '/login' }),
-  function(req, res) {
-    // Successful authentication
-    res.json(req.user);
-  });
-  
-  
-router.get('/auth/yahoo', passportYahoo.authenticate('yahoo'));
+  callbackResponse);
 
+router.get('/auth/tumblr/:token',
+  validateToken,
+  passportTumblr.authenticate('tumblr'));
+
+//===================== google =================
 router.get('/auth/yahoo/callback',
   passportYahoo.authenticate('yahoo', { failureRedirect: '/login' }),
-  function(req, res) {
-    // Successful authentication
-    res.json(req.user);
-  });
-  
-router.get('/auth/google/', passportGoogle.authenticate('google',{ scope: 'https://www.google.com/m8/feeds' }));
+  callbackResponse);
 
+router.get('/auth/yahoo/:token',
+  validateToken,
+  passportYahoo.authenticate('yahoo'));
+
+//===================== google =================
 router.get('/auth/google/callback',
   passportGoogle.authenticate('google', { failureRedirect: '/login' }),
-  function(req, res) {
-    // Successful authentication
-    res.json(req.user);
-  });
-  
- router.get('/auth/windowslive', passportWindowsLive.authenticate('windowslive'));
+  callbackResponse);
 
+router.get('/auth/google/:token',
+  validateToken,
+  passportGoogle.authenticate('google', { scope : ['profile', 'email'] }));
+
+//================== windowslive ===============
 router.get('/auth/windowslive/callback',
-  passportWindowsLive.authenticate('windowslive'),
-  function(req, res) {
-    // Successful authentication
-    res.json(req.user);
-  });
-  
-  
-  router.get('/auth/dropbox', passportDropbox.authenticate('dropbox'));
+  passportWindowsLive.authenticate('windowslive', { failureRedirect: '/login' }),
+  callbackResponse);
 
+router.get('/auth/windowslive/:token',
+  validateToken,
+  passportWindowsLive.authenticate('windowslive'));
+
+//================== dropbox ==================
 router.get('/auth/dropbox/callback',
-  passportGoogle.authenticate('dropbox'),
-  function(req, res) {
-    // Successful authentication
-    res.json(req.user);
-  });
-  
-  
-  
+  passportGoogle.authenticate('dropbox', { failureRedirect: '/login' }),
+  callbackResponse);
+
+router.get('/auth/dropbox/:token',
+  validateToken,
+  passportDropbox.authenticate('dropbox'));
 
 module.exports = router;

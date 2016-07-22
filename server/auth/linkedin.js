@@ -1,22 +1,29 @@
 var passport = require('passport');
 var LinkedInStrategy = require('passport-linkedin');
-
+var consumerDetailsRequester = require('./consumerDetailsRequester');
 var config = require('../_config');
-var init = require('./init');
 
-passport.use(new LinkedInStrategy({
-    consumerKey: config.linkedin.clientID,
-    consumerSecret: config.linkedin.clientSecret,
-    callbackURL: config.linkedin.callbackURL
-  },
-  function(token, tokenSecret, profile, done) {
-    return done(null, profile);
-  }
+consumerDetailsRequester.credentialsRequester('linkedin', function(err, data){
+	passport.use(new LinkedInStrategy({
+	    consumerKey: data.consumerKey,
+	    consumerSecret: data.consumerSecret,
+	    callbackURL: data.callbackURL
+	  },
+	  function(token, tokenSecret, profile, done) {
+			var userProfile = {
+	      id: profile.id,
+	      name: profile.displayName,
+	      username: profile.username || profile.id,
+	      email: profile.email,
+	      givenName: profile.name.givenName,
+	      familyName: profile.name.familyName,
+	      provider: profile.provider,
+	      accessToken: token
+	    }
+	    return done(null, userProfile);
+	  }
 
-));
-
-// serialize user into the session
-init();
-
+	));
+});
 
 module.exports = passport;
