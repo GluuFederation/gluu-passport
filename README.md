@@ -111,6 +111,9 @@ Here provider is a string value representing an sso example: twitter, gplus, fac
 
 | Example request        |
 | ------------- |
-| { 
-    "provider": "twitter"
-}       |
+| { "provider": "twitter"}       |
+
+#Response
+| Status        | Response           |
+| ------------- |:-------------:|
+| 200      | { "consumerKey" : "consumerKey", "consumerSecret": "consumerSecret", "callbackURL": "CallbackURL" } |
