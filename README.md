@@ -99,7 +99,18 @@ Requirements for Node-Passport server is just Node js and project dependencies w
 This API returns application ID,Secret and return URL (callback URL) of a sso provider.
 
 #Request
-| Method        | Are           |
+| Method        | URL           |
 | ------------- |:-------------:|
 | POST      | /apiURL |
 
+| Type        | Params           | Param type           |
+| ------------- |:-------------:| ------------- |
+| POST      | provider | string |
+
+Here provider is a string value representing an sso example: twitter, gplus, facebook.
+
+| Example request        |
+| ------------- |
+| { 
+    "provider": "twitter"
+}       |
