@@ -92,9 +92,9 @@ For configuring the application secret and application Id we can create a UI to 
 Requirements for Node-Passport server is just Node js and project dependencies which can be installed by moving to project directory and executing command (npm install).
 
 
-##Gluu APIs For Configuration of Node-Passport Server
+#Gluu APIs For Configuration of Node-Passport Server
 
-#Client application credentials
+##Client application credentials
 
 This API returns application ID,Secret and return URL (callback URL) of a sso provider.
 
