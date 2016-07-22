@@ -41,7 +41,7 @@ app.use(function (req, res, next) {
     res.header("Access-Control-Expose-Headers", "Authorization");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
     res.header("Access-Control-Request-Methods", "POST, GET, PUT, DELETE, OPTIONS");
-    
+
     next();
 });
 
@@ -59,6 +59,13 @@ app.use(session({
 
 app.use(passport.initialize());
 app.use(passport.session());
+passport.serializeUser(function(user, done) {
+  done(null, user);
+});
+
+passport.deserializeUser(function(user, done) {
+  done(null, user);
+});
 
 app.get('/token', function(req, res){
   var token = jwt.sign({"name":"Gluuserver"}, config.applicationSecretKey, { expiresIn: 1440 });

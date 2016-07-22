@@ -44,9 +44,10 @@ var ids = {
     consumerSecret: 'tBGcbOwQOyl4vOcUSiSIK1NKXRoerrnCp5Jhs77rUB23w73ZDe',
     callbackURL: "https://192.168.200.67:8000/auth/dropbox/callback"
   },
-  serverURI: "192.168.200.67",
+  serverURI: "gluu.local.org",
   serverWebPort: 8000,
-  applicationEndpoint: "https://gluu.local.org/oxauth/auth/twitter/twitterpostlogin.htm",
+  applicationEndpoint: "https://gluu.local.org/oxauth/auth/generic/genericpostlogin.htm",
+  applicationStartpoint: "https://gluu.local.org/oxauth/auth/generic/genericlogin.htm",
   applicationSecretKey: "GluuNodeServerSocialLogin1234567890"
 };
 
