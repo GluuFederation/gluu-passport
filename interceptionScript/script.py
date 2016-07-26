@@ -29,7 +29,7 @@ class PersonAuthentication(PersonAuthenticationType):
     def logwrite(self, msg):
         try:
             localtime = time.asctime( time.localtime(time.time()) )
-            target = open("/etc/log/tweet.log", 'a+')
+            target = open("/etc/log/generic.log", 'a+')
             target.write(localtime+" : "+str(msg)+"\n")
             target.close()
         except Exception,err:
