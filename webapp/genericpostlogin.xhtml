@@ -53,9 +53,7 @@
             var user = window.location.href.split("=");
             history.replaceState({}, 'oxAuth-Login', '/oxauth/auth/generic/generic-post-login');
             var userQueryString = decodeURIComponent(user[1]);
-            debugger;
             var userObj = JSON.parse(userQueryString.substring(0,userQueryString.indexOf('}')+1));
-            debugger; 
             document.getElementById('loginForm')["loginForm:userid"].value = userObj.id;
             document.getElementById('loginForm')["loginForm:displayname"].value = userObj.name;
             document.getElementById('loginForm')["loginForm:username2"].value = userObj.username;
@@ -63,14 +61,12 @@
             document.getElementById('loginForm')["loginForm:provider"].value = userObj.provider;
             document.getElementById('loginForm')["loginForm:givenname"].value = userObj.givenname;
             document.getElementById('loginForm')["loginForm:familyname"].value = userObj.familyname;
-            debugger;
             if(userObj.email){
                 document.getElementById('loginForm')["loginForm:email"].value = userObj.email;
                 document.getElementById('loginForm')["loginForm:postForm"].click();
             }
             jQuery(":input:submit[id='loginForm:loginButton']").click(function(){
                 if(document.getElementById('loginForm')["loginForm:email"].value != ""){
-                    debugger;
                     document.getElementById('loginForm')["loginForm:postForm"].click();
                 }
             })
