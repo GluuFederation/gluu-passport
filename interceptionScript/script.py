@@ -18,11 +18,14 @@ except ImportError:
 try:
     import time
 except Exception,err:
-    print(" Error occure while import time pakeage "+str(err))
+    print("Error while importing time module. Error: "+str(err))
 import java
+
 class PersonAuthentication(PersonAuthenticationType):
+
     def __init__(self, currentTimeMillis):
         self.currentTimeMillis = currentTimeMillis
+
     def logwrite(self, msg):
         try:
             localtime = time.asctime( time.localtime(time.time()) )
@@ -31,6 +34,7 @@ class PersonAuthentication(PersonAuthenticationType):
             target.close()
         except Exception,err:
             print("File Handling Error"+err)
+
     def init(self, configurationAttributes):
         print "Basic. Initialization init method call ^&"
         print "Basic. Initialized successfully"
@@ -67,91 +71,116 @@ class PersonAuthentication(PersonAuthenticationType):
         else:
             print("Extension module key not found")
         return True
+
     def destroy(self, configurationAttributes):
         print "Basic. Destroy destroy method call ^&"
         print "Basic. Destroyed successfully"
         return True
+
     def getApiVersion(self):
         return 1
+
     def isValidAuthenticationMethod(self, usageType, configurationAttributes):
         return True
+
     def getAlternativeAuthenticationMethod(self, usageType, configurationAttributes):
         return None
+
     def getUserValueFromAuth(self,remote_attr,requestParameters):
         try:
             val=ServerUtil.getFirstValue(requestParameters, "loginForm:"+remote_attr)
             return val.decode('utf-8')
         except Exception,err:
             print("Exception inside getUserValueFromAuth "+str(err))
+
     def authenticate(self, configurationAttributes, requestParameters, step):
         try:
-            userService = UserService.instance()
-            authenticationService = AuthenticationService.instance()
-            foundUser = userService.getUserByAttribute("oxExternalUid",self.getUserValueFromAuth("provider",requestParameters)+":" + self.getUserValueFromAuth(self.getUidRemoteAttr(),requestParameters))
-
-            if (foundUser == None):
-                newUser = User()
-                for attributesMappingEntry in self.attributesMapping.entrySet():
-                    remoteAttribute = attributesMappingEntry.getKey()
-                    localAttribute = attributesMappingEntry.getValue()
-                    localAttributeValue = self.getUserValueFromAuth(remoteAttribute,requestParameters)
-                    print("Key: "+ localAttribute+ "  |||   value: "+ localAttributeValue)
-                    if ((localAttribute != None) & (localAttributeValue != "undefined")):
-                        newUser.setAttribute(localAttribute,localAttributeValue)
-                    #self.logwrite("inside for remoteAttribute "+remoteAttribute+" localAttribute "+localAttribute+" localAttributeValue: "+localAttributeValue)
-                newUser.setAttribute("oxExternalUid", self.getUserValueFromAuth("provider",requestParameters)+":" +self.getUserValueFromAuth(self.getUidRemoteAttr(),requestParameters))
-                print (self.getUserValueFromAuth("provider",requestParameters)+"Authenticate for step 1. Attempting to add user "+ self.getUserValueFromAuth(self.getUidRemoteAttr(),requestParameters))
-                self.logwrite(self.getUserValueFromAuth(self.getUidRemoteAttr(),requestParameters))
-                try:
-                    foundUser = userService.addUser(newUser, True)
-                    foundUserName = foundUser.getUserId()
-                    self.logwrite("found user name "+foundUserName)
-                    #print("foundusername"+foundUserName)
-                    userAuthenticated = authenticationService.authenticate(foundUserName)
-                except Exception,err:
-                    print(str(err)+"error add user")
-                    self.logwrite(str(err)+"error add user")
-                return True
-            else:
-                foundUserName = foundUser.getUserId()
-                print("User Found "+str(foundUserName))
-                userAuthenticated = authenticationService.authenticate(foundUserName)
-                print(userAuthenticated)
-                return True
-                postLoginResult = self.extensionPostLogin(configurationAttributes, foundUser)
-                print (self.getUserValueFromAuth("provider",requestParameters)+" Authenticate for step 2. postLoginResult: "+postLoginResult)
-                return postLoginResult
-                return True
+            UserEmail=self.getUserValueFromAuth("email",requestParameters)
         except Exception,err:
-            print ("Error occure during request parameter fatching "+str(err))
-        if (step == 1):
-            print "Basic. Authenticate for step 1 method call ^&"
+            self.logwrite("error: "+str(err))
+
+        # Check if user uses basic method to log in
+        useBasicAuth = False
+        if (StringHelper.isEmptyString(UserEmail)):
+            useBasicAuth = True
+
+        # Use basic method to log in
+        if (useBasicAuth):
+            print "Basic Authentication"
             credentials = Identity.instance().getCredentials()
             user_name = credentials.getUsername()
             user_password = credentials.getPassword()
             logged_in = False
+            
             if (StringHelper.isNotEmptyString(user_name) and StringHelper.isNotEmptyString(user_password)):
                 userService = UserService.instance()
                 logged_in = userService.authenticate(user_name, user_password)
+            
             if (not logged_in):
                 return False
             return True
+
+        else:
+            try:
+                userService = UserService.instance()
+                authenticationService = AuthenticationService.instance()
+                foundUser = userService.getUserByAttribute("oxExternalUid",self.getUserValueFromAuth("provider",requestParameters)+":" + self.getUserValueFromAuth(self.getUidRemoteAttr(),requestParameters))
+
+                if (foundUser == None):
+                    newUser = User()
+                    for attributesMappingEntry in self.attributesMapping.entrySet():
+                        remoteAttribute = attributesMappingEntry.getKey()
+                        localAttribute = attributesMappingEntry.getValue()
+                        localAttributeValue = self.getUserValueFromAuth(remoteAttribute,requestParameters)
+                        print("Key: "+ localAttribute+ "  |||   value: "+ localAttributeValue)
+                        if ((localAttribute != None) & (localAttributeValue != "undefined")):
+                            newUser.setAttribute(localAttribute,localAttributeValue)
+                    newUser.setAttribute("oxExternalUid", self.getUserValueFromAuth("provider",requestParameters)+":" +self.getUserValueFromAuth(self.getUidRemoteAttr(),requestParameters))
+                    print (self.getUserValueFromAuth("provider",requestParameters)+"Authenticate for step 1. Attempting to add user "+ self.getUserValueFromAuth(self.getUidRemoteAttr(),requestParameters))
+                    self.logwrite(self.getUserValueFromAuth(self.getUidRemoteAttr(),requestParameters))
+                    
+                    try:
+                        foundUser = userService.addUser(newUser, True)
+                        foundUserName = foundUser.getUserId()
+                        self.logwrite("found user name "+foundUserName)
+                        userAuthenticated = authenticationService.authenticate(foundUserName)
+                    except Exception,err:
+                        print(str(err)+"error add user")
+                        self.logwrite(str(err)+"error add user")
+                    return True
+
+                else:
+                    foundUserName = foundUser.getUserId()
+                    print("User Found "+str(foundUserName))
+                    userAuthenticated = authenticationService.authenticate(foundUserName)
+                    print(userAuthenticated)
+                    return True
+
+            except Exception,err:
+                self.logwrite("Error occure during request parameter fatchi"+str(err))
+                print ("Error occure during request parameter fatching "+str(err))
+        
     def prepareForStep(self, configurationAttributes, requestParameters, step):
         if (step == 1):
             print "Basic. Prepare for Step 1 method call ^&"
             return True
         else:
             return True
+
     def getExtraParametersForStep(self, configurationAttributes, step):
         return None
+
     def getCountAuthenticationSteps(self, configurationAttributes):
         return 1
+
     def getPageForStep(self, configurationAttributes, step):
         if (step == 1):
             return "/auth/generic/genericlogin.xhtml"
         return "/auth/generic/genericpostlogin.xhtml"
+
     def logout(self, configurationAttributes, requestParameters):
         return True
+
     def extensionPostLogin(self, configurationAttributes, user):
         if (self.extensionModule != None):
             try:
@@ -216,3 +245,4 @@ class PersonAuthentication(PersonAuthenticationType):
                 return "Not Get UID related remote attribute"
         except Exception,err:
             print("Exception inside getUidRemoteattr "+str(err))
+
