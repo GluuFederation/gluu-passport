@@ -181,22 +181,6 @@ class PersonAuthentication(PersonAuthenticationType):
     def logout(self, configurationAttributes, requestParameters):
         return True
 
-    def extensionPostLogin(self, configurationAttributes, user):
-        if (self.extensionModule != None):
-            try:
-                postLoginResult = self.extensionModule.postLogin(configurationAttributes, user)
-                print "PostLogin result:", postLoginResult
-                return postLoginResult
-            except Exception, ex:
-                print "PostLogin. Failed to execute postLogin method"
-                print "PostLogin. Unexpected error:", ex
-                return False
-            except java.lang.Throwable, ex:
-                print "PostLogin. Failed to execute postLogin method"
-                ex.printStackTrace()
-                return False
-        return True
-
     def prepareAttributesMapping(self, remoteAttributesList, localAttributesList):
         try:
             remoteAttributesListArray = StringHelper.split(remoteAttributesList, ",")
