@@ -15,10 +15,6 @@ try:
     import json
 except ImportError:
     import simplejson as json
-try:
-    import time
-except Exception,err:
-    print("Error while importing time module. Error: "+str(err))
 import java
 
 class PersonAuthentication(PersonAuthenticationType):
@@ -26,14 +22,6 @@ class PersonAuthentication(PersonAuthenticationType):
     def __init__(self, currentTimeMillis):
         self.currentTimeMillis = currentTimeMillis
 
-    def logwrite(self, msg):
-        try:
-            localtime = time.asctime( time.localtime(time.time()) )
-            target = open("/etc/log/generic.log", 'a+')
-            target.write(localtime+" : "+str(msg)+"\n")
-            target.close()
-        except Exception,err:
-            print("File Handling Error"+err)
 
     def init(self, configurationAttributes):
         print "Basic. Initialization init method call ^&"
@@ -97,9 +85,7 @@ class PersonAuthentication(PersonAuthenticationType):
         try:
             UserEmail=self.getUserValueFromAuth("email",requestParameters)
         except Exception,err:
-            self.logwrite("error: "+str(err))
-
-        # Check if user uses basic method to log in
+            print("Error: "+str(err))
         useBasicAuth = False
         if (StringHelper.isEmptyString(UserEmail)):
             useBasicAuth = True
@@ -137,16 +123,14 @@ class PersonAuthentication(PersonAuthenticationType):
                             newUser.setAttribute(localAttribute,localAttributeValue)
                     newUser.setAttribute("oxExternalUid", self.getUserValueFromAuth("provider",requestParameters)+":" +self.getUserValueFromAuth(self.getUidRemoteAttr(),requestParameters))
                     print (self.getUserValueFromAuth("provider",requestParameters)+"Authenticate for step 1. Attempting to add user "+ self.getUserValueFromAuth(self.getUidRemoteAttr(),requestParameters))
-                    self.logwrite(self.getUserValueFromAuth(self.getUidRemoteAttr(),requestParameters))
                     
                     try:
                         foundUser = userService.addUser(newUser, True)
                         foundUserName = foundUser.getUserId()
-                        self.logwrite("found user name "+foundUserName)
+                        print("found user name "+foundUserName)
                         userAuthenticated = authenticationService.authenticate(foundUserName)
                     except Exception,err:
                         print(str(err)+"error add user")
-                        self.logwrite(str(err)+"error add user")
                     return True
 
                 else:
@@ -157,7 +141,6 @@ class PersonAuthentication(PersonAuthenticationType):
                     return True
 
             except Exception,err:
-                self.logwrite("Error occure during request parameter fatchi"+str(err))
                 print ("Error occure during request parameter fatching "+str(err))
         
     def prepareForStep(self, configurationAttributes, requestParameters, step):
