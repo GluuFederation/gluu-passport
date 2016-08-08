@@ -1,18 +1,20 @@
 var passport = require('passport');
 var DropboxStrategy = require('passport-dropbox').Strategy;
-var consumerDetailsRequester = require('./consumerDetailsRequester');
-var config = require('../_config');
 
-consumerDetailsRequester.credentialsRequester('dropbox', function(err, data){
-	passport.use(new DropboxStrategy({
-	    consumerKey: data.consumerKey,
-	    consumerSecret: data.consumerSecret,
-	    callbackURL: data.callbackURL
-	  },
-	  function(accessToken, refreshToken, profile, done) {
-	    return done(null, profile);
-	  }
-	));
-});
+var setCredentials = function(credentials) {
+    var callbackURL = "https://".concat(global.hostname, ":", global.serverPort, "/auth/dropbox/callback");
+    passport.use(new DropboxStrategy({
+            consumerKey: credentials.consumerKey,
+            consumerSecret: credentials.consumerSecret,
+            callbackURL: callbackURL
+        },
+        function(accessToken, refreshToken, profile, done) {
+            return done(null, profile);
+        }
+    ));
+};
 
-module.exports = passport;
+module.exports = {
+    passport: passport,
+    setCredentials: setCredentials
+}

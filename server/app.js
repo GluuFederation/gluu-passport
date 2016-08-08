@@ -11,6 +11,7 @@ var session = require('express-session');
 var expressJwt = require('express-jwt');
 var jwt = require('jsonwebtoken');
 var fs = require('fs');
+var configureStrategies = require('./auth/configureStrategies');
 var config = require('./_config');
 
 //var RedisStore = require('connect-redis')(express.session);
@@ -36,7 +37,7 @@ app.set('view engine', 'html');
 app.set('views', path.join(__dirname, 'views'));
 
 //Allow cross origin
-app.use(function (req, res, next) {
+app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Expose-Headers", "Authorization");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
@@ -48,30 +49,39 @@ app.use(function (req, res, next) {
 // *** config middleware *** //
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({
+    extended: false
+}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, '../client/public')));
 app.use(session({
-  secret: 'keyboard cat',
-  key: 'sid',
-  cookie: { secure: false }
+    secret: 'keyboard cat',
+    key: 'sid',
+    cookie: {
+        secure: false
+    }
 }));
 
 app.use(passport.initialize());
 app.use(passport.session());
 passport.serializeUser(function(user, done) {
-  done(null, user);
+    done(null, user);
 });
 
 passport.deserializeUser(function(user, done) {
-  done(null, user);
+    done(null, user);
 });
 
-app.get('/token', function(req, res){
-  var token = jwt.sign({"name":"Gluuserver"}, config.applicationSecretKey, { expiresIn: 1440 });
-  res.send(200, { "token_": token });
-  console.log("request token genreted");
-  return;
+app.get('/token', function(req, res) {
+    var token = jwt.sign({
+        "name": "Gluuserver"
+    }, config.applicationSecretKey, {
+        expiresIn: 1440
+    });
+    res.send(200, {
+        "token_": token
+    });
+    return;
 });
 
 // *** main routes *** //
@@ -80,9 +90,9 @@ app.use('/', routes);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
+    var err = new Error('Not Found');
+    err.status = 404;
+    next(err);
 });
 
 
@@ -91,31 +101,29 @@ app.use(function(req, res, next) {
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {
-  app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('error', {
-      message: err.message,
-      error: err
-    });
-  });
-}
+    app.use(function(err, req, res, next) {
+        res.redirect('/login');
+    })
+};
 
 // production error handler
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
-  res.status(err.status || 500);
-  res.render('error', {
-    message: err.message,
-    error: {}
-  });
+    res.redirect('/login');
 });
 
 
 var options = {
-  key: fs.readFileSync('server.key'),
-  cert: fs.readFileSync('server.crt')
+    key: fs.readFileSync('server.key'),
+    cert: fs.readFileSync('server.crt')
 };
 
-server.createServer(options,app).listen(config.serverWebPort, config.serverURI , function(){
-  console.log("Server listning on https://"+config.serverURI+":"+config.serverWebPort);
+process.on('uncaughtException', function(err) {
+    console.error(err);
+});
+
+var listner = server.createServer(options, app).listen(config.serverWebPort, config.serverURI, configureStrategies.setConfiguratins(),function() {
+    global.serverAddress = listner.address().address;
+    global.serverPort = listner.address().port;
+    console.log("Server listning on https://" + listner.address().address + ":" + listner.address().port);
 });
