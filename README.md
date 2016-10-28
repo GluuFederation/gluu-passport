@@ -14,6 +14,10 @@ Clone the repository and move to server directory and hit:
 
 ```npm install```
 
+This will install all the dependencies of the server and then to start server move to server directory and hit
+
+```node app```
+
 
 ## GOALS
 
