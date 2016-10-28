@@ -4,6 +4,16 @@
 
 Node-Passport Auth is a project for authenticating all the social media providers from only one server which will be used by Gluu server for authenticating users to all social networks.
 
+## INSTALLATION
+
+Node-Passport server requires npm and nodejs to be installed on the system.
+
+For installing node and npm please refer [this link](https://nodejs.org/en/download/package-manager/).
+
+Clone the repository and move to server directory and hit:
+
+```npm install```
+
 
 ## GOALS
 
