@@ -2,10 +2,10 @@ var passport = require('passport');
 var GoogleStrategy = require('kroknet-passport-google-oauth').Strategy;
 
 var setCredentials = function(credentials) {
-    var callbackURL = "https://".concat(global.hostname, ":", global.serverPort, "/auth/google/callback");
+    var callbackURL = "https://".concat(global.serverAddress, ":", global.serverPort, "/auth/google/callback");
     passport.use(new GoogleStrategy({
-            clientID: credentials.consumerKey,
-            clientSecret: credentials.consumerSecret,
+            clientID: credentials.clientID,
+            clientSecret: credentials.clientSecret,
             callbackURL: callbackURL
         },
         function(accessToken, refreshToken, profile, done) {

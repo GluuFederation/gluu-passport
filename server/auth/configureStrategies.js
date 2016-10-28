@@ -8,65 +8,50 @@ var TumblrStrategy = require('./tumblr');
 var TwitterStrategy = require('./twitter');
 var YahooStrategy = require('./yahoo');
 
-var options = {
-    host: '192.168.200.67',
-    port: 7777,
-    path: '/authCreds',
-    method: 'GET',
-    headers: {
-        'Content-Type': 'application/json'
-    }
-};
-
-exports.setConfiguratins = function(){
-    getConsumerDetails.getJSON(options, function(err, data) {
-        if (!err) {
-            if (data.hostname) {
-                global.hostname = data.hostname;
-            }
-            if (data.applicationEndpoint) {
-                global.applicationEndpoint = data.applicationEndpoint;
-            }
-            if (data.applicationStartpoint) {
-                global.applicationStartpoint = data.applicationStartpoint;
-            }
-
-            //FacebookStrategy
-            if (data.facebook) {
-                FacebookStrategy.setCredentials(data.facebook);
-            }
-            //GitHubStrategy
-            if (data.github) {
-                GitHubStrategy.setCredentials(data.github);
-            }
-
-            //GoogleStrategy
-            if (data.google) {
-                GoogleStrategy.setCredentials(data.google);
-            }
-
-            //LinkedinStrategy
-            if (data.linkedin) {
-                LinkedinStrategy.setCredentials(data.linkedin);
-            }
-
-            //TumblrStrategy
-            if (data.tumblr) {
-                TumblrStrategy.setCredentials(data.tumblr);
-            }
-
-            //TwitterStrategy
-            if (data.twitter) {
-                TwitterStrategy.setCredentials(data.twitter);
-            }
-
-            //YahooStrategy
-            if (data.yahoo) {
-                YahooStrategy.setCredentials(data.yahoo);
-            }
-
-        } else {
-            console.log("Error in getting data, error: ", err);
+exports.setConfiguratins = function(data){
+    if (data) {
+        if (data.applicationEndpoint) {
+            global.applicationEndpoint = data.applicationEndpoint;
         }
-    });
+        if (data.applicationStartpoint) {
+            global.applicationStartpoint = data.applicationStartpoint;
+        }
+
+        //FacebookStrategy
+        if (data.passportStrategies.facebook) {
+            FacebookStrategy.setCredentials(data.passportStrategies.facebook);
+        }
+        //GitHubStrategy
+        if (data.passportStrategies.github) {
+            GitHubStrategy.setCredentials(data.passportStrategies.github);
+        }
+
+        //GoogleStrategy
+        if (data.passportStrategies.google) {
+            GoogleStrategy.setCredentials(data.passportStrategies.google);
+        }
+
+        //LinkedinStrategy
+        if (data.passportStrategies.linkedin) {
+            LinkedinStrategy.setCredentials(data.passportStrategies.linkedin);
+        }
+
+        //TumblrStrategy
+        if (data.passportStrategies.tumblr) {
+            TumblrStrategy.setCredentials(data.passportStrategies.tumblr);
+        }
+
+        //TwitterStrategy
+        if (data.passportStrategies.twitter) {
+            TwitterStrategy.setCredentials(data.passportStrategies.twitter);
+        }
+
+        //YahooStrategy
+        if (data.passportStrategies.yahoo) {
+            YahooStrategy.setCredentials(data.passportStrategies.yahoo);
+        }
+
+    } else {
+        console.log("Error in getting data, error: ", err);
+    }
 }

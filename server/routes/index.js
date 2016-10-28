@@ -27,6 +27,7 @@ var validateToken = function(req, res, next) {
             } else {
                 // if everything is good, save to request for use in other routes
                 req.decoded = decoded;
+                global.applicationStartpoint = req.headers.host;
                 next();
             }
         });

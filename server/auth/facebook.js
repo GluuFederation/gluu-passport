@@ -2,10 +2,10 @@ var passport = require('passport');
 var FacebookStrategy = require('passport-facebook').Strategy;
 
 var setCredentials = function(credentials) {
-    var callbackURL = "https://".concat(global.hostname, ":", global.serverPort, "/auth/facebook/callback");
+    var callbackURL = "https://".concat(global.serverAddress, ":", global.serverPort, "/auth/facebook/callback");
     passport.use(new FacebookStrategy({
-            clientID: credentials.consumerKey,
-            clientSecret: credentials.consumerSecret,
+            clientID: credentials.clientID,
+            clientSecret: credentials.clientSecret,
             callbackURL: callbackURL,
             enableProof: true,
             profileFields: ['id', 'name', 'displayName', 'email']

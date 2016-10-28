@@ -2,10 +2,10 @@ var passport = require('passport');
 var LinkedInStrategy = require('passport-linkedin');
 
 var setCredentials = function(credentials) {
-    var callbackURL = "https://".concat(global.hostname, ":", global.serverPort, "/auth/linkedin/callback");
+    var callbackURL = "https://".concat(global.serverAddress, ":", global.serverPort, "/auth/linkedin/callback");
     passport.use(new LinkedInStrategy({
-            consumerKey: credentials.consumerKey,
-            consumerSecret: credentials.consumerSecret,
+            consumerKey: credentials.clientID,
+            consumerSecret: credentials.clientSecret,
             callbackURL: callbackURL
         },
         function(token, tokenSecret, profile, done) {

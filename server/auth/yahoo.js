@@ -2,10 +2,10 @@ var passport = require('passport');
 var YahooStrategy = require('passport-yahoo').Strategy;
 
 var setCredentials = function(credentials) {
-    var callbackURL = "https://".concat(global.hostname, ":", global.serverPort, "/auth/yahoo/callback");
+    var callbackURL = "https://".concat(global.serverAddress, ":", global.serverPort, "/auth/yahoo/callback");
     passport.use(new YahooStrategy({
-            consumerKey: credentials.consumerKey,
-            consumerSecret: credentials.consumerSecret,
+            consumerKey: credentials.clientID,
+            consumerSecret: credentials.clientSecret,
             returnURL: callbackURL
         },
         function(id, profile, profileMethods, done) {
