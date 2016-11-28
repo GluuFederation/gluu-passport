@@ -5,6 +5,7 @@ var fs = require('fs'),
 if (!fs.existsSync(dir)){
     fs.mkdirSync(dir);
 }
+
 winston.emitErrs = true;
 
 var logger = new winston.Logger({
