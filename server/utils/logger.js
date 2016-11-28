@@ -31,6 +31,6 @@ var logger = new winston.Logger({
 module.exports = logger;
 module.exports.stream = {
     write: function(message, encoding){
-        logger.info(message);
+        logger.info(message.slice(0, -1));
     }
 };
