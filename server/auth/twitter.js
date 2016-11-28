@@ -2,7 +2,7 @@ var passport = require('passport');
 var TwitterStrategy = require('passport-twitter').Strategy;
 
 var setCredentials = function(credentials) {
-    var callbackURL = "https://".concat(global.serverAddress, ":", global.serverPort, "/auth/twitter/callback");
+    var callbackURL = global.applicationHost.concat("/auth/twitter/callback");
     passport.use(new TwitterStrategy({
             consumerKey: credentials.clientID,
             consumerSecret: credentials.clientSecret,
@@ -19,7 +19,7 @@ var setCredentials = function(credentials) {
                 familyName: profile.last_name || "",
                 provider: profile.provider,
                 accessToken: accessToken
-            }
+            };
             return done(null, userProfile);
         }
     ));
@@ -28,4 +28,4 @@ var setCredentials = function(credentials) {
 module.exports = {
     passport: passport,
     setCredentials: setCredentials
-}
+};

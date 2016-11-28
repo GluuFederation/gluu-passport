@@ -1,53 +1,101 @@
-var http = require("http");
 var request = require("request");
+var fs = require('fs');
+var uuid = require('uuid');
+var jwt = require('jsonwebtoken');
 var configureStrategies = require("./configureStrategies");
-function getJSON(rpt, onResult) {
+var logger = require("../utils/logger");
+
+var UMAConfigURL = 'https://' + global.config.serverURI + '/.well-known/uma-configuration';
+
+exports.getTokenEndpoint = function (callback) {
     var options = {
-        method: 'POST',
-        url: 'https://ce-dev.gluu.org/identity/seam/resource/restv1/passportconfig/',
-        headers: {
-            'content-type': 'application/x-www-form-urlencoded'
-        },
-        form: {
-            access_token: rpt
-        }
+        method: 'GET',
+        url: UMAConfigURL
     };
+
     request(options, function (error, response, body) {
+
         if (error) {
-            return onResult(error, null);
-        }
-
-        configureStrategies.setConfiguratins(JSON.parse(body));
-        return onResult(null, body);
-
-    });
-}
-
-exports.getATT = function (callback) {
-
-    var username = "@!5A58.AE0D.D383.1E46!0001!E38B.7DBE!0008!BB95.73E1";
-    var password = "passport";
-    var toEncode = username.concat(":",password);
-    var basicToken = new Buffer(toEncode).toString('base64');
-    var options = {
-        method: 'POST',
-        url: 'https://ce-dev.gluu.org/oxauth/seam/resource/restv1/oxauth/token',
-        headers: {
-            'content-type': 'application/x-www-form-urlencoded',
-            authorization: 'Basic'.concat(" ", basicToken)
-        },
-        form: {
-            grant_type: 'client_credentials',
-            scope: 'uma_authorization'
-        }
-    };
-    request(options, function (error, response, body) {
-        if (error) {
+            logger.log('error', "Error in requesting uma configurations");
             return callback(error, null);
         }
-        var ATTDetails = JSON.parse(body);
-        getGAT(ATTDetails, function (err, data) {
-            if(err){
+
+        try{
+            body = JSON.parse(body);
+        } catch (ex){
+            logger.log('error', "Error in parsing JSON in getTokenEndpoint: ", JSON.stringify(ex));
+            return callback(ex, null);
+        }
+
+        global.UMAConfig = body;
+        getATT(global.UMAConfig.token_endpoint, function (err, data) {
+            if (err) {
+                return callback(err, null);
+            }
+            return callback(null, data);
+        });
+    });
+};
+
+function getATT(token_endpoint, callback) {
+
+    var passportCert = fs.readFileSync(global.config.keyPath, 'utf8'); // get private key and replace headers to sign jwt
+    passportCert = passportCert.replace("-----BEGIN RSA PRIVATE KEY-----", "-----BEGIN PRIVATE KEY-----");
+    passportCert = passportCert.replace("-----END RSA PRIVATE KEY-----", "-----END PRIVATE KEY-----");
+
+    var clientId = global.config.clientId;
+    var options = {
+        algorithm: global.config.keyAlg,
+        header: {
+            "typ": "JWT",
+            "alg": global.config.keyAlg,
+            "kid": global.config.keyId
+        }
+    };
+    var token = jwt.sign({
+        iss: clientId,
+        sub: clientId,
+        aud: token_endpoint,
+        jti: uuid(),
+        exp: (new Date().getTime()/1000 + 30),
+        iat: (new Date().getTime())
+    }, passportCert, options);
+
+    var optionsForRequest = {
+        method: 'POST',
+        url: token_endpoint,
+        headers: { 'content-type': 'application/x-www-form-urlencoded' },
+        //json: true,
+        form: {
+            grant_type: 'client_credentials',
+            scope: 'uma_authorization',
+            client_assertion_type: 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
+            client_assertion: token,
+            client_id: clientId
+        }
+    };
+
+    request(optionsForRequest, function (error, response, body) {
+
+        if (error) {
+            logger.log('error', "Error in requesting ATT");
+            return callback(error, null);
+        }
+
+        try{
+            body = JSON.parse(body);
+        } catch (ex){
+            logger.log('error', "Error in parsing JSON in getATT: ", JSON.stringify(ex));
+            return callback(ex, null);
+        }
+
+        if (body.error) {
+            logger.log('error', "Error in response from ATT: ", JSON.stringify(body.error));
+            return callback(body.error, null);
+        }
+
+        getGAT(body, function (err, data) {
+            if (err) {
                 return callback(err, null);
             }
             return callback(null, data);
@@ -60,28 +108,75 @@ function getGAT(ATTDetails, callback) {
     var accessToken = ATTDetails.access_token;
     var options = {
         method: 'POST',
-        url: 'https://ce-dev.gluu.org/oxauth/seam/resource/restv1/requester/gat',
-        headers:
-        {
+        url: global.UMAConfig.gat_endpoint,
+        headers: {
             'content-type': 'application/json',
             gat: 'true',
             authorization: 'Bearer '.concat(accessToken)
         },
         body: {
-            scopes: [ 'uma_authorization' ]
-        },
-        json: true
+            scopes: ['uma_authorization']
+        }
     };
     request(options, function (error, response, body) {
+
         if (error) {
+            logger.log('error', "Error in requesting GAT");
             return callback(error, null);
         }
+
+        try{
+            body = JSON.parse(body);
+        } catch (ex){
+            logger.log('error', "Error in parsing JSON in getGAT: ", JSON.stringify(ex));
+            return callback(ex, null);
+        }
+
         var rpt = body.rpt;
         getJSON(rpt, function (err, data) {
-            if(err){
+            if (err) {
                 return callback(err, null);
             }
             return callback(null, data);
         });
+    });
+}
+
+function getJSON(rpt, onResult) {
+
+    var options = {
+        method: 'POST',
+        //url: global.config.passportConfigAPI,
+        url: 'https://ce-dev.gluu.org/identity/seam/resource/restv1/passportconfig',
+        json: true,
+        headers: {
+            'content-type': 'application/x-www-form-urlencoded'
+        },
+        form: {
+            access_token: rpt
+        }
+    };
+    request(options, function (error, response, body) {
+
+        if (error) {
+            logger.log('error', "Error in requesting getJSON");
+            return callback(error, null);
+        }
+
+        try{
+            body = JSON.parse(body);
+        } catch (ex){
+            logger.log('error', "Error in parsing JSON in getJSON: ", JSON.stringify(ex));
+            return callback(ex, null);
+        }
+
+        if (body.error) {
+            logger.log('error', "Error in response from getJSON: ", JSON.stringify(body.error));
+            return callback(body.error, null);
+        }
+
+        configureStrategies.setConfiguratins(body);
+        return onResult(null, body);
+
     });
 }

@@ -12,13 +12,12 @@ var passportGoogle = require('../auth/google').passport;
 var passportWindowsLive = require('../auth/windowslive').passport;
 var passportDropbox = require('../auth/dropbox').passport;
 
-var config = require('../_config');
-
 var validateToken = function(req, res, next) {
-    var token = req.body.token || req.params.token || req.headers['x-access-token'];
+
+    var token = req.body && req.body.token || req.params && req.params.token || req.headers['x-access-token'];
     if (token) {
         // verifies secret and checks expiration of token
-        jwt.verify(token, config.applicationSecretKey, function(err, decoded) {
+        jwt.verify(token, global.applicationSecretKey, function(err, decoded) {
             if (err) {
                 return res.json({
                     success: false,
@@ -27,41 +26,34 @@ var validateToken = function(req, res, next) {
             } else {
                 // if everything is good, save to request for use in other routes
                 req.decoded = decoded;
-                global.applicationStartpoint = req.headers.host;
-                next();
+                return next();
             }
         });
 
     } else {
 
         // if there is no token
-        // return an error
-        // return res.status(403).send({
-        //     success: false,
-        //     message: 'No token provided.'
-        // });
-        return res.redirect(global.applicationStartpoint + '?failure=No token provided');
-
+        // returning an error
+        return res.redirect(global.config.applicationStartpoint + '?failure=No token provided');
     }
-}
+};
 
 var callbackResponse = function(req, res) {
     if (!req.user) {
-        return res.redirect(global.applicationStartpoint + '?failure=Unauthorized');
+        return res.redirect(global.config.applicationStartpoint + '?failure=Unauthorized');
     }
     var queryUserString = encodeURIComponent(JSON.stringify(req.user));
-    return res.redirect(global.applicationEndpoint + '?user=' + queryUserString);
-    //return res.send(req.user);
-}
+    return res.redirect(global.config.applicationEndpoint + '?user=' + queryUserString);
+};
 
 router.get('/', function(req, res, next) {
     res.render('index', {
         title: 'Node-Passport'
     });
 });
+
 router.get('/login', function(req, res, next) {
-    res.redirect(global.applicationStartpoint + '?failure=Go back and register!');
-    //res.send('Go back and register!');
+    res.redirect(global.config.applicationStartpoint + '?failure=Go back and register!');
 });
 
 //=================== linkedin =================
@@ -168,5 +160,12 @@ router.get('/auth/dropbox/callback',
 router.get('/auth/dropbox/:token',
     validateToken,
     passportDropbox.authenticate('dropbox'));
+
+//======== catch 404 and forward to login ========
+router.all('/*', function(req, res, next) {
+    var err = new Error('Not Found');
+    err.status = 404;
+    res.redirect('/login');
+});
 
 module.exports = router;

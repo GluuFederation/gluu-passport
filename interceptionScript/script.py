@@ -141,7 +141,7 @@ class PersonAuthentication(PersonAuthenticationType):
                     return True
 
             except Exception,err:
-                print ("Error occure during request parameter fatching "+str(err))
+                print ("Error occurred during request parameter fetching "+str(err))
         
     def prepareForStep(self, configurationAttributes, requestParameters, step):
         if (step == 1):
@@ -211,5 +211,4 @@ class PersonAuthentication(PersonAuthenticationType):
             else:
                 return "Not Get UID related remote attribute"
         except Exception,err:
-            print("Exception inside getUidRemoteattr "+str(err))
-
+            print("Exception inside getUidRemoteAttr "+str(err))

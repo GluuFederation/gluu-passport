@@ -2,7 +2,7 @@ var passport = require('passport');
 var FacebookStrategy = require('passport-facebook').Strategy;
 
 var setCredentials = function(credentials) {
-    var callbackURL = "https://".concat(global.serverAddress, ":", global.serverPort, "/auth/facebook/callback");
+    var callbackURL = global.applicationHost.concat("/auth/facebook/callback");
     passport.use(new FacebookStrategy({
             clientID: credentials.clientID,
             clientSecret: credentials.clientSecret,
@@ -20,7 +20,7 @@ var setCredentials = function(credentials) {
                 familyName: profile._json.last_name,
                 provider: profile.provider,
                 accessToken: accessToken
-            }
+            };
             return done(null, userProfile);
         }
     ));
@@ -29,4 +29,4 @@ var setCredentials = function(credentials) {
 module.exports = {
     passport: passport,
     setCredentials: setCredentials
-}
+};

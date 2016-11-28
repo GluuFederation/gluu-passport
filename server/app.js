@@ -2,30 +2,26 @@
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
-var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var swig = require('swig');
 var passport = require('passport');
 var session = require('express-session');
-var expressJwt = require('express-jwt');
 var jwt = require('jsonwebtoken');
 var fs = require('fs');
+var uuid = require('uuid');
+
+global.config = require('./oxpassport-config.json');
 var getConsumerDetails = require('./auth/getConsumerDetails');
-var config = require('./_config');
-var os = require("os");
+var logger = require("./utils/logger");
 
-//var RedisStore = require('connect-redis')(express.session);
-//var REDIS_URL = process.env.REDISCLOUD_URL || "redis://localhost";
-// *** routes *** //
-var routes = require('./routes/index.js');
-
-var sess;
+global.applicationHost = "https://" + global.config.serverURI + ":" + global.config.serverWebPort;
+global.applicationSecretKey = uuid();
 
 // *** express instance *** //
 var app = express();
 
-var server = require('https');
+var server = require('http');
 
 
 // *** view engine *** //
@@ -48,23 +44,21 @@ app.use(function(req, res, next) {
 });
 
 // *** config middleware *** //
-app.use(logger('dev'));
+app.use(require('morgan')({ "stream": logger.stream }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: false
 }));
+
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, '../client/public')));
 app.use(session({
-    secret: 'keyboard cat',
-    key: 'sid',
-    cookie: {
-        secure: false
-    }
+    secret: uuid(),
+    key: uuid()
 }));
 
 app.use(passport.initialize());
 app.use(passport.session());
+
 passport.serializeUser(function(user, done) {
     done(null, user);
 });
@@ -75,8 +69,8 @@ passport.deserializeUser(function(user, done) {
 
 app.get('/token', function(req, res) {
     var token = jwt.sign({
-        "name": "Gluuserver"
-    }, config.applicationSecretKey, {
+        "jwt": uuid()
+    }, global.applicationSecretKey, {
         expiresIn: 1440
     });
     return res.send(200, {
@@ -85,50 +79,23 @@ app.get('/token', function(req, res) {
 });
 
 // *** main routes *** //
-app.use('/', routes);
-
-
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-    var err = new Error('Not Found');
-    err.status = 404;
-    next(err);
-});
-
+app.use('/', require('./routes/index.js'));
 
 // *** error handlers *** //
+process.on('uncaughtException', function(err) {
+    logger.log('error', 'Uncaught Exception: ' + JSON.stringify(err));
+});
 
-// development error handler
-// will print stacktrace
-if (app.get('env') === 'development') {
-    app.use(function(err, req, res, next) {
-        console.log("Err: ", err);
-        //res.redirect('/login');
-    })
+if ('development' == app.get('env')) {
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 }
 
-// production error handler
-// no stacktraces leaked to user
-app.use(function(err, req, res, next) {
-    res.redirect('/login');
-});
-
-
-var options = {
-    key: fs.readFileSync('server.key'),
-    cert: fs.readFileSync('server.crt')
-};
-
-process.on('uncaughtException', function(err) {
-    console.error(err);
-});
-
-global.serverAddress = os.hostname();
-global.serverAddress = config.serverURI;
-global.serverPort = config.serverWebPort;
-
-var listener = server.createServer(options, app).listen(config.serverWebPort, config.serverURI, /*configureStrategies.setConfiguratins()*/ getConsumerDetails.getATT(function(err, data) {
-    global.serverAddress = listener.address().address;
-    global.serverPort = listener.address().port;
-    console.log("Server listning on https://" + listener.address().address + ":" + listener.address().port);
+var listener = server.createServer(app).listen(global.config.serverWebPort, global.config.serverURI, getConsumerDetails.getTokenEndpoint(function(err, data) {
+    if(err){
+        listener.close(function () {
+            logger.log('error', "Error in starting the server. error:- ", err);
+        });
+    } else {
+        logger.info("Server listning on https://" + listener.address().address + ":" + listener.address().port);
+    }
 }));

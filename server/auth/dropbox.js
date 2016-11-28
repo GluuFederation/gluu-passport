@@ -2,7 +2,7 @@ var passport = require('passport');
 var DropboxStrategy = require('passport-dropbox').Strategy;
 
 var setCredentials = function(credentials) {
-    var callbackURL = "https://".concat(global.serverAddress, ":", global.serverPort, "/auth/dropbox/callback");
+    var callbackURL = global.applicationHost.concat("/auth/dropbox/callback");
     passport.use(new DropboxStrategy({
             consumerKey: credentials.clientID,
             consumerSecret: credentials.clientSecret,
@@ -17,4 +17,4 @@ var setCredentials = function(credentials) {
 module.exports = {
     passport: passport,
     setCredentials: setCredentials
-}
+};

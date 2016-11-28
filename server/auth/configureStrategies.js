@@ -1,5 +1,3 @@
-var getConsumerDetails = require('./getConsumerDetails');
-
 var FacebookStrategy = require('./facebook');
 var GitHubStrategy = require('./github');
 var GoogleStrategy = require('./google');
@@ -7,15 +5,10 @@ var LinkedinStrategy = require('./linkedin');
 var TumblrStrategy = require('./tumblr');
 var TwitterStrategy = require('./twitter');
 var YahooStrategy = require('./yahoo');
+var logger = require("../utils/logger");
 
 exports.setConfiguratins = function(data){
     if (data) {
-        if (data.applicationEndpoint) {
-            global.applicationEndpoint = data.applicationEndpoint;
-        }
-        if (data.applicationStartpoint) {
-            global.applicationStartpoint = data.applicationStartpoint;
-        }
 
         //FacebookStrategy
         if (data.passportStrategies.facebook) {
@@ -52,6 +45,6 @@ exports.setConfiguratins = function(data){
         }
 
     } else {
-        console.log("Error in getting data, error: ", err);
+        logger.log('error',"Error in getting data, error: " + JSON.stringify(err));
     }
-}
+};

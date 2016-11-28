@@ -1,9 +1,9 @@
 {
-  "name": "_example",
-  "version": "0.0.0",
+  "name": "passport",
+  "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "node ./server/bin/www"
+    "start": "node app"
   },
   "dependencies": {
     "body-parser": "~1.13.2",
@@ -14,14 +14,13 @@
     "express-jwt": "^3.4.0",
     "express-session": "^1.11.3",
     "jsonwebtoken": "^7.0.1",
-    "kroknet-passport-google-oauth": "0.0.2",
     "morgan": "~1.6.1",
     "passport": "^0.3.2",
     "passport-dropbox": "^2.0.0",
     "passport-facebook": "^2.1.1",
     "passport-github": "^1.1.0",
-    "passport-linkedin": "^1.0.0",
-    "passport-local": "^1.0.0",
+    "passport-google-oauth2": "^0.1.6",
+    "passport-linkedin-oauth2": "^1.4.1",
     "passport-tumblr": "^0.1.2",
     "passport-twitter": "^1.0.3",
     "passport-windowslive": "^1.0.2",
@@ -30,6 +29,7 @@
     "passport-yahoo-oauth2": "^0.2.6",
     "passport-yahoo-token": "^2.1.0",
     "serve-favicon": "~2.3.0",
-    "swig": "^1.4.2"
+    "swig": "^1.4.2",
+    "winston": "^2.3.0"
   }
 }

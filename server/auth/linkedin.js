@@ -1,12 +1,14 @@
 var passport = require('passport');
-var LinkedInStrategy = require('passport-linkedin');
+var LinkedInStrategy = require('passport-linkedin-oauth2').Strategy;
 
 var setCredentials = function(credentials) {
-    var callbackURL = "https://".concat(global.serverAddress, ":", global.serverPort, "/auth/linkedin/callback");
+    var callbackURL = global.applicationHost.concat("/auth/linkedin/callback");
     passport.use(new LinkedInStrategy({
-            consumerKey: credentials.clientID,
-            consumerSecret: credentials.clientSecret,
-            callbackURL: callbackURL
+            clientID: credentials.clientID,
+            clientSecret: credentials.clientSecret,
+            callbackURL: callbackURL,
+            scope: ['r_emailaddress', 'r_basicprofile'],
+            state: true
         },
         function(token, tokenSecret, profile, done) {
             var userProfile = {
@@ -18,7 +20,7 @@ var setCredentials = function(credentials) {
                 familyName: profile.name.familyName,
                 provider: profile.provider,
                 accessToken: token
-            }
+            };
             return done(null, userProfile);
         }
     ));
@@ -27,4 +29,4 @@ var setCredentials = function(credentials) {
 module.exports = {
     passport: passport,
     setCredentials: setCredentials
-}
+};

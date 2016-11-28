@@ -1,14 +1,15 @@
 var passport = require('passport');
-var GoogleStrategy = require('kroknet-passport-google-oauth').Strategy;
+var GoogleStrategy = require('passport-google-oauth2').Strategy;
 
 var setCredentials = function(credentials) {
-    var callbackURL = "https://".concat(global.serverAddress, ":", global.serverPort, "/auth/google/callback");
+    var callbackURL = global.applicationHost.concat("/auth/google/callback");
     passport.use(new GoogleStrategy({
             clientID: credentials.clientID,
             clientSecret: credentials.clientSecret,
-            callbackURL: callbackURL
+            callbackURL: callbackURL,
+            passReqToCallback: true
         },
-        function(accessToken, refreshToken, profile, done) {
+        function(request, accessToken, refreshToken, profile, done) {
             var userProfile = {
                 id: profile.id,
                 name: profile.displayName,
@@ -18,7 +19,7 @@ var setCredentials = function(credentials) {
                 familyName: profile.name.familyName,
                 provider: profile.provider,
                 accessToken: accessToken
-            }
+            };
             return done(null, userProfile);
         }
     ));
@@ -27,4 +28,4 @@ var setCredentials = function(credentials) {
 module.exports = {
     passport: passport,
     setCredentials: setCredentials
-}
+};

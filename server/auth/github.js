@@ -2,7 +2,7 @@ var passport = require('passport');
 var GitHubStrategy = require('passport-github').Strategy;
 
 var setCredentials = function(credentials) {
-    var callbackURL = "https://".concat(global.serverAddress, ":", global.serverPort, "/auth/github/callback");
+    var callbackURL = global.applicationHost.concat("/auth/github/callback");
     passport.use(new GitHubStrategy({
             clientID: credentials.clientID,
             clientSecret: credentials.clientSecret,
@@ -19,7 +19,7 @@ var setCredentials = function(credentials) {
                 familyName: profile.last_name || "",
                 provider: profile.provider,
                 accessToken: accessToken
-            }
+            };
             return done(null, userProfile);
         }
     ));
@@ -28,4 +28,4 @@ var setCredentials = function(credentials) {
 module.exports = {
     passport: passport,
     setCredentials: setCredentials
-}
+};

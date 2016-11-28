@@ -2,7 +2,7 @@ var passport = require('passport');
 var TumblrStrategy = require('passport-tumblr').Strategy;
 
 var setCredentials = function(credentials) {
-    var callbackURL = "https://".concat(global.serverAddress, ":", global.serverPort, "/auth/tumblr/callback");
+    var callbackURL = global.applicationHost.concat("/auth/tumblr/callback");
     passport.use(new TumblrStrategy({
             consumerKey: credentials.clientID,
             consumerSecret: credentials.clientSecret,
@@ -18,7 +18,7 @@ var setCredentials = function(credentials) {
                 familyName: profile.familyName || "",
                 provider: profile.provider || "tumblr",
                 accessToken: accessToken
-            }
+            };
             return done(null, userProfile);
         }
     ));
@@ -27,4 +27,4 @@ var setCredentials = function(credentials) {
 module.exports = {
     passport: passport,
     setCredentials: setCredentials
-}
+};
