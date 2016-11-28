@@ -11,7 +11,7 @@ var jwt = require('jsonwebtoken');
 var fs = require('fs');
 var uuid = require('uuid');
 
-global.config = require('./oxpassport-config.json');
+global.config = require('/etc/gluu/conf/passport-config.json');
 var getConsumerDetails = require('./auth/getConsumerDetails');
 var logger = require("./utils/logger");
 
@@ -44,7 +44,7 @@ app.use(function(req, res, next) {
 });
 
 // *** config middleware *** //
-app.use(require('morgan')({ "stream": logger.stream }));
+app.use(require('morgan')('combined', { "stream": logger.stream }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: false
