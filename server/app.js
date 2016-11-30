@@ -80,6 +80,10 @@ app.get('/token', function(req, res) {
 app.use('/', require('./routes/index.js'));
 
 // *** error handlers *** //
+app.use(function (err, req, res, next) {
+    res.redirect('/login');
+});
+
 process.on('uncaughtException', function(err) {
     logger.log('error', 'Uncaught Exception: ' + JSON.stringify(err));
 });

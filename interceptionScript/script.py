@@ -11,39 +11,40 @@ from org.xdi.oxauth.service import UserService, ClientService, AuthenticationSer
 from org.xdi.oxauth.model.common import User
 from org.xdi.util import StringHelper
 from org.xdi.oxauth.util import ServerUtil
+
 try:
     import json
 except ImportError:
     import simplejson as json
 import java
 
-class PersonAuthentication(PersonAuthenticationType):
 
+class PersonAuthentication(PersonAuthenticationType):
     def __init__(self, currentTimeMillis):
         self.currentTimeMillis = currentTimeMillis
 
+    print "Passport: Basic. Initialized successfully"
 
     def init(self, configurationAttributes):
-        print "Passport. Initialization init method call ^&"
-        print "Passport. Initialized successfully"
+        print "Passport: Basic. Initialization init method call"
         self.extensionModule = None
         self.attributesMapping = None
         if (configurationAttributes.containsKey("generic_remote_attributes_list") and
-            configurationAttributes.containsKey("generic_local_attributes_list")):
+                configurationAttributes.containsKey("generic_local_attributes_list")):
 
             remoteAttributesList = configurationAttributes.get("generic_remote_attributes_list").getValue2()
             if (StringHelper.isEmpty(remoteAttributesList)):
-                print "Passport. Initialization. The property generic_remote_attributes_list is empty"
+                print "Passport: Initialization. The property generic_remote_attributes_list is empty"
                 return False
 
             localAttributesList = configurationAttributes.get("generic_local_attributes_list").getValue2()
             if (StringHelper.isEmpty(localAttributesList)):
-                print "Passport. Initialization. The property generic_local_attributes_list is empty"
+                print "Passport: Initialization. The property generic_local_attributes_list is empty"
                 return False
 
             self.attributesMapping = self.prepareAttributesMapping(remoteAttributesList, localAttributesList)
             if (self.attributesMapping == None):
-                print "Passport. Initialization. The attributes mapping isn't valid"
+                print "Passport: Initialization. The attributes mapping isn't valid"
                 return False
         if (configurationAttributes.containsKey("extension_module")):
             extensionModuleName = configurationAttributes.get("extension_module").getValue2()
@@ -53,16 +54,16 @@ class PersonAuthentication(PersonAuthenticationType):
                 if (not extensionModuleInitResult):
                     return False
             except ImportError, ex:
-                print "Passport. Initialization. Failed to load generic_extension_module:", extensionModuleName
-                print "Passport. Initialization. Unexpected error:", ex
+                print "Passport: Initialization. Failed to load generic_extension_module:", extensionModuleName
+                print "Passport: Initialization. Unexpected error:", ex
                 return False
         else:
-            print("Passport. Extension module key not found")
+            print("Passport: Extension module key not found")
         return True
 
     def destroy(self, configurationAttributes):
-        print "Passport. Destroy destroy method call ^&"
-        print "Passport. Destroyed successfully"
+        print "Passport: Basic. Destroy method call"
+        print "Passport: Basic. Destroyed successfully"
         return True
 
     def getApiVersion(self):
@@ -74,34 +75,34 @@ class PersonAuthentication(PersonAuthenticationType):
     def getAlternativeAuthenticationMethod(self, usageType, configurationAttributes):
         return None
 
-    def getUserValueFromAuth(self,remote_attr,requestParameters):
+    def getUserValueFromAuth(self, remote_attr, requestParameters):
         try:
-            val=ServerUtil.getFirstValue(requestParameters, "loginForm:"+remote_attr)
-            return val.decode('utf-8')
-        except Exception,err:
-            print("Passport. Exception inside getUserValueFromAuth "+str(err))
+            toBeFeatched = "loginForm:" + remote_attr
+            return ServerUtil.getFirstValue(requestParameters, toBeFeatched)
+        except Exception, err:
+            print("Passport: Exception inside getUserValueFromAuth " + str(err))
 
     def authenticate(self, configurationAttributes, requestParameters, step):
         try:
-            UserEmail=self.getUserValueFromAuth("email",requestParameters)
-        except Exception,err:
-            print("Passport. Error: "+str(err))
+            UserEmail = self.getUserValueFromAuth("email", requestParameters)
+        except Exception, err:
+            print("Passport: Error: " + str(err))
         useBasicAuth = False
         if (StringHelper.isEmptyString(UserEmail)):
             useBasicAuth = True
 
         # Use basic method to log in
         if (useBasicAuth):
-            print "Passport. Basic Authentication"
+            print "Passport: Basic Authentication"
             credentials = Identity.instance().getCredentials()
             user_name = credentials.getUsername()
             user_password = credentials.getPassword()
             logged_in = False
-            
+
             if (StringHelper.isNotEmptyString(user_name) and StringHelper.isNotEmptyString(user_password)):
                 userService = UserService.instance()
                 logged_in = userService.authenticate(user_name, user_password)
-            
+
             if (not logged_in):
                 return False
             return True
@@ -110,42 +111,48 @@ class PersonAuthentication(PersonAuthenticationType):
             try:
                 userService = UserService.instance()
                 authenticationService = AuthenticationService.instance()
-                foundUser = userService.getUserByAttribute("oxExternalUid",self.getUserValueFromAuth("provider",requestParameters)+":" + self.getUserValueFromAuth(self.getUidRemoteAttr(),requestParameters))
+                foundUser = userService.getUserByAttribute("oxExternalUid", self.getUserValueFromAuth("provider",
+                                                                                                      requestParameters) + ":" + self.getUserValueFromAuth(
+                    self.getUidRemoteAttr(), requestParameters))
 
                 if (foundUser == None):
                     newUser = User()
                     for attributesMappingEntry in self.attributesMapping.entrySet():
                         remoteAttribute = attributesMappingEntry.getKey()
                         localAttribute = attributesMappingEntry.getValue()
-                        localAttributeValue = self.getUserValueFromAuth(remoteAttribute,requestParameters)
-                        print("Passport. Authentication. Key: "+ localAttribute+ "  |||   value: "+ localAttributeValue)
-                        if ((localAttribute != None) & (localAttributeValue != "undefined")):
-                            newUser.setAttribute(localAttribute,localAttributeValue)
-                    newUser.setAttribute("oxExternalUid", self.getUserValueFromAuth("provider",requestParameters)+":" +self.getUserValueFromAuth(self.getUidRemoteAttr(),requestParameters))
-                    print (self.getUserValueFromAuth("provider",requestParameters)+"Authenticate for step 1. Attempting to add user "+ self.getUserValueFromAuth(self.getUidRemoteAttr(),requestParameters))
-                    
+                        localAttributeValue = self.getUserValueFromAuth(remoteAttribute, requestParameters)
+                        if ((localAttribute != None) & (localAttributeValue != "undefined") & (
+                                    localAttribute != "provider")):
+                            newUser.setAttribute(localAttribute, localAttributeValue)
+                    newUser.setAttribute("oxExternalUid", self.getUserValueFromAuth("provider",
+                                                                                    requestParameters) + ":" + self.getUserValueFromAuth(
+                        self.getUidRemoteAttr(), requestParameters))
+                    print ("Passport: " + self.getUserValueFromAuth("provider",
+                                                     requestParameters) + "Authenticate for step 1. Attempting to add user " + self.getUserValueFromAuth(
+                        self.getUidRemoteAttr(), requestParameters))
+
                     try:
                         foundUser = userService.addUser(newUser, True)
                         foundUserName = foundUser.getUserId()
-                        print("Passport. Authentication. Found user name "+foundUserName)
+                        print("Passport: Found user name " + foundUserName)
                         userAuthenticated = authenticationService.authenticate(foundUserName)
-                    except Exception,err:
-                        print("Passport. Authentication. "str(err)+" error add user")
+                    except Exception, err:
+                        print("Passport: Error in adding user:" + str(err))
                     return True
 
                 else:
                     foundUserName = foundUser.getUserId()
-                    print("Passport. Authentication. User Found "+str(foundUserName))
+                    print("Passport: User Found " + str(foundUserName))
                     userAuthenticated = authenticationService.authenticate(foundUserName)
-                    print(userAuthenticated)
+                    print("Passport: Is user authenticated = " + str(userAuthenticated))
                     return True
 
-            except Exception,err:
-                print ("Passport. Authentication. Error occurred during request parameter fetching "+str(err))
-        
+            except Exception, err:
+                print ("Passport: Error occurred during request parameter fetching " + str(err))
+
     def prepareForStep(self, configurationAttributes, requestParameters, step):
         if (step == 1):
-            print "Passport. Prepare for Step 1 method call ^&"
+            print "Passport: Basic. Prepare for Step 1 method call"
             return True
         else:
             return True
@@ -168,16 +175,16 @@ class PersonAuthentication(PersonAuthenticationType):
         try:
             remoteAttributesListArray = StringHelper.split(remoteAttributesList, ",")
             if (ArrayHelper.isEmpty(remoteAttributesListArray)):
-                print("Passport.  PrepareAttributesMapping. There is no attributes specified in remoteAttributesList property")
+                print("Passport: PrepareAttributesMapping. There is no attributes specified in remoteAttributesList property")
                 return None
 
             localAttributesListArray = StringHelper.split(localAttributesList, ",")
             if (ArrayHelper.isEmpty(localAttributesListArray)):
-                print("Passport. PrepareAttributesMapping. There is no attributes specified in localAttributesList property")
+                print("Passport: PrepareAttributesMapping. There is no attributes specified in localAttributesList property")
                 return None
 
             if (len(remoteAttributesListArray) != len(localAttributesListArray)):
-                print("Passport. PrepareAttributesMapping. The number of attributes in remoteAttributesList and localAttributesList isn't equal")
+                print("Passport: PrepareAttributesMapping. The number of attributes in remoteAttributesList and localAttributesList isn't equal")
                 return None
 
             attributeMapping = IdentityHashMap()
@@ -194,21 +201,21 @@ class PersonAuthentication(PersonAuthenticationType):
                 i = i + 1
 
             if (not containsUid):
-                print "Passport. PrepareAttributesMapping. There is no mapping to mandatory 'uid' attribute"
+                print "Passport: PrepareAttributesMapping. There is no mapping to mandatory 'uid' attribute"
                 return None
 
             return attributeMapping
-        except Exception,err:
-            print("Passport. Exception inside prepareAttributesMapping "+str(err))
+        except Exception, err:
+            print("Passport: Exception inside prepareAttributesMapping " + str(err))
 
     def getUidRemoteAttr(self):
         try:
             for attributesMappingEntry in self.attributesMapping.entrySet():
-                            remoteAttribute = attributesMappingEntry.getKey()
-                            localAttribute = attributesMappingEntry.getValue()
-                            if localAttribute=="uid":
-                                return remoteAttribute
+                remoteAttribute = attributesMappingEntry.getKey()
+                localAttribute = attributesMappingEntry.getValue()
+                if localAttribute == "uid":
+                    return remoteAttribute
             else:
-                return "Passport. Not Get UID related remote attribute"
-        except Exception,err:
-            print("Passport. Exception inside getUidRemoteAttr "+str(err))
+                return "Not Get UID related remote attribute"
+        except Exception, err:
+            print("Passport: Exception inside getUidRemoteAttr " + str(err))
