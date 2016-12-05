@@ -1,5 +1,13 @@
+# oxAuth is available under the MIT License (2008). See http://opensource.org/licenses/MIT for full text.
+# Copyright (c) 2016, Gluu
+#
+# Author: Arvind Tomar
+#
+
 from org.jboss.seam.contexts import Context, Contexts
+from org.jboss.seam.faces import FacesMessages
 from javax.faces.context import FacesContext
+from org.jboss.seam.international import StatusMessage
 from org.xdi.util import StringHelper, ArrayHelper
 from java.util import Arrays, ArrayList, HashMap, IdentityHashMap
 from org.xdi.oxauth.client import TokenClient, TokenRequest, UserInfoClient
@@ -84,11 +92,11 @@ class PersonAuthentication(PersonAuthenticationType):
 
     def authenticate(self, configurationAttributes, requestParameters, step):
         try:
-            UserEmail = self.getUserValueFromAuth("email", requestParameters)
+            UserId = self.getUserValueFromAuth("userid", requestParameters)
         except Exception, err:
             print("Passport: Error: " + str(err))
         useBasicAuth = False
-        if (StringHelper.isEmptyString(UserEmail)):
+        if (StringHelper.isEmptyString(UserId)):
             useBasicAuth = True
 
         # Use basic method to log in
@@ -117,6 +125,21 @@ class PersonAuthentication(PersonAuthenticationType):
 
                 if (foundUser == None):
                     newUser = User()
+
+                    try:
+                        UserEmail = self.getUserValueFromAuth("email", requestParameters)
+                    except Exception, err:
+                        print("Passport: Error in getting user email: " + str(err))
+
+                    if (StringHelper.isEmptyString(UserEmail)):
+                        facesMessages = FacesMessages.instance()
+                        FacesContext.getCurrentInstance().getExternalContext().getFlash().setKeepMessages(True)
+                        facesMessages.clear()
+                        facesMessages.add(StatusMessage.Severity.ERROR, "Please provide your email.")
+                        print "Passport: Email was not received so sent error"
+
+                        return False
+
                     for attributesMappingEntry in self.attributesMapping.entrySet():
                         remoteAttribute = attributesMappingEntry.getKey()
                         localAttribute = attributesMappingEntry.getValue()
@@ -128,7 +151,7 @@ class PersonAuthentication(PersonAuthenticationType):
                                                                                     requestParameters) + ":" + self.getUserValueFromAuth(
                         self.getUidRemoteAttr(), requestParameters))
                     print ("Passport: " + self.getUserValueFromAuth("provider",
-                                                     requestParameters) + "Authenticate for step 1. Attempting to add user " + self.getUserValueFromAuth(
+                                                     requestParameters) + ": Attempting to add user " + self.getUserValueFromAuth(
                         self.getUidRemoteAttr(), requestParameters))
 
                     try:
@@ -136,9 +159,11 @@ class PersonAuthentication(PersonAuthenticationType):
                         foundUserName = foundUser.getUserId()
                         print("Passport: Found user name " + foundUserName)
                         userAuthenticated = authenticationService.authenticate(foundUserName)
+                        print("Passport: User added successfully and isUserAuthenticated = " + str(userAuthenticated))
                     except Exception, err:
                         print("Passport: Error in adding user:" + str(err))
-                    return True
+                        return False
+                    return userAuthenticated
 
                 else:
                     foundUserName = foundUser.getUserId()

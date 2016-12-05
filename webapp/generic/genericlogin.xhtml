@@ -8,10 +8,7 @@
                 template="/WEB-INF/incl/layout/template.xhtml">
     <ui:define name="head">
         <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-
-        <!-- Google+ script -->
         <script src="#{oxAuthConfigurationService.jsLocation}/jquery-1.11.3.min.js"></script>
-        <script src="https://apis.google.com/js/client:platform.js?onload=start" async="async" defer="defer"></script>
 
         <style type="text/css">
             .login-panel {
@@ -48,6 +45,13 @@
             $(document).ready(function () {
                 var APIURL = window.location.origin;
 
+                var errormsg = window.location.href.split("=");
+                if(errormsg[1]){
+                    history.replaceState({}, 'oxAuth-Login', '/oxauth/auth/generic/generic-login');
+                    $('.errormsg').html(decodeURIComponent(errormsg[1]));
+                    $('.errormsg').prop('style', 'display:block');
+                }
+
                 $(".provider").click(function () {
                     provider = $(this).attr("data-p");
                     $.ajax({
@@ -55,6 +59,10 @@
                         success: function (result) {
                             token = result.token_;
                             window.location.href = APIURL + "/auth/" + provider + "/" + token;
+                        },
+                        error: function (error) {
+                            $('.errormsg').html("An unknown error occurred");
+                            $('.errormsg').prop('style', 'display:block');
                         }
                     });
                 });
@@ -62,17 +70,18 @@
         </script>
     </ui:define>
 
-    <ui:define name="pageTitle">oxAuth - Google+ Login</ui:define>
+    <ui:define name="pageTitle">oxAuth - Passport Login</ui:define>
 
     <ui:define name="body">
+        <ul id="messages" class="message">
+            <li class="errormsg" style="display:none">error message.</li>
+        </ul>
         <table border="0" align="center">
             <tr>
                 <td>
                     <div>
                         <h:form id="loginForm">
                             <s:token/>
-
-                            <input type="hidden" name="gplus_auth_code" value=""/>
 
                             <h:panelGroup rendered="#{not identity.loggedIn}">
                                 <div class="login-panel">

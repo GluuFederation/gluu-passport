@@ -165,7 +165,7 @@ router.get('/auth/dropbox/:token',
 router.all('/*', function(req, res, next) {
     var err = new Error('Not Found');
     err.status = 404;
-    res.redirect('/login');
+    res.redirect(global.config.applicationStartpoint + '?failure=The requested resource does not exists!');
 });
 
 module.exports = router;
