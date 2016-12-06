@@ -8,7 +8,7 @@ var YahooStrategy = require('./yahoo');
 var logger = require("../utils/logger");
 
 exports.setConfiguratins = function(data){
-    if (data) {
+    if (data && data.passportStrategies) {
 
         //FacebookStrategy
         if (data.passportStrategies.facebook) {
