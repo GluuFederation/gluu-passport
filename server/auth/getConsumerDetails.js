@@ -20,14 +20,15 @@ exports.getTokenEndpoint = function (callback) {
             return callback(error, null);
         }
 
-        try{
+        try {
             body = JSON.parse(body);
-        } catch (ex){
+        } catch (ex) {
             logger.log('error', "Error in parsing JSON in getTokenEndpoint: ", JSON.stringify(ex));
             return callback(ex, null);
         }
 
         global.UMAConfig = body;
+        logger.log('info', "UMAConfigurations were received");
         getATT(global.UMAConfig.token_endpoint, function (err, data) {
             if (err) {
                 return callback(err, null);
@@ -57,15 +58,16 @@ function getATT(token_endpoint, callback) {
         sub: clientId,
         aud: token_endpoint,
         jti: uuid(),
-        exp: (new Date().getTime()/1000 + 30),
+        exp: (new Date().getTime() / 1000 + 30),
         iat: (new Date().getTime())
     }, passportCert, options);
 
     var optionsForRequest = {
         method: 'POST',
         url: token_endpoint,
-        headers: { 'content-type': 'application/x-www-form-urlencoded' },
-        //json: true,
+        headers: {
+            'content-type': 'application/x-www-form-urlencoded'
+        },
         form: {
             grant_type: 'client_credentials',
             scope: 'uma_authorization',
@@ -82,9 +84,9 @@ function getATT(token_endpoint, callback) {
             return callback(error, null);
         }
 
-        try{
+        try {
             body = JSON.parse(body);
-        } catch (ex){
+        } catch (ex) {
             logger.log('error', "Error in parsing JSON in getATT: ", JSON.stringify(ex));
             return callback(ex, null);
         }
@@ -94,6 +96,7 @@ function getATT(token_endpoint, callback) {
             return callback(body.error, null);
         }
 
+        logger.log('info', "ATTDetails were received");
         getGAT(body, function (err, data) {
             if (err) {
                 return callback(err, null);
@@ -114,9 +117,7 @@ function getGAT(ATTDetails, callback) {
             gat: 'true',
             authorization: 'Bearer '.concat(accessToken)
         },
-        body: {
-            scopes: ['uma_authorization']
-        }
+        body: JSON.stringify({ scopes: [global.config.umaScope] })
     };
     request(options, function (error, response, body) {
 
@@ -125,14 +126,15 @@ function getGAT(ATTDetails, callback) {
             return callback(error, null);
         }
 
-        try{
+        try {
             body = JSON.parse(body);
-        } catch (ex){
+        } catch (ex) {
             logger.log('error', "Error in parsing JSON in getGAT: ", JSON.stringify(ex));
             return callback(ex, null);
         }
 
         var rpt = body.rpt;
+        logger.log('info', "rpt was received");
         getJSON(rpt, function (err, data) {
             if (err) {
                 return callback(err, null);
@@ -145,36 +147,31 @@ function getGAT(ATTDetails, callback) {
 function getJSON(rpt, onResult) {
 
     var options = {
-        method: 'POST',
-        //url: global.config.passportConfigAPI,
-        url: 'https://ce-dev.gluu.org/identity/seam/resource/restv1/passportconfig',
-        json: true,
+        method: 'GET',
+        url: global.config.passportConfigAPI,
         headers: {
-            'content-type': 'application/x-www-form-urlencoded'
-        },
-        form: {
-            access_token: rpt
+            'authorization': 'Bearer '.concat(rpt)
         }
     };
     request(options, function (error, response, body) {
 
         if (error) {
             logger.log('error', "Error in requesting getJSON");
-            return callback(error, null);
+            return onResult(error, null);
         }
 
-        try{
+        try {
             body = JSON.parse(body);
-        } catch (ex){
+        } catch (ex) {
             logger.log('error', "Error in parsing JSON in getJSON: ", JSON.stringify(ex));
-            return callback(ex, null);
+            return onResult(ex, null);
         }
 
         if (body.error) {
             logger.log('error', "Error in response from getJSON: ", JSON.stringify(body.error));
-            return callback(body.error, null);
+            return onResult(body.error, null);
         }
-
+        logger.log('info', "Passport strategies were received");
         configureStrategies.setConfiguratins(body);
         return onResult(null, body);
 
