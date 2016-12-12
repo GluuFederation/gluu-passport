@@ -47,7 +47,7 @@
 
                 var errormsg = window.location.href.split("=");
                 if(errormsg[1]){
-                    history.replaceState({}, 'oxAuth-Login', '/oxauth/auth/generic/generic-login');
+                    history.replaceState({}, 'oxAuth-Login', '/oxauth/auth/passport/generic-login');
                     $('.errormsg').html(decodeURIComponent(errormsg[1]));
                     $('.errormsg').prop('style', 'display:block');
                 }

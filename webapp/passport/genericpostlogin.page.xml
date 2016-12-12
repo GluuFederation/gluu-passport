@@ -2,15 +2,15 @@
 <page xmlns="http://jboss.com/products/seam/pages"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="http://jboss.com/products/seam/pages http://jboss.com/products/seam/pages-2.2.xsd"
-	  view-id="/auth/generic/genericlogin.xhtml">
+	  view-id="/auth/passport/genericpostlogin.xhtml">
 
     <action execute="#{authenticator.prepareAuthenticationForStep}" on-postback="false" if="#{not identity.loggedIn}"/>
 
-    <rewrite pattern="/auth/generic/generic-login" />
+    <rewrite pattern="/auth/passport/generic-post-login" />
 
     <navigation from-action="#{authenticator.prepareAuthenticationForStep}">
         <rule if-outcome="success">
-            <render view-id="/auth/generic/genericlogin.xhtml" />
+            <render view-id="/auth/passport/genericpostlogin.xhtml" />
         </rule>
 
         <rule if-outcome="no_permissions">
