@@ -92,7 +92,7 @@ if ('development' == app.get('env')) {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 }
 
-var listener = server.createServer(app).listen(global.config.serverWebPort, global.config.serverURI, getConsumerDetails.getTokenEndpoint(function(err, data) {
+var listener = server.createServer(app).listen(global.config.serverWebPort, getConsumerDetails.getTokenEndpoint(function(err, data) {
     if(err){
         listener.close(function () {
             logger.log('error', "Error in starting the server. error:- ", err);
