@@ -65,7 +65,7 @@ passport.deserializeUser(function(user, done) {
     done(null, user);
 });
 
-app.get('/token', function(req, res) {
+app.get('/passport/token', function(req, res) {
     var token = jwt.sign({
         "jwt": uuid()
     }, global.applicationSecretKey, {
@@ -77,11 +77,11 @@ app.get('/token', function(req, res) {
 });
 
 // *** main routes *** //
-app.use('/', require('./routes/index.js'));
+app.use('/passport', require('./routes/index.js'));
 
 // *** error handlers *** //
 app.use(function (err, req, res, next) {
-    res.redirect('/login');
+    res.redirect('/passport/login');
 });
 
 process.on('uncaughtException', function(err) {

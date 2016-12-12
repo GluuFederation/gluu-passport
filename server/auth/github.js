@@ -2,7 +2,7 @@ var passport = require('passport');
 var GitHubStrategy = require('passport-github').Strategy;
 
 var setCredentials = function(credentials) {
-    var callbackURL = global.applicationHost.concat("/auth/github/callback");
+    var callbackURL = global.applicationHost.concat("/passport/auth/github/callback");
     passport.use(new GitHubStrategy({
             clientID: credentials.clientID,
             clientSecret: credentials.clientSecret,

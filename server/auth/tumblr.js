@@ -2,7 +2,7 @@ var passport = require('passport');
 var TumblrStrategy = require('passport-tumblr').Strategy;
 
 var setCredentials = function(credentials) {
-    var callbackURL = global.applicationHost.concat("/auth/tumblr/callback");
+    var callbackURL = global.applicationHost.concat("/passport/auth/tumblr/callback");
     passport.use(new TumblrStrategy({
             consumerKey: credentials.clientID,
             consumerSecret: credentials.clientSecret,

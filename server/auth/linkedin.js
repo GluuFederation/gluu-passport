@@ -2,7 +2,7 @@ var passport = require('passport');
 var LinkedInStrategy = require('passport-linkedin-oauth2').Strategy;
 
 var setCredentials = function(credentials) {
-    var callbackURL = global.applicationHost.concat("/auth/linkedin/callback");
+    var callbackURL = global.applicationHost.concat("/passport/auth/linkedin/callback");
     passport.use(new LinkedInStrategy({
             clientID: credentials.clientID,
             clientSecret: credentials.clientSecret,

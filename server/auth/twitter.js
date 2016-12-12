@@ -2,7 +2,7 @@ var passport = require('passport');
 var TwitterStrategy = require('passport-twitter').Strategy;
 
 var setCredentials = function(credentials) {
-    var callbackURL = global.applicationHost.concat("/auth/twitter/callback");
+    var callbackURL = global.applicationHost.concat("/passport/auth/twitter/callback");
     passport.use(new TwitterStrategy({
             consumerKey: credentials.clientID,
             consumerSecret: credentials.clientSecret,

@@ -2,7 +2,7 @@ var passport = require('passport');
 var WindowsLiveStrategy = require('passport-windowslive').Strategy;
 
 var setCredentials = function(credentials) {
-    var callbackURL = global.applicationHost.concat("/auth/windowslive/callback");
+    var callbackURL = global.applicationHost.concat("/passport/auth/windowslive/callback");
     passport.use(new WindowsLiveStrategy({
             clientID: credentials.clientID,
             clientSecret: credentials.clientSecret,

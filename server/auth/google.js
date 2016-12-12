@@ -2,7 +2,7 @@ var passport = require('passport');
 var GoogleStrategy = require('passport-google-oauth2').Strategy;
 
 var setCredentials = function(credentials) {
-    var callbackURL = global.applicationHost.concat("/auth/google/callback");
+    var callbackURL = global.applicationHost.concat("/passport/auth/google/callback");
     passport.use(new GoogleStrategy({
             clientID: credentials.clientID,
             clientSecret: credentials.clientSecret,
