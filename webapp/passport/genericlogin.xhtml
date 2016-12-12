@@ -55,10 +55,10 @@
                 $(".provider").click(function () {
                     provider = $(this).attr("data-p");
                     $.ajax({
-                        url: APIURL + "/token",
+                        url: APIURL + "/passport/token",
                         success: function (result) {
                             token = result.token_;
-                            window.location.href = APIURL + "/auth/" + provider + "/" + token;
+                            window.location.href = APIURL + "/passport/auth/" + provider + "/" + token;
                         },
                         error: function (error) {
                             $('.errormsg').html("An unknown error occurred");
