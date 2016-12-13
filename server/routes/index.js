@@ -57,107 +57,107 @@ router.get('/login', function(req, res, next) {
 });
 
 //=================== linkedin =================
-router.get('/passport/auth/linkedin/callback',
+router.get('/auth/linkedin/callback',
     passportLinkedIn.authenticate('linkedin', {
         failureRedirect: '/passport/login'
     }),
     callbackResponse);
 
-router.get('/passport/auth/linkedin/:token',
+router.get('/auth/linkedin/:token',
     validateToken,
     passportLinkedIn.authenticate('linkedin'));
 
 //===================== github =================
-router.get('/passport/auth/github/callback',
+router.get('/auth/github/callback',
     passportGithub.authenticate('github', {
         failureRedirect: '/passport/login'
     }),
     callbackResponse);
 
-router.get('/passport/auth/github/:token',
+router.get('/auth/github/:token',
     validateToken,
     passportGithub.authenticate('github', {
         scope: ['user:email']
     }));
 
 //==================== twitter =================
-router.use('/passport/auth/twitter/callback',
+router.use('/auth/twitter/callback',
     passportTwitter.authenticate('twitter', {
         failureRedirect: '/passport/login'
     }),
     callbackResponse);
 
-router.get('/passport/auth/twitter/:token',
+router.get('/auth/twitter/:token',
     validateToken,
     passportTwitter.authenticate('twitter'));
 
 //==================== facebook ================
-router.get('/passport/auth/facebook/callback',
+router.get('/auth/facebook/callback',
     passportFacebook.authenticate('facebook', {
         failureRedirect: '/passport/login'
     }),
     callbackResponse);
 
-router.get('/passport/auth/facebook/:token',
+router.get('/auth/facebook/:token',
     validateToken,
     passportFacebook.authenticate('facebook', {
         scope: ['email']
     }));
 
 //===================== tumblr =================
-router.get('/passport/auth/tumblr/callback',
+router.get('/auth/tumblr/callback',
     passportTumblr.authenticate('tumblr', {
         failureRedirect: '/passport/login'
     }),
     callbackResponse);
 
-router.get('/passport/auth/tumblr/:token',
+router.get('/auth/tumblr/:token',
     validateToken,
     passportTumblr.authenticate('tumblr'));
 
 //===================== google =================
-router.get('/passport/auth/yahoo/callback',
+router.get('/auth/yahoo/callback',
     passportYahoo.authenticate('yahoo', {
         failureRedirect: '/passport/login'
     }),
     callbackResponse);
 
-router.get('/passport/auth/yahoo/:token',
+router.get('/auth/yahoo/:token',
     validateToken,
     passportYahoo.authenticate('yahoo'));
 
 //===================== google =================
-router.get('/passport/auth/google/callback',
+router.get('/auth/google/callback',
     passportGoogle.authenticate('google', {
         failureRedirect: '/passport/login'
     }),
     callbackResponse);
 
-router.get('/passport/auth/google/:token',
+router.get('/auth/google/:token',
     validateToken,
     passportGoogle.authenticate('google', {
         scope: ['profile', 'email']
     }));
 
 //================== windowslive ===============
-router.get('/passport/auth/windowslive/callback',
+router.get('/auth/windowslive/callback',
     passportWindowsLive.authenticate('windowslive', {
         failureRedirect: '/passport/login'
     }),
     callbackResponse);
 
-router.get('/passport/auth/windowslive/:token',
+router.get('/auth/windowslive/:token',
     validateToken,
     passportWindowsLive.authenticate('windowslive'));
 
 //================== dropbox ==================
-router.get('/passport/auth/dropbox/callback',
+router.get('/auth/dropbox/callback',
     passportDropbox.authenticate('dropbox', {
         failureRedirect: '/passport/login'
     }),
     callbackResponse);
 
-router.get('/passport/auth/dropbox/:token',
+router.get('/auth/dropbox/:token',
     validateToken,
     passportDropbox.authenticate('dropbox'));
 

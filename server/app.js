@@ -15,7 +15,7 @@ global.config = require('/etc/gluu/conf/passport-config.json');
 var getConsumerDetails = require('./auth/getConsumerDetails');
 var logger = require("./utils/logger");
 
-global.applicationHost = "https://" + global.config.serverURI + ":" + global.config.serverWebPort;
+global.applicationHost = "https://" + global.config.serverURI;
 global.applicationSecretKey = uuid();
 
 // *** express instance *** //
@@ -98,6 +98,6 @@ var listener = server.createServer(app).listen(global.config.serverWebPort, getC
             logger.log('error', "Error in starting the server. error:- ", err);
         });
     } else {
-        logger.info("Server listning on https://" + listener.address().address + ":" + listener.address().port);
+        logger.info("Server listning on http://localhost:" + global.config.serverWebPort);
     }
 }));
