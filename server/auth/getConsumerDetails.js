@@ -168,7 +168,7 @@ function getJSON(rpt, onResult) {
         } catch (ex) {
             logger.log('error', "Error in parsing JSON in getJSON: ", JSON.stringify(ex));
             logger.log('error', "Error received in getJSON: ", body.toString());
-            return callback(body.toString(), null);
+            return onResult(body.toString(), null);
         }
 
         if (body.error) {
