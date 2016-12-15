@@ -115,7 +115,7 @@ router.get('/auth/tumblr/:token',
     validateToken,
     passportTumblr.authenticate('tumblr'));
 
-//===================== google =================
+//===================== yahoo =================
 router.get('/auth/yahoo/callback',
     passportYahoo.authenticate('yahoo', {
         failureRedirect: '/passport/login'

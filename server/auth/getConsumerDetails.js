@@ -24,7 +24,8 @@ exports.getTokenEndpoint = function (callback) {
             body = JSON.parse(body);
         } catch (ex) {
             logger.log('error', "Error in parsing JSON in getTokenEndpoint: ", JSON.stringify(ex));
-            return callback(ex, null);
+            logger.log('error', "Error received in getTokenEndpoint: ", body.toString());
+            return callback(body.toString(), null);
         }
 
         global.UMAConfig = body;
@@ -88,7 +89,8 @@ function getATT(token_endpoint, callback) {
             body = JSON.parse(body);
         } catch (ex) {
             logger.log('error', "Error in parsing JSON in getATT: ", JSON.stringify(ex));
-            return callback(ex, null);
+            logger.log('error', "Error received in getATT: ", body.toString());
+            return callback(body.toString(), null);
         }
 
         if (body.error) {
@@ -130,7 +132,8 @@ function getGAT(ATTDetails, callback) {
             body = JSON.parse(body);
         } catch (ex) {
             logger.log('error', "Error in parsing JSON in getGAT: ", JSON.stringify(ex));
-            return callback(ex, null);
+            logger.log('error', "Error received in getGAT: ", body.toString());
+            return callback(body.toString(), null);
         }
 
         var rpt = body.rpt;
@@ -164,7 +167,8 @@ function getJSON(rpt, onResult) {
             body = JSON.parse(body);
         } catch (ex) {
             logger.log('error', "Error in parsing JSON in getJSON: ", JSON.stringify(ex));
-            return onResult(ex, null);
+            logger.log('error', "Error received in getJSON: ", body.toString());
+            return callback(body.toString(), null);
         }
 
         if (body.error) {

@@ -81,6 +81,7 @@ app.use('/passport', require('./routes/index.js'));
 
 // *** error handlers *** //
 app.use(function (err, req, res, next) {
+    logger.log('error', 'Unknown Error: ' + JSON.stringify(err));
     res.redirect('/passport/login');
 });
 
@@ -94,9 +95,7 @@ if ('development' == app.get('env')) {
 
 var listener = server.createServer(app).listen(global.config.serverWebPort, getConsumerDetails.getTokenEndpoint(function(err, data) {
     if(err){
-        listener.close(function () {
-            logger.log('error', "Error in starting the server. error:- ", err);
-        });
+        logger.log('error', "Error in starting the server. error:- ", err);
     } else {
         logger.info("Server listning on http://localhost:" + global.config.serverWebPort);
     }
