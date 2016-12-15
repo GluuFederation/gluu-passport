@@ -89,7 +89,7 @@ process.on('uncaughtException', function(err) {
     logger.log('error', 'Uncaught Exception: ' + JSON.stringify(err));
 });
 
-if ('development' == app.get('env')) {
+if (('development' == app.get('env')) || true) { // To make sure that the requests are not rejected
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 }
 
