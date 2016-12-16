@@ -30,6 +30,7 @@
     "passport-yahoo-token": "^2.1.0",
     "serve-favicon": "~2.3.0",
     "swig": "^1.4.2",
-    "winston": "^2.3.0"
+    "winston": "^2.3.0",
+    "winston-daily-rotate-file": "^1.4.0"
   }
 }

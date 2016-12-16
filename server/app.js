@@ -51,7 +51,9 @@ app.use(bodyParser.urlencoded({
 app.use(cookieParser());
 app.use(session({
     secret: uuid(),
-    key: uuid()
+    key: uuid(),
+    resave: false,
+    saveUninitialized: true
 }));
 
 app.use(passport.initialize());
