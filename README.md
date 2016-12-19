@@ -20,7 +20,7 @@ This will install all the dependencies of the server and then to start server mo
 
 ## SETUP passport with Gluu
 
-While setup, select yes to install passport when prompted weather to install passport or not.
+While setup, select yes to install passport when prompted to install passport or not.
 
 To enable passport log in to oxTrust and then go to Configuration > Organization Configuration
 
@@ -87,11 +87,11 @@ JSON Web Tokens consist of three parts separated by dots (.), which are:
 Therefore, a JWT typically looks like the following.
 xxxxx.yyyyy.zzzzz
 
-All the three parts are then Base64Url encoded to form JSON Web Token. 
+All the three parts are then Base64Url encoded to form JSON Web Token.
 
 The output is three Base64 strings separated by dots that can be easily passed in HTML and HTTP environments, while being more compact compared to XML-based standards such as SAML.
 
-The following shows a JWT that has the previous header and payload encoded, and it is signed with a secret. 
+The following shows a JWT that has the previous header and payload encoded, and it is signed with a secret.
 
 If you want to play with JWT and put these concepts to practice, you can use jwt.io Debugger to decode, verify and generate JWTs.
 
@@ -126,7 +126,7 @@ There will be single page for the authentication with different buttons which wi
 Find an npm module that fits best for the strategy that you want to add.
 Let's start with an example. In this example we will consider adding facebook strategy.
 1. If you want to add facebook strategy, search for passport-facebook npm module where you can select the npm module and then add the module to passport server.
-2. Lets say we found this module "passport-facebook" and want to use this module in for facebook authentication, install the module in passport app by executing ```npm install passport-facebook --save``` to install the module and also save the dependency to the passport server.
+2. Let's say we found this module "passport-facebook" and want to use this module in for facebook authentication, install the module in passport app by executing ```npm install passport-facebook --save``` to install the module and also save the dependency to the passport server.
 3. Configure the strategy.
 4. Configure routes for the strategy.
 5. Call method to configure the strategy
@@ -173,7 +173,7 @@ module.exports = {
 ```
 Here is an example of the facebook strategy configured. For facebook the required parameters are clientID, clientSecret and callbackURL. You can search for more configurations depending on the requirements and configure accordingly.
 
-The function setCredentials is used to configure the strategy of the crendentials of this strategy are been received. The parameter credentials holds the values that are stored in the oxTrust
+The function setCredentials is used to configure the strategy of the credentials of this strategy are been received. The parameter credentials holds the values that are stored in the oxTrust
 
 The parameter callbackURL should point to the callback route that we will configure in step 4. As we are configuring facebook strategy, the callbackURL can be set to ```"/passport/auth/facebook/callback"``` according the the convention of the app. You can customise the callbackURL but it is recommended not to change the convention.
 
@@ -194,7 +194,7 @@ Here ```require('../auth/facebook').passport``` will include the passport strate
 
 Then add the routes for the strategy. First we are going to register the callback route and then the authenticate route.
 
-The authenticate route first validated the jwt token that is been sent by Gluu server to passport server. If the JWT is valid then the user is redirected to the strategy and user can be authenticated there and the responese of the user authentication is redirected to callback route.
+The authenticate route first validated the jwt token that is been sent by Gluu server to passport server. If the JWT is valid then the user is redirected to the strategy and user can be authenticated there and the response of the user authentication is redirected to callback route.
 
 If the callback routes receives the user data then user is been redirected to Gluu.
 
@@ -213,7 +213,7 @@ router.get('/auth/facebook/:token',
     }));
 ```
 
-scope value can be set fron the strategy itsekf it it supports that or you can set the scope value here too.
+scope value can be set from the strategy itself it it supports that or you can set the scope value here too.
 
 The callbackResponse method return the control to gluu server and user is been enrolled in the system.
 
@@ -267,4 +267,4 @@ router.get('/auth/facebook/:token',
     }));
 ```
 
-In oder to call the Strategy, the request URL to call the API must match the route that we configured.
+In order to call the Strategy, the request URL to call the API must match the route that we configured.
