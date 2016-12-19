@@ -18,6 +18,9 @@ var logger = require("./utils/logger");
 global.applicationHost = "https://" + global.config.serverURI;
 global.applicationSecretKey = uuid();
 
+if(!process.env.NODE_LOGGING_DIR)
+    logger.log('error', 'NODE_LOGGING_DIR was not set, Default log folder will be used');
+
 // *** express instance *** //
 var app = express();
 
