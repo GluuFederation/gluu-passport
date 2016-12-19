@@ -15,6 +15,7 @@ exports.setConfiguratins = function(data){
             logger.log('info', 'Facebook Strategy details received');
             FacebookStrategy.setCredentials(data.passportStrategies.facebook);
         }
+
         //GitHubStrategy
         if (data.passportStrategies.github) {
             logger.log('info', 'Github Strategy details received');
