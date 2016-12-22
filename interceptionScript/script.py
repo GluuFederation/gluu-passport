@@ -25,6 +25,7 @@ try:
 except ImportError:
     import simplejson as json
 import java
+import re
 
 
 class PersonAuthentication(PersonAuthenticationType):
@@ -137,7 +138,14 @@ class PersonAuthentication(PersonAuthenticationType):
                         facesMessages.clear()
                         facesMessages.add(StatusMessage.Severity.ERROR, "Please provide your email.")
                         print "Passport: Email was not received so sent error"
+                        return False
 
+                    if not re.match(r"[^@]+@[^@]+\.[^@]+", UserEmail):
+                        facesMessages = FacesMessages.instance()
+                        FacesContext.getCurrentInstance().getExternalContext().getFlash().setKeepMessages(True)
+                        facesMessages.clear()
+                        facesMessages.add(StatusMessage.Severity.ERROR, "Please provide valid email.")
+                        print "Passport: Email was not a valid email so sent error"
                         return False
 
                     for attributesMappingEntry in self.attributesMapping.entrySet():
