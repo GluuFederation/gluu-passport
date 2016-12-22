@@ -6,7 +6,7 @@ Node-Passport Auth is a project for authenticating all the social media provider
 
 ## INSTALLATION
 
-Node-Passport server requires npm and nodejs to be installed on the system.
+Node-Passport server requires npm and NodeJS to be installed on the system.
 
 For installing node and npm please refer [this link](https://nodejs.org/en/download/package-manager/).
 
@@ -47,7 +47,7 @@ Add the strategies that are required and then click update to save the configura
 For enabling the passport Authentication go to Configuration > Manage Authentication > Default Authentication Method
 and then select passport as default authentication mode and update.
 
-Restart gluu server.
+Restart Gluu server.
 Done.
 
 ## GOALS
@@ -215,7 +215,7 @@ router.get('/auth/facebook/:token',
 
 scope value can be set from the strategy itself it it supports that or you can set the scope value here too.
 
-The callbackResponse method return the control to gluu server and user is been enrolled in the system.
+The callbackResponse method return the control to Gluu server and user is been enrolled in the system.
 
 ##### 5. Call method to configure the strategy
 
