@@ -6,11 +6,11 @@
 
     <action execute="#{authenticator.prepareAuthenticationForStep}" on-postback="false" if="#{not identity.loggedIn}"/>
 
-    <rewrite pattern="/auth/passport/generic-post-login" />
+    <rewrite pattern="/auth/passport/passport-post-login" />
 
     <navigation from-action="#{authenticator.prepareAuthenticationForStep}">
         <rule if-outcome="success">
-            <render view-id="/auth/passport/genericpostlogin.xhtml" />
+            <render view-id="/auth/passport/passportpostlogin.xhtml" />
         </rule>
 
         <rule if-outcome="no_permissions">
