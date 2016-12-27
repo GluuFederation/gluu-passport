@@ -22,7 +22,7 @@ This will install all the dependencies of the server. To start the server move t
 
 During installation of the Gluu Server select `yes` to install Passport.js when prompted.
 
-After Gluu Server installation can enable Passport.js by logging in to oxTrust and navigating to Configuration > Organization Configuration.
+After Gluu Server installation, enable Passport.js by logging in to oxTrust and navigating to Configuration > Organization Configuration.
 
 Enable Passport.js support and click the update button to save the settings.
 
