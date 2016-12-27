@@ -35,7 +35,7 @@ You can set the strategies from Configuration > Manage Authentication > Passport
 
 And then add the strategy details like provider, clientID and clientSecret.
 
-The keys that should be the value of provider are:
+The keys for common providers are:
 - google for GPlus Authentication
 - twitter for Twitter Authentication
 - linkedin for LinkedIn Authentication
