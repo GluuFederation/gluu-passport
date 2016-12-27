@@ -45,11 +45,13 @@ The keys for common providers are:
 Add the strategies that are required and then click update to save the configuration.
 
 Finally, to display the strategies on your login page navigate to Configuration > Manage Authentication > Default Authentication Method
-and then select passport as the default authentication mode and click update.
+and then select passport as the default authentication mode. 
+
+Click update.
 
 Restart Gluu server. 
 
-Done.
+And you'r all done.
 
 ## GOALS
 
