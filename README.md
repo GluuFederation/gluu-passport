@@ -1,32 +1,32 @@
-# Node-Passport Social Auth
+# Passport.js 
 
 ## OVERVIEW
 
-Node-Passport Auth is a project for authenticating all the social media providers from only one server which will be used by Gluu server for authenticating users to all social networks.
+Passport is authentication middleware for Node.js. Extremely flexible and modular, Passport can be unobtrusively dropped in to any Express-based web application. Including Passport.js in the Gluu Server will allow an admin to offer many authentication strategies to end users, including social login at large consumer IDPs like Google, Facebook, etc.
 
 ## INSTALLATION
 
 Node-Passport server requires npm and NodeJS to be installed on the system.
 
-For installing node and npm please refer [this link](https://nodejs.org/en/download/package-manager/).
+For installing node and npm please refer to [this guide](https://nodejs.org/en/download/package-manager/).
 
 Clone the repository and move to server directory and hit:
 
-```npm install```
+`npm install`
 
-This will install all the dependencies of the server and then to start server move to server directory and hit
+This will install all the dependencies of the server. To start the server move to the server directory and hit
 
-```node app```
+`node app`
 
-## SETUP passport with Gluu
+## SETUP Passport.js with Gluu
 
-While setup, select yes to install passport when prompted to install passport or not.
+During installation of the Gluu Server select `yes` to install Passport.js when prompted.
 
-To enable passport log in to oxTrust and then go to Configuration > Organization Configuration
+After Gluu Server installation can enable Passport.js by logging in to oxTrust and navigating to Configuration > Organization Configuration.
 
-Enable Passport Support and click update button to save the settings.
+Enable Passport.js support and click the update button to save the settings.
 
-Then go to Manage Custom Scripts and then:
+Then go to Manage Custom Scripts and:
 
     1. Enable passport script in Person Authentication Tab.
     2. Enable uma authorization policy in uma authorization policy tab.
@@ -38,16 +38,17 @@ And then add the strategy details like provider, clientID and clientSecret.
 The keys that should be the value of provider are:
 - google for GPlus Authentication
 - twitter for Twitter Authentication
-- linkedin for Linked Authentication
+- linkedin for LinkedIn Authentication
 - github for Github Authentication
 - facebook for Facebook Authentication
 
 Add the strategies that are required and then click update to save the configuration.
 
-For enabling the passport Authentication go to Configuration > Manage Authentication > Default Authentication Method
-and then select passport as default authentication mode and update.
+Finally, to display the strategies on your login page navigate to Configuration > Manage Authentication > Default Authentication Method
+and then select passport as the default authentication mode and click update.
 
-Restart Gluu server.
+Restart Gluu server. 
+
 Done.
 
 ## GOALS
