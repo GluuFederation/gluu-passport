@@ -1,4 +1,4 @@
-var request = require("request");
+var request = require('request-promise');
 var fs = require('fs');
 var uuid = require('uuid');
 var jwt = require('jsonwebtoken');
@@ -7,39 +7,37 @@ var logger = require("../utils/logger");
 
 var UMAConfigURL = 'https://' + global.config.serverURI + '/.well-known/uma-configuration';
 
-exports.getTokenEndpoint = function (callback) {
+Promise = require('bluebird');
+
+function getTokenEndpoint(UMAConfigURL) {
     var options = {
         method: 'GET',
         url: UMAConfigURL
     };
 
-    request(options, function (error, response, body) {
+    return new Promise(function (resolve, reject) {
+        request(options)
+            .then(function (umaConfigurations) {
+                try {
+                    umaConfigurations = JSON.parse(umaConfigurations);
+                } catch (ex) {
+                    logger.log('error', "Error in parsing JSON in getTokenEndpoint: ", JSON.stringify(ex));
+                    logger.log('error', "Error received in getTokenEndpoint: ", umaConfigurations.toString());
+                    reject(umaConfigurations.toString());
+                }
 
-        if (error) {
-            logger.log('error', "Error in requesting uma configurations");
-            return callback(error, null);
-        }
-
-        try {
-            body = JSON.parse(body);
-        } catch (ex) {
-            logger.log('error', "Error in parsing JSON in getTokenEndpoint: ", JSON.stringify(ex));
-            logger.log('error', "Error received in getTokenEndpoint: ", body.toString());
-            return callback(body.toString(), null);
-        }
-
-        global.UMAConfig = body;
-        logger.log('info', "UMAConfigurations were received");
-        getATT(global.UMAConfig.token_endpoint, function (err, data) {
-            if (err) {
-                return callback(err, null);
-            }
-            return callback(null, data);
-        });
+                global.UMAConfig = umaConfigurations;
+                logger.log('info', "UMAConfigurations were received");
+                resolve(global.UMAConfig.token_endpoint);
+            })
+            .catch(function (error) {
+                logger.log('error', "Error in requesting uma configurations");
+                reject(error);
+            });
     });
-};
+}
 
-function getATT(token_endpoint, callback) {
+function getAAT(token_endpoint) {
 
     var passportCert = fs.readFileSync(global.config.keyPath, 'utf8'); // get private key and replace headers to sign jwt
     passportCert = passportCert.replace("-----BEGIN RSA PRIVATE KEY-----", "-----BEGIN PRIVATE KEY-----");
@@ -78,39 +76,35 @@ function getATT(token_endpoint, callback) {
         }
     };
 
-    request(optionsForRequest, function (error, response, body) {
+    return new Promise(function (resolve, reject) {
+        request(optionsForRequest)
+            .then(function (AATDetails) {
+                try {
+                    AATDetails = JSON.parse(AATDetails);
+                } catch (ex) {
+                    logger.log('error', "Error in parsing JSON in getAAT: ", JSON.stringify(ex));
+                    logger.log('error', "Error received in getAAT: ", AATDetails.toString());
+                    reject(AATDetails.toString());
+                }
 
-        if (error) {
-            logger.log('error', "Error in requesting ATT");
-            return callback(error, null);
-        }
+                if (AATDetails.error) {
+                    logger.log('error', "Error in response from ATT: ", JSON.stringify(AATDetails.error));
+                    reject(AATDetails.error);
+                }
 
-        try {
-            body = JSON.parse(body);
-        } catch (ex) {
-            logger.log('error', "Error in parsing JSON in getATT: ", JSON.stringify(ex));
-            logger.log('error', "Error received in getATT: ", body.toString());
-            return callback(body.toString(), null);
-        }
-
-        if (body.error) {
-            logger.log('error', "Error in response from ATT: ", JSON.stringify(body.error));
-            return callback(body.error, null);
-        }
-
-        logger.log('info', "ATTDetails were received");
-        getGAT(body, function (err, data) {
-            if (err) {
-                return callback(err, null);
-            }
-            return callback(null, data);
-        });
+                logger.log('info', "ATTDetails were received");
+                resolve(AATDetails);
+            })
+            .catch(function (error) {
+                logger.log('error', "Error in requesting ATT");
+                reject(error);
+            });
     });
 }
 
-function getGAT(ATTDetails, callback) {
+function getGAT(AATDetails) {
 
-    var accessToken = ATTDetails.access_token;
+    var accessToken = AATDetails.access_token;
     var options = {
         method: 'POST',
         url: global.UMAConfig.gat_endpoint,
@@ -121,33 +115,30 @@ function getGAT(ATTDetails, callback) {
         },
         body: JSON.stringify({ scopes: [global.config.umaScope] })
     };
-    request(options, function (error, response, body) {
 
-        if (error) {
-            logger.log('error', "Error in requesting GAT");
-            return callback(error, null);
-        }
+    return new Promise(function (resolve, reject) {
+        request(options)
+            .then(function (GATDetails) {
+                try {
+                    GATDetails = JSON.parse(GATDetails);
+                } catch (ex) {
+                    logger.log('error', "Error in parsing JSON in getGAT: ", JSON.stringify(ex));
+                    logger.log('error', "Error received in getGAT: ", GATDetails.toString());
+                    reject(GATDetails.toString());
+                }
 
-        try {
-            body = JSON.parse(body);
-        } catch (ex) {
-            logger.log('error', "Error in parsing JSON in getGAT: ", JSON.stringify(ex));
-            logger.log('error', "Error received in getGAT: ", body.toString());
-            return callback(body.toString(), null);
-        }
-
-        var rpt = body.rpt;
-        logger.log('info', "rpt was received");
-        getJSON(rpt, function (err, data) {
-            if (err) {
-                return callback(err, null);
-            }
-            return callback(null, data);
-        });
+                var rpt = GATDetails.rpt;
+                logger.log('info', "rpt was received");
+                resolve(rpt);
+            })
+            .catch(function (error) {
+                logger.log('error', "Error in requesting GAT");
+                reject(error);
+            });
     });
 }
 
-function getJSON(rpt, onResult) {
+function getJSON(rpt) {
 
     var options = {
         method: 'GET',
@@ -156,28 +147,49 @@ function getJSON(rpt, onResult) {
             'authorization': 'Bearer '.concat(rpt)
         }
     };
-    request(options, function (error, response, body) {
 
-        if (error) {
-            logger.log('error', "Error in requesting getJSON");
-            return onResult(error, null);
-        }
+    return new Promise(function (resolve, reject) {
+        request(options)
+            .then(function (passportStrategies) {
+                try {
+                    passportStrategies = JSON.parse(passportStrategies);
+                } catch (ex) {
+                    logger.log('error', "Error in parsing JSON in getJSON: ", JSON.stringify(ex));
+                    logger.log('error', "Error received in getJSON: ", passportStrategies.toString());
+                    reject(passportStrategies.toString());
+                }
 
-        try {
-            body = JSON.parse(body);
-        } catch (ex) {
-            logger.log('error', "Error in parsing JSON in getJSON: ", JSON.stringify(ex));
-            logger.log('error', "Error received in getJSON: ", body.toString());
-            return onResult(body.toString(), null);
-        }
-
-        if (body.error) {
-            logger.log('error', "Error in response from getJSON: ", JSON.stringify(body.error));
-            return onResult(body.error, null);
-        }
-        logger.log('info', "Passport strategies were received");
-        configureStrategies.setConfiguratins(body);
-        return onResult(null, body);
-
+                if (passportStrategies.error) {
+                    logger.log('error', "Error in response from getJSON: ", JSON.stringify(passportStrategies.error));
+                    reject(passportStrategies.error);
+                }
+                logger.log('info', "Passport strategies were received");
+                configureStrategies.setConfiguratins(passportStrategies);
+                resolve(passportStrategies);
+            })
+            .catch(function (error) {
+                logger.log('error', "Error in requesting getJSON");
+                reject(error);
+            });
     });
 }
+
+exports.getDetailsAndConfigureStrategies = function(callback){
+    getTokenEndpoint(UMAConfigURL)
+        .then(function (umaConfigurations) {
+            return getAAT(umaConfigurations);
+        })
+        .then(function (AATDetails) {
+            return getGAT(AATDetails);
+        })
+        .then(function (rpt) {
+            return getJSON(rpt);
+        })
+        .then(function (passportStrategies) {
+            configureStrategies.setConfiguratins(passportStrategies);
+            callback(null, passportStrategies);
+        })
+        .catch(function (error) {
+            callback(error, null);
+        });
+};
