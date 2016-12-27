@@ -126,6 +126,7 @@ There will be single page for the authentication with different buttons which wi
 
 Find an npm module that fits best for the strategy that you want to add.
 Let's start with an example. In this example we will consider adding facebook strategy.
+
 1. If you want to add facebook strategy, search for passport-facebook npm module where you can select the npm module and then add the module to passport server.
 2. Let's say we found this module "passport-facebook" and want to use this module in for facebook authentication, install the module in passport app by executing ```npm install passport-facebook --save``` to install the module and also save the dependency to the passport server.
 3. Configure the strategy.
