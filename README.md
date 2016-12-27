@@ -51,7 +51,7 @@ Click update.
 
 Restart Gluu server. 
 
-And you'r all done.
+And you're all done.
 
 ## GOALS
 
