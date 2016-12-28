@@ -29,7 +29,9 @@ var logger = new (winston.Logger)({
     exitOnError: false
 });
 
-var mqSetUp = global.config.activeMQConf.isEnabled && global.config.activeMQConf;
+var mqSetUp = global.config.activeMQConf
+                && global.config.activeMQConf.isEnabled
+                && global.config.activeMQConf;
 
 var MQDetails = {
     CLIENT_QUEUE_NAME: 'oauth2.audit.logging',
