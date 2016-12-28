@@ -18,8 +18,10 @@ var logger = require("./utils/logger");
 global.applicationHost = "https://" + global.config.serverURI;
 global.applicationSecretKey = uuid();
 
-if(!process.env.NODE_LOGGING_DIR)
+if(!process.env.NODE_LOGGING_DIR){
     logger.log('error', 'NODE_LOGGING_DIR was not set, Default log folder will be used');
+    logger.sendMQMessage('error: NODE_LOGGING_DIR was not set, Default log folder will be used');
+}
 
 // *** express instance *** //
 var app = express();
@@ -87,11 +89,13 @@ app.use('/passport', require('./routes/index.js'));
 // *** error handlers *** //
 app.use(function (err, req, res, next) {
     logger.log('error', 'Unknown Error: ' + JSON.stringify(err));
+    logger.sendMQMessage('error: Unknown Error: ' + JSON.stringify(err));
     res.redirect('/passport/login');
 });
 
 process.on('uncaughtException', function(err) {
     logger.log('error', 'Uncaught Exception: ' + JSON.stringify(err));
+    logger.sendMQMessage('error: Unknown Exception: ' + JSON.stringify(err));
 });
 
 if (('development' == app.get('env')) || true) { // To make sure that the requests are not rejected
@@ -100,8 +104,10 @@ if (('development' == app.get('env')) || true) { // To make sure that the reques
 
 var listener = server.createServer(app).listen(global.config.serverWebPort, getConsumerDetails.getDetailsAndConfigureStrategies(function(err, data) {
     if(err){
-        logger.log('error', "Error in starting the server. error:- ", err);
+        logger.log('error', 'Error in starting the server. error:- ', err);
+        logger.sendMQMessage('error: Error in starting the server. error:- ' + JSON.stringify(err));
     } else {
-        logger.info("Server listning on http://localhost:" + global.config.serverWebPort);
+        logger.log('info', 'Server listening on http://localhost:' + global.config.serverWebPort);
+        logger.sendMQMessage('info: Server listening on http://localhost:' + global.config.serverWebPort);
     }
 }));

@@ -21,17 +21,21 @@ function getTokenEndpoint(UMAConfigURL) {
                 try {
                     umaConfigurations = JSON.parse(umaConfigurations);
                 } catch (ex) {
-                    logger.log('error', "Error in parsing JSON in getTokenEndpoint: ", JSON.stringify(ex));
-                    logger.log('error', "Error received in getTokenEndpoint: ", umaConfigurations.toString());
+                    logger.log('error', 'Error in parsing JSON in getTokenEndpoint: ', JSON.stringify(ex));
+                    logger.sendMQMessage('error: Error in parsing JSON in getTokenEndpoint: ' + JSON.stringify(ex));
+                    logger.log('error', 'Error received in getTokenEndpoint: ', umaConfigurations.toString());
+                    logger.sendMQMessage('error: Error received in getTokenEndpoint: ' + umaConfigurations.toString());
                     reject(umaConfigurations.toString());
                 }
 
                 global.UMAConfig = umaConfigurations;
-                logger.log('info', "UMAConfigurations were received");
+                logger.log('info', 'UMAConfigurations were received');
+                logger.sendMQMessage('info: UMAConfigurations were received');
                 resolve(global.UMAConfig.token_endpoint);
             })
             .catch(function (error) {
-                logger.log('error', "Error in requesting uma configurations");
+                logger.log('error', 'Error in requesting uma configurations');
+                logger.sendMQMessage('error: Error in requesting uma configurations');
                 reject(error);
             });
     });
@@ -82,21 +86,26 @@ function getAAT(token_endpoint) {
                 try {
                     AATDetails = JSON.parse(AATDetails);
                 } catch (ex) {
-                    logger.log('error', "Error in parsing JSON in getAAT: ", JSON.stringify(ex));
-                    logger.log('error', "Error received in getAAT: ", AATDetails.toString());
+                    logger.log('error', 'Error in parsing JSON in getAAT: ', JSON.stringify(ex));
+                    logger.sendMQMessage('error: Error in parsing JSON in getAAT: ' + JSON.stringify(ex));
+                    logger.log('error', 'Error received in getAAT: ', AATDetails.toString());
+                    logger.sendMQMessage('error: Error received in getAAT: ' + AATDetails.toString());
                     reject(AATDetails.toString());
                 }
 
                 if (AATDetails.error) {
-                    logger.log('error', "Error in response from ATT: ", JSON.stringify(AATDetails.error));
+                    logger.log('error', 'Error in response from AAT: ', JSON.stringify(AATDetails.error));
+                    logger.sendMQMessage('error: Error in response from AAT:: ' + JSON.stringify(AATDetails.error));
                     reject(AATDetails.error);
                 }
 
-                logger.log('info', "ATTDetails were received");
+                logger.log('info', 'AATDetails were received');
+                logger.sendMQMessage('info: AATDetails were received');
                 resolve(AATDetails);
             })
             .catch(function (error) {
-                logger.log('error', "Error in requesting ATT");
+                logger.log('error', 'Error in requesting AAT');
+                logger.sendMQMessage('error: Error in requesting AAT');
                 reject(error);
             });
     });
@@ -122,17 +131,21 @@ function getGAT(AATDetails) {
                 try {
                     GATDetails = JSON.parse(GATDetails);
                 } catch (ex) {
-                    logger.log('error', "Error in parsing JSON in getGAT: ", JSON.stringify(ex));
-                    logger.log('error', "Error received in getGAT: ", GATDetails.toString());
+                    logger.log('error', 'Error in parsing JSON in getGAT: ', JSON.stringify(ex));
+                    logger.sendMQMessage('error: Error in parsing JSON in getGAT: ', JSON.stringify(ex));
+                    logger.log('error', 'Error received in getGAT: ', GATDetails.toString());
+                    logger.sendMQMessage('error: Error received in getGAT: ', GATDetails.toString());
                     reject(GATDetails.toString());
                 }
 
                 var rpt = GATDetails.rpt;
-                logger.log('info', "rpt was received");
+                logger.log('info', 'rpt was received');
+                logger.sendMQMessage('info: rpt was received');
                 resolve(rpt);
             })
             .catch(function (error) {
-                logger.log('error', "Error in requesting GAT");
+                logger.log('error', 'Error in requesting GAT');
+                logger.sendMQMessage('error: Error in requesting GAT');
                 reject(error);
             });
     });
@@ -154,21 +167,26 @@ function getJSON(rpt) {
                 try {
                     passportStrategies = JSON.parse(passportStrategies);
                 } catch (ex) {
-                    logger.log('error', "Error in parsing JSON in getJSON: ", JSON.stringify(ex));
-                    logger.log('error', "Error received in getJSON: ", passportStrategies.toString());
+                    logger.log('error', 'Error in parsing JSON in getJSON: ', JSON.stringify(ex));
+                    logger.sendMQMessage('error: Error in parsing JSON in getJSON: ', JSON.stringify(ex));
+                    logger.log('error', 'Error received in getJSON: ', passportStrategies.toString());
+                    logger.sendMQMessage('error: Error received in getJSON: ', passportStrategies.toString());
                     reject(passportStrategies.toString());
                 }
 
                 if (passportStrategies.error) {
-                    logger.log('error', "Error in response from getJSON: ", JSON.stringify(passportStrategies.error));
+                    logger.log('error', 'Error in response from getJSON: ', JSON.stringify(passportStrategies.error));
+                    logger.sendMQMessage('error: Error in response from getJSON: ', JSON.stringify(passportStrategies.error));
                     reject(passportStrategies.error);
                 }
-                logger.log('info', "Passport strategies were received");
+                logger.log('info', 'Passport strategies were received');
+                logger.sendMQMessage('info: Passport strategies were received');
                 configureStrategies.setConfiguratins(passportStrategies);
                 resolve(passportStrategies);
             })
             .catch(function (error) {
-                logger.log('error', "Error in requesting getJSON");
+                logger.log('error', 'Error in requesting getJSON');
+                logger.sendMQMessage('error: Error in requesting getJSON');
                 reject(error);
             });
     });
