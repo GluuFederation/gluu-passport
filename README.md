@@ -237,6 +237,7 @@ And then in setConfiguratins function, call the setCredentials method if the str
 //FacebookStrategy
 if (data.passportStrategies.facebook) {
 	logger.log('info', 'Facebook Strategy details received');
+	logger.sendMQMessage('info: Facebook Strategy details received');
 	FacebookStrategy.setCredentials(data.passportStrategies.facebook);
 }
 ```
