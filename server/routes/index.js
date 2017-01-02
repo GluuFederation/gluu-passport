@@ -11,6 +11,7 @@ var passportYahoo = require('../auth/yahoo').passport;
 var passportGoogle = require('../auth/google').passport;
 var passportWindowsLive = require('../auth/windowslive').passport;
 var passportDropbox = require('../auth/dropbox').passport;
+var logger = require("../utils/logger");
 
 var validateToken = function(req, res, next) {
 
@@ -42,6 +43,8 @@ var callbackResponse = function(req, res) {
     if (!req.user) {
         return res.redirect(global.config.applicationStartpoint + '?failure=Unauthorized');
     }
+    logger.log('info', 'User authenticated with' + req.user.provider + 'Strategy with userid: ' + req.user.id);
+    logger.sendMQMessage('info: User authenticated with' + req.user.provider + 'Strategy with userid: ' + req.user.id);
     var queryUserString = encodeURIComponent(JSON.stringify(req.user));
     return res.redirect(global.config.applicationEndpoint + '?user=' + queryUserString);
 };
