@@ -42,6 +42,9 @@ The values for Strategy field for common providers are:
 - github for Github Authentication
 - facebook for Facebook Authentication
 
+Make sure the  Authorized redirect URIs list of your app contains the passport strategy's callback.
+If your gluu server points to https://example.gluu.org and the strategy is facebook, the list of Authorized redirect URIs should contain https://example.gluu.org/passport/auth/facebook/callback.
+
 Add the strategies that are required and then click update to save the configuration.
 
 Finally, to display the strategies on your login page navigate to Configuration > Manage Authentication > Default Authentication Method
