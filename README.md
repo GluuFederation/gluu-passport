@@ -33,9 +33,9 @@ Then go to Manage Custom Scripts and:
 
 You can set the strategies from Configuration > Manage Authentication > Passport Authentication Method
 
-And then add the strategy details like provider, clientID and clientSecret.
+And then add the strategy details like clientID and clientSecret.
 
-The keys for common providers are:
+The values for Strategy field for common providers are:
 - google for GPlus Authentication
 - twitter for Twitter Authentication
 - linkedin for LinkedIn Authentication
