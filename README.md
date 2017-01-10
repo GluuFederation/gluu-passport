@@ -127,6 +127,18 @@ During the installation of Gluu server we can setup node server as well. We can 
 
 There will be single page for the authentication with different buttons which will call different endpoints on Node-Passport server. For example twitter button will call the twitter strategy of Node-Passport server for twitter authentication.
 
+## How to create a new app to use for Passport server?
+
+Every provider has different protocols and ways to create the app. We will look at one of the most common providers "facebook" and create a new app.
+
+1. Login to https://developers.facebook.com
+2. Click on Add a new App from My Apps dropdown
+3. Fill the required details and click the create Create App ID button to create the app.
+4. Click on the dashboard menu and get the clientID and clientSecret which can be used with the passport.
+5. Click on settings menu and put the domain of your gluu server in the App Domains field.
+
+Note: If there is a filed for Authorized redirect URIs, make sure the Authorized redirect URIs list of your app contains the passport strategy's callback. If your gluu server points to https://example.gluu.org and the strategy is facebook, the list of Authorized redirect URIs should contain https://example.gluu.org/passport/auth/facebook/callback.
+
 ## How to add new strategies to Passport server?
 
 Find an npm module that fits best for the strategy that you want to add.
