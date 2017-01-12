@@ -18,7 +18,7 @@ Gluu server has only one interception script for all the social network provider
 
 ### Sequence Diagram
 
-![Sequence Diagram](../img/passport/sequence_diagram.png "Title")
+![Sequence Diagram](/img/passport/sequence_diagram.png "Title")
 
 1. Gluu server calls Node-Passport server for JWT token.
 2. Node-Passport server generates a JWT token and provides it in response to Gluu server.
