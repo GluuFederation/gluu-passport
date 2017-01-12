@@ -18,7 +18,7 @@ Gluu server has only one interception script for all the social network provider
 
 ### Sequence Diagram
 
-![Sequence Diagram](../img/passport/sequence_diagram.png "Title")
+![Sequence Diagram](/img/passport/sequence_diagram.png "Title")
 
 1. Gluu server calls Node-Passport server for JWT token.
 2. Node-Passport server generates a JWT token and provides it in response to Gluu server.
@@ -33,13 +33,13 @@ Gluu server has only one interception script for all the social network provider
 During installation of the Gluu Server select `yes` to install Passport.js when prompted.
 
 1. Click on Manage Custom Scripts under configuration tab on the main menu.
-2. Enable passport script in Person Authentication Tab.![Enable passport1](../img/passport/enable-passport.png)
-3. Click on update at the end of the page.![update](../img/passport/auth-update.png)
-4. Enable uma authorization policy in uma authorization policy tab.![uma-enable](../img/passport/uma-enable.png)
+2. Enable passport script in Person Authentication Tab.![Enable passport1](/img/passport/enable-passport.png)
+3. Click on update at the end of the page.![update](/img/passport/auth-update.png)
+4. Enable uma authorization policy in uma authorization policy tab.![uma-enable](/img/passport/uma-enable.png)
 5. Click on update.
 6. To set the strategies from Configuration > Manage Authentication > Default Authenticaion
 7. Under Default Authenticaion tab, change Authentication mode to passport
-8. Change passport support to enabled.![enable-authentication](../img/passport/enable-authentication.png)
+8. Change passport support to enabled.![enable-authentication](/img/passport/enable-authentication.png)
 9. Once Passport support is enabled and updated, Passport Authentication Method will appear in the next tab.
 10. Click on the Passport Authenticaion Method, and set the strategies as follows,The values for Strategy field for common providers are:
 	- google for GPlus Authentication
@@ -48,7 +48,7 @@ During installation of the Gluu Server select `yes` to install Passport.js when 
 	- github for Github Authentication
 	- facebook for Facebook Authentication
 11. And then add the strategy details like clientID and clientSecret.
-			clientID and clientSecret are details obtained from the provider, after the app is created in the provider form.![setting-strategies](../img/passport/setting-strategies.png)
+			clientID and clientSecret are details obtained from the provider, after the app is created in the provider form.![setting-strategies](/img/passport/setting-strategies.png)
 12. Once the configuration and settings are done, restart the passport service or Gluu Server.
 		a. Login to chroot
 		b. Enter below command to stop.
@@ -113,7 +113,7 @@ If you want to play with JWT and put these concepts to practice, you can use jwt
 
 ### Example of encoded and decoded JWT
 
-![JWT](../img/passport/jwt.png "Title")
+![JWT](/img/passport/jwt.png "Title")
 
 Whenever the user wants to access a protected route or resource, it should send the JWT, here in our case in route url. Therefore the route or api call should look like the following.
 
