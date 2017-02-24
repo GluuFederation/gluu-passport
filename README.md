@@ -76,7 +76,7 @@ If your gluu server points to https://example.gluu.org and the strategy is faceb
 ## INSTALLATION
 
 !!! note
-	The node installation is already installed when passport is selected during the installation of Gluu 3.0.0 CE Server.
+	The node installation is already installed when passport is selected during the installation of Gluu 3.0.1 CE Server.
 	
 Node-Passport server requires npm and NodeJS to be installed on the system.
 
