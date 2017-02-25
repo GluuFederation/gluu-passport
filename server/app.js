@@ -88,9 +88,11 @@ app.use('/passport', require('./routes/index.js'));
 
 // *** error handlers *** //
 app.use(function (err, req, res, next) {
-    logger.log('error', 'Unknown Error: ' + JSON.stringify(err));
-    logger.sendMQMessage('error: Unknown Error: ' + JSON.stringify(err));
-    res.redirect('/passport/login');
+    if(err) {
+        logger.log('error', 'Unknown Error: ' + JSON.stringify(err));
+        logger.sendMQMessage('error: Unknown Error: ' + JSON.stringify(err));
+        res.redirect('/passport/login');
+    }
 });
 
 process.on('uncaughtException', function(err) {

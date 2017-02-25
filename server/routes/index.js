@@ -43,8 +43,8 @@ var callbackResponse = function(req, res) {
     if (!req.user) {
         return res.redirect(global.config.applicationStartpoint + '?failure=Unauthorized');
     }
-    logger.log('info', 'User authenticated with' + req.user.provider + 'Strategy with userid: ' + req.user.id);
-    logger.sendMQMessage('info: User authenticated with' + req.user.provider + 'Strategy with userid: ' + req.user.id);
+    logger.log('info', 'User authenticated with: ' + req.user.provider + 'Strategy with userid: ' + req.user.id);
+    logger.sendMQMessage('info: User authenticated with: ' + req.user.provider + 'Strategy with userid: ' + req.user.id);
     var queryUserString = encodeURIComponent(JSON.stringify(req.user));
     return res.redirect(global.config.applicationEndpoint + '?user=' + queryUserString);
 };
