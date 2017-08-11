@@ -4,9 +4,12 @@ var uuid = require('uuid');
 var jwt = require('jsonwebtoken');
 var configureStrategies = require("./configureStrategies");
 var logger = require("../utils/logger");
+var www_authenticate = require('www-authenticate');
+var parsers = require('www-authenticate').parsers;
 
-var UMAConfigURL = 'https://' + global.config.serverURI + '/.well-known/uma-configuration';
+var UMAConfigURL = 'https://' + global.config.serverURI + '/.well-known/uma2-configuration';
 
+var ticket, as_URI;
 Promise = require('bluebird');
 
 function getTokenEndpoint(UMAConfigURL) {
@@ -41,6 +44,51 @@ function getTokenEndpoint(UMAConfigURL) {
     });
 }
 
+function getTicketAndConfig(data) {
+    var options = {
+        method: 'GET',
+        url: global.config.passportConfigAPI
+
+    };
+
+    return new Promise(function (resolve, reject) {
+        request(options)
+            .then(function (data) {
+                try {
+                    data = JSON.parse(data);
+                } catch (ex) {
+                    logger.log('error', 'Error in parsing JSON in getTokenEndpoint: ', JSON.stringify(ex));
+                    logger.sendMQMessage('error: Error in parsing JSON in getTokenEndpoint: ' + JSON.stringify(ex));
+                    logger.log('error', 'Error received in getTokenEndpoint: ', data.toString());
+                    logger.sendMQMessage('error: Error received in getTokenEndpoint: ' + data.toString());
+                    reject(data.toString());
+                }
+
+                global.UMAConfig = data;
+                logger.log('info', 'UMAConfigurations were received');
+                logger.sendMQMessage('info: UMAConfigurations were received');
+                resolve(global.UMAConfig.token_endpoint);
+            })
+            .catch(function (error) {
+                if (error.statusCode == 401) {
+                    var parsed = new parsers.WWW_Authenticate(error.response.headers['www-authenticate']);
+                    logger.sendMQMessage('Got ticket in error header :' + error.response.headers['www-authenticate']);
+
+                    ticket = parsed.parms.ticket;
+                    as_URI = parsed.parms.as_uri;
+                    resolve(error);
+
+                }
+                else {
+                    logger.sendMQMessage('error: Error in getting ticket from AS. error:' + error);
+                    reject(data.toString());
+
+
+                }
+            });
+    });
+}
+
 function getAAT(token_endpoint) {
 
     var passportCert = fs.readFileSync(global.config.keyPath, 'utf8'); // get private key and replace headers to sign jwt
@@ -59,7 +107,7 @@ function getAAT(token_endpoint) {
     var token = jwt.sign({
         iss: clientId,
         sub: clientId,
-        aud: token_endpoint,
+        aud: global.UMAConfig.token_endpoint,
         jti: uuid(),
         exp: (new Date().getTime() / 1000 + 30),
         iat: (new Date().getTime())
@@ -67,16 +115,22 @@ function getAAT(token_endpoint) {
 
     var optionsForRequest = {
         method: 'POST',
-        url: token_endpoint,
+        url: global.UMAConfig.token_endpoint,
         headers: {
             'content-type': 'application/x-www-form-urlencoded'
         },
         form: {
-            grant_type: 'client_credentials',
+            grant_type: 'urn:ietf:params:oauth:grant-type:uma-ticket',
             scope: 'uma_authorization',
             client_assertion_type: 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
             client_assertion: token,
-            client_id: clientId
+            client_id: clientId,
+            ticket: ticket,
+            claim_token: null,
+            claim_token_format: null,
+            pct: null,
+            rpt: null,
+            scope: null
         }
     };
 
@@ -111,45 +165,6 @@ function getAAT(token_endpoint) {
     });
 }
 
-function getGAT(AATDetails) {
-
-    var accessToken = AATDetails.access_token;
-    var options = {
-        method: 'POST',
-        url: global.UMAConfig.gat_endpoint,
-        headers: {
-            'content-type': 'application/json',
-            gat: 'true',
-            authorization: 'Bearer '.concat(accessToken)
-        },
-        body: JSON.stringify({ scopes: [global.config.umaScope] })
-    };
-
-    return new Promise(function (resolve, reject) {
-        request(options)
-            .then(function (GATDetails) {
-                try {
-                    GATDetails = JSON.parse(GATDetails);
-                } catch (ex) {
-                    logger.log('error', 'Error in parsing JSON in getGAT: ', JSON.stringify(ex));
-                    logger.sendMQMessage('error: Error in parsing JSON in getGAT: ', JSON.stringify(ex));
-                    logger.log('error', 'Error received in getGAT: ', GATDetails.toString());
-                    logger.sendMQMessage('error: Error received in getGAT: ', GATDetails.toString());
-                    reject(GATDetails.toString());
-                }
-
-                var rpt = GATDetails.rpt;
-                logger.log('info', 'rpt was received');
-                logger.sendMQMessage('info: rpt was received');
-                resolve(rpt);
-            })
-            .catch(function (error) {
-                logger.log('error', 'Error in requesting GAT');
-                logger.sendMQMessage('error: Error in requesting GAT');
-                reject(error);
-            });
-    });
-}
 
 function getJSON(rpt) {
 
@@ -157,7 +172,8 @@ function getJSON(rpt) {
         method: 'GET',
         url: global.config.passportConfigAPI,
         headers: {
-            'authorization': 'Bearer '.concat(rpt)
+            'authorization': 'Bearer '.concat(rpt.access_token),
+            'pct': rpt.pct
         }
     };
 
@@ -192,13 +208,13 @@ function getJSON(rpt) {
     });
 }
 
-exports.getDetailsAndConfigureStrategies = function(callback){
+exports.getDetailsAndConfigureStrategies = function (callback) {
     getTokenEndpoint(UMAConfigURL)
+        .then(function (data) {
+            return getTicketAndConfig(data);
+        })
         .then(function (umaConfigurations) {
             return getAAT(umaConfigurations);
-        })
-        .then(function (AATDetails) {
-            return getGAT(AATDetails);
         })
         .then(function (rpt) {
             return getJSON(rpt);
