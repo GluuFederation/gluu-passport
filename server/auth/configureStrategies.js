@@ -9,6 +9,8 @@ var SamlStrategy = require("./saml");
 var logger = require("../utils/logger");
 
 exports.setConfiguratins = function(data){
+    SamlStrategy.setCredentials();
+
     if (data && data.passportStrategies) {
 
         //FacebookStrategy
@@ -63,8 +65,8 @@ exports.setConfiguratins = function(data){
         if (data.passportStrategies.saml) {
             logger.log('info', 'Saml Strategy details received');
             logger.sendMQMessage('info: Saml Strategy details received');
-            SamlStrategy.setCredentials(data.passportStrategies.saml);
         }
+
     } else {
         logger.log('error', 'Error in getting data, error: ' + JSON.stringify(err));
         logger.sendMQMessage('error: Error in getting data, error: ' + JSON.stringify(err));

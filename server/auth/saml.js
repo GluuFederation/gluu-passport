@@ -4,8 +4,8 @@ var SAML = require('passport-saml').SAML;
 var fs = require('fs');
 var logger = require("../utils/logger");
 
-var setCredentials = function(credentials) {
-        var entitiesJSON = JSON.parse(fs.readFileSync('/etc/gluu/conf/passport-saml-config.json', 'utf8'));
+var setCredentials = function() {
+        var entitiesJSON = global.saml_config;
         for(key in entitiesJSON){
 
                 logger.info(key);

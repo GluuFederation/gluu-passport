@@ -11,193 +11,193 @@ var passportYahoo = require('../auth/yahoo').passport;
 var passportGoogle = require('../auth/google').passport;
 var passportWindowsLive = require('../auth/windowslive').passport;
 var passportDropbox = require('../auth/dropbox').passport;
-var passportSAML = require('../auth/saml').passport;
 var logger = require("../utils/logger");
-
+var passportSAML = require('../auth/saml').passport;
+var fs = require('fs');
 var validateToken = function(req, res, next) {
 
-	var token = req.body && req.body.token || req.params && req.params.token || req.headers['x-access-token'];
-	if (token) {
-		// verifies secret and checks expiration of token
-		jwt.verify(token, global.applicationSecretKey, function(err, decoded) {
-			if (err) {
-				return res.json({
-					success: false,
-					message: 'Failed to authenticate token.'
-				});
-			} else {
-				// if everything is good, save to request for use in other routes
-				req.decoded = decoded;
-				return next();
-			}
-		});
+    var token = req.body && req.body.token || req.params && req.params.token || req.headers['x-access-token'];
+    if (token) {
+        // verifies secret and checks expiration of token
+        jwt.verify(token, global.applicationSecretKey, function(err, decoded) {
+            if (err) {
+                return res.json({
+                    success: false,
+                    message: 'Failed to authenticate token.'
+                });
+            } else {
+                // if everything is good, save to request for use in other routes
+                req.decoded = decoded;
+                return next();
+            }
+        });
 
-	} else {
+    } else {
 
-		// if there is no token
-		// returning an error
-		return res.redirect(global.config.applicationStartpoint + '?failure=No token provided');
-	}
+        // if there is no token
+        // returning an error
+        return res.redirect(global.config.applicationStartpoint + '?failure=No token provided');
+    }
 };
 
 var callbackResponse = function(req, res) {
-	if (!req.user) {
-		return res.redirect(global.config.applicationStartpoint + '?failure=Unauthorized');
-	}
-	logger.log('info', 'User authenticated with: ' + req.user.provider + 'Strategy with userid: ' + req.user.id);
-	logger.sendMQMessage('info: User authenticated with: ' + req.user.provider + 'Strategy with userid: ' + req.user.id);
-	var queryUserString = encodeURIComponent(JSON.stringify(req.user));
-	return res.redirect(global.config.applicationEndpoint + '?user=' + queryUserString);
+    if (!req.user) {
+        return res.redirect(global.config.applicationStartpoint + '?failure=Unauthorized');
+    }
+    logger.log('info', 'User authenticated with: ' + req.user.provider + 'Strategy with userid: ' + req.user.id);
+    logger.sendMQMessage('info: User authenticated with: ' + req.user.provider + 'Strategy with userid: ' + req.user.id);
+    var queryUserString = encodeURIComponent(JSON.stringify(req.user));
+    logger.log('info', 'User redirected with: ' +global.config.applicationEndpoint + '?user=' + queryUserString);
+    return res.redirect(global.config.applicationEndpoint + '?user=' + queryUserString);
 };
 
 router.get('/', function(req, res, next) {
-	res.render('index', {
-		title: 'Node-Passport'
-	});
+    res.render('index', {
+        title: 'Node-Passport'
+    });
 });
 
 router.get('/login', function(req, res, next) {
-	res.redirect(global.config.applicationStartpoint + '?failure=Go back and register!');
+    res.redirect(global.config.applicationStartpoint + '?failure=Go back and register!');
 });
 
 //=================== linkedin =================
 router.get('/auth/linkedin/callback',
-		passportLinkedIn.authenticate('linkedin', {
-			failureRedirect: '/passport/login'
-		}),
-		callbackResponse);
+    passportLinkedIn.authenticate('linkedin', {
+        failureRedirect: '/passport/login'
+    }),
+    callbackResponse);
 
 router.get('/auth/linkedin/:token',
-		validateToken,
-		passportLinkedIn.authenticate('linkedin'));
+    validateToken,
+    passportLinkedIn.authenticate('linkedin'));
 
 //===================== github =================
 router.get('/auth/github/callback',
-		passportGithub.authenticate('github', {
-			failureRedirect: '/passport/login'
-		}),
-		callbackResponse);
+    passportGithub.authenticate('github', {
+        failureRedirect: '/passport/login'
+    }),
+    callbackResponse);
 
 router.get('/auth/github/:token',
-		validateToken,
-		passportGithub.authenticate('github', {
-			scope: ['user:email']
-		}));
+    validateToken,
+    passportGithub.authenticate('github', {
+        scope: ['user:email']
+    }));
 
 //==================== twitter =================
 router.use('/auth/twitter/callback',
-		passportTwitter.authenticate('twitter', {
-			failureRedirect: '/passport/login'
-		}),
-		callbackResponse);
+    passportTwitter.authenticate('twitter', {
+        failureRedirect: '/passport/login'
+    }),
+    callbackResponse);
 
 router.get('/auth/twitter/:token',
-		validateToken,
-		passportTwitter.authenticate('twitter'));
+    validateToken,
+    passportTwitter.authenticate('twitter'));
 
 //==================== facebook ================
 router.get('/auth/facebook/callback',
-		passportFacebook.authenticate('facebook', {
-			failureRedirect: '/passport/login'
-		}),
-		callbackResponse);
+    passportFacebook.authenticate('facebook', {
+        failureRedirect: '/passport/login'
+    }),
+    callbackResponse);
 
 router.get('/auth/facebook/:token',
-		validateToken,
-		passportFacebook.authenticate('facebook', {
-			scope: ['email']
-		}));
+    validateToken,
+    passportFacebook.authenticate('facebook', {
+        scope: ['email']
+    }));
 
 //===================== tumblr =================
 router.get('/auth/tumblr/callback',
-		passportTumblr.authenticate('tumblr', {
-			failureRedirect: '/passport/login'
-		}),
-		callbackResponse);
+    passportTumblr.authenticate('tumblr', {
+        failureRedirect: '/passport/login'
+    }),
+    callbackResponse);
 
 router.get('/auth/tumblr/:token',
-		validateToken,
-		passportTumblr.authenticate('tumblr'));
+    validateToken,
+    passportTumblr.authenticate('tumblr'));
 
 //===================== yahoo =================
 router.get('/auth/yahoo/callback',
-		passportYahoo.authenticate('yahoo', {
-			failureRedirect: '/passport/login'
-		}),
-		callbackResponse);
+    passportYahoo.authenticate('yahoo', {
+        failureRedirect: '/passport/login'
+    }),
+    callbackResponse);
 
 router.get('/auth/yahoo/:token',
-		validateToken,
-		passportYahoo.authenticate('yahoo'));
+    validateToken,
+    passportYahoo.authenticate('yahoo'));
 
 //===================== google =================
 router.get('/auth/google/callback',
-		passportGoogle.authenticate('google', {
-			failureRedirect: '/passport/login'
-		}),
-		callbackResponse);
+    passportGoogle.authenticate('google', {
+        failureRedirect: '/passport/login'
+    }),
+    callbackResponse);
 
 router.get('/auth/google/:token',
-		validateToken,
-		passportGoogle.authenticate('google', {
-			scope: ['profile', 'email']
-		}));
+    validateToken,
+    passportGoogle.authenticate('google', {
+        scope: ['profile', 'email']
+    }));
 
 //================== windowslive ===============
 router.get('/auth/windowslive/callback',
-		passportWindowsLive.authenticate('windowslive', {
-			failureRedirect: '/passport/login'
-		}),
-		callbackResponse);
+    passportWindowsLive.authenticate('windowslive', {
+        failureRedirect: '/passport/login'
+    }),
+    callbackResponse);
 
 router.get('/auth/windowslive/:token',
-		validateToken,
-		passportWindowsLive.authenticate('windowslive'));
+    validateToken,
+    passportWindowsLive.authenticate('windowslive'));
 
 //================== dropbox ==================
 router.get('/auth/dropbox/callback',
-		passportDropbox.authenticate('dropbox', {
-			failureRedirect: '/passport/login'
-		}),
-		callbackResponse);
+    passportDropbox.authenticate('dropbox', {
+        failureRedirect: '/passport/login'
+    }),
+    callbackResponse);
 
 router.get('/auth/dropbox/:token',
-		validateToken,
-		passportDropbox.authenticate('dropbox'));
+    validateToken,
+    passportDropbox.authenticate('dropbox'));
 
-//===================saml ==================== 
-var entitiesJSON = JSON.parse(fs.readFileSync('/etc/gluu/conf/passport-saml-config.json', 'utf8'));
+//===================saml ====================
+var entitiesJSON = global.saml_config;
 for(key in entitiesJSON){
-	router.post('/auth/saml/'+key+'/callback',
-			passportSAML.authenticate(key, {
-				failureRedirect: '/passport/login'
-			}),
-			callbackResponse);
+    router.post('/auth/saml/'+key+'/callback',
+        passportSAML.authenticate(key, {
+            failureRedirect: '/passport/login'
+        }),
+        callbackResponse);
 
-	router.get('/auth/saml/'+key+'/:token',
-			validateToken,
-			passportSAML.authenticate(key));
-
+    router.get('/auth/saml/'+key+'/:token',
+        validateToken,
+        passportSAML.authenticate(key));
 }
 
-router.get('/auth/meta/idp/:idp',function (req, res){
-	var idp = req.params.idp;
-	logger.info(idp);
-	fs.readFile(__dirname + '/../idp-metadata/'+idp+'.xml', (e, data) =>
-	{
-		if (e)
-			res.status(404).send("Internal Error");
-		else
-			res.status(200).set('Content-Type', 'text/xml').send(String(data));
-	});
-});
 
-
+router.get('/auth/meta/idp/:idp',
+    function (req, res){
+        var idp = req.params.idp;
+        logger.info(idp);
+        fs.readFile(__dirname + '/../idp-metadata/'+idp+'.xml', (e, data) =>
+        {
+            if (e)
+                res.status(404).send("Internal Error");
+            else
+                res.status(200).set('Content-Type', 'text/xml').send(String(data));
+        });
+    });
 //======== catch 404 and forward to login ========
 router.all('/*', function(req, res, next) {
-	var err = new Error('Not Found');
-	err.status = 404;
-	res.redirect(global.config.applicationStartpoint + '?failure=The requested resource does not exists!');
+    var err = new Error('Not Found');
+    err.status = 404;
+    res.redirect(global.config.applicationStartpoint + '?failure=The requested resource does not exists!');
 });
 
 module.exports = router;
