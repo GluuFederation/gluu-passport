@@ -53,6 +53,9 @@ var setCredentials = function() {
                         });
                 passport.use(key,strategy);
                 logger.info(key);
+                 if (!fs.existsSync(__dirname + '/../idp-metadata/')){
+                        fs.mkdirSync(__dirname + '/../idp-metadata/');
+                }
                 fs.truncate(__dirname + '/../idp-metadata/' + key +'.xml', 0, function() {
                 });
                 var decryptionCert = fs.readFileSync('/etc/certs/openldap.crt', 'utf-8');
