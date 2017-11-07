@@ -1,4 +1,4 @@
-﻿﻿﻿var passport = require('passport');
+﻿var passport = require('passport');
 var SamlStrategy = require('passport-saml').Strategy;
 var SAML = require('passport-saml').SAML;
 var fs = require('fs');
