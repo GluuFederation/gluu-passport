@@ -1,11 +1,11 @@
 {
         "idp1": {
-                "entryPoint": "https://test.gluu.org/idp/profile/SAML2/POST/SSO",
+                "entryPoint": "https://arvind1.gluu.org/idp/profile/SAML2/POST/SSO",
                 "issuer": "urn:test",
                 "identifierFormat": "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
                 "authnRequestBinding": "HTTP-POST",
                 "additionalAuthorizeParams": "{ providerId: 'test' }",
-                "cert":"MIIDbDCCAlQCCQCuwqx2PNP....YsMw==",
+                "cert":"MIIDcjCCAloCCQDs/VBHylkL/jANBgkqhkiG9w0BAQsFADB7MQswCQYDVQQGEwJVUzELMAkGA1UECAwCVFgxDzANBgNVBAcMBkF1c3RpbjESMBAGA1UECgwJR2x1dSBJbmMuMRkwFwYDVQQDDBBhcnZpbmQxLmdsdXUub3JnMR8wHQYJKoZIhvcNAQkBFhBhcnZpbmQxQGdsdXUub3JnMB4XDTE3MTEwMTA3NDgxMFoXDTE4MTEwMTA3NDgxMFowezELMAkGA1UEBhMCVVMxCzAJBgNVBAgMAlRYMQ8wDQYDVQQHDAZBdXN0aW4xEjAQBgNVBAoMCUdsdXUgSW5jLjEZMBcGA1UEAwwQYXJ2aW5kMS5nbHV1Lm9yZzEfMB0GCSqGSIb3DQEJARYQYXJ2aW5kMUBnbHV1Lm9yZzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAORedLfCOELV473Ik2qGdWBg6Mh6oNmlP2ORBszf3YttvkwKJPXq3H5SShpjTb3UG9f8qOXv0eCIdK1KNk8h5SaP9EtvcKtIp+Mf29z5IAZ9fNY2/Vu0Qg2SHuKRBs/sRkKBqDGeNwxhRBnW6/J9ws4tav6rfZ9C8dgSXfmx8T4IV/Ni4fy/YOOJMUR3+nnCEMZwNPVgT1rVHAvJnpFe+qAIToTQef1NHTq5otT4HNYOfU+AcNYP3yVMfNgHqPBWzrSzCVddDNa6PYG+Gf923L4cPj+auBB+/XPl8Nzxe/eTWhLSiAyBAfjF27rtaIbMrRBXCPIHABoo7IMRzMaFjHECAwEAATANBgkqhkiG9w0BAQsFAAOCAQEAR0O0+NAd+7gj4jXJSTow5q2PbC35ig3ICvQTlHo80psVJKkbxTzBlvq1HX9yyQuSVbOTreK3gaMPKi4QsxFMTBqmgTpag1YlweFIf+3e2UE7p6j7ts7eChgKhEga9z0tI5Gvpp7VzOdB6RRcPfowzUsifjqz6E4fw1mLmqwOfk4Rocy6ph+p8IDLBvcOWi2w4lzZ1ut/twAr+PkWaWmHyINo08IbplvN9nM0jWhn8HqHj4XvKuXibjKcVGwU8tfLdKk3NSmulp0rAt3sF4Ujf7dH89XcuXZV+x9S/BldOhSvZlYEA7enIsWpG1uLW6LfhTwfvVfNusSyNd7lELN09g==",
                 "skipRequestCompression": "true",
                 "reverseMapping": {
                         "email" : "email",
@@ -19,21 +19,19 @@
                 }
         },
         "idp2": {
-                "entryPoint": "https://",
+                "entryPoint": "https://arvind1.gluu.org/idp/profile/SAML2/POST/SSO",
                 "issuer": "urn:test",
+                "cert":"MIIDcjCCAloCCQDs/VBHylkL/jANBgkqhkiG9w0BAQsFADB7MQswCQYDVQQGEwJVUzELMAkGA1UECAwCVFgxDzANBgNVBAcMBkF1c3RpbjESMBAGA1UECgwJR2x1dSBJbmMuMRkwFwYDVQQDDBBhcnZpbmQxLmdsdXUub3JnMR8wHQYJKoZIhvcNAQkBFhBhcnZpbmQxQGdsdXUub3JnMB4XDTE3MTEwMTA3NDgxMFoXDTE4MTEwMTA3NDgxMFowezELMAkGA1UEBhMCVVMxCzAJBgNVBAgMAlRYMQ8wDQYDVQQHDAZBdXN0aW4xEjAQBgNVBAoMCUdsdXUgSW5jLjEZMBcGA1UEAwwQYXJ2aW5kMS5nbHV1Lm9yZzEfMB0GCSqGSIb3DQEJARYQYXJ2aW5kMUBnbHV1Lm9yZzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAORedLfCOELV473Ik2qGdWBg6Mh6oNmlP2ORBszf3YttvkwKJPXq3H5SShpjTb3UG9f8qOXv0eCIdK1KNk8h5SaP9EtvcKtIp+Mf29z5IAZ9fNY2/Vu0Qg2SHuKRBs/sRkKBqDGeNwxhRBnW6/J9ws4tav6rfZ9C8dgSXfmx8T4IV/Ni4fy/YOOJMUR3+nnCEMZwNPVgT1rVHAvJnpFe+qAIToTQef1NHTq5otT4HNYOfU+AcNYP3yVMfNgHqPBWzrSzCVddDNa6PYG+Gf923L4cPj+auBB+/XPl8Nzxe/eTWhLSiAyBAfjF27rtaIbMrRBXCPIHABoo7IMRzMaFjHECAwEAATANBgkqhkiG9w0BAQsFAAOCAQEAR0O0+NAd+7gj4jXJSTow5q2PbC35ig3ICvQTlHo80psVJKkbxTzBlvq1HX9yyQuSVbOTreK3gaMPKi4QsxFMTBqmgTpag1YlweFIf+3e2UE7p6j7ts7eChgKhEga9z0tI5Gvpp7VzOdB6RRcPfowzUsifjqz6E4fw1mLmqwOfk4Rocy6ph+p8IDLBvcOWi2w4lzZ1ut/twAr+PkWaWmHyINo08IbplvN9nM0jWhn8HqHj4XvKuXibjKcVGwU8tfLdKk3NSmulp0rAt3sF4Ujf7dH89XcuXZV+x9S/BldOhSvZlYEA7enIsWpG1uLW6LfhTwfvVfNusSyNd7lELN09g==",
                 "identifierFormat": "urn:oasis:names:tc:SAML:2.0:attrname-format:basic",
-                "authnRequestBinding": "HTTP-POST",
-                "cert":"MIIDbDCCAlQCCQCuwqx2PNP....YsMw==",
-                "skipRequestCompression": "true",
                 "reverseMapping": {
                         "email" : "email",
-                        "username": "urn:oid:0.9.2342.19200300.100.1.1",
-                        "displayName": "urn:oid:2.16.840.1.113730.3.1.241",
-                        "id":  "urn:oid:0.9.2342.19200300.100.1.1",
-                        "name": "urn:oid:2.5.4.42",
-                        "givenName": "urn:oid:2.5.4.42",
-                        "familyName": "urn:oid:2.5.4.4",
-                        "provider" :"issuer"
+                        "username": "firstname",
+                        "displayName": "firstname",
+                        "id":  "firstname",
+                        "name": "firstname",
+                        "givenName": "firstname",
+                        "familyName": "lastName",
+                        "provider" :"provider"
                 }
 
         }

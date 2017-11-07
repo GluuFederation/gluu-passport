@@ -1,4 +1,4 @@
-var passport = require('passport');
+﻿﻿﻿var passport = require('passport');
 var SamlStrategy = require('passport-saml').Strategy;
 var SAML = require('passport-saml').SAML;
 var fs = require('fs');
@@ -26,7 +26,7 @@ var setCredentials = function () {
             strategyConfigOptions.cert = objectJSON['cert'];
         }
         else {
-            logger.info('"cert"  is not present so' + key + " will not work");
+            logger.info('"cert"  is not present so' + key + " will not work" +objectJSON);
             return
         }
         if (objectJSON.hasOwnProperty('skipRequestCompression')) {
@@ -38,15 +38,17 @@ var setCredentials = function () {
         if (objectJSON.hasOwnProperty('additionalAuthorizeParams')) {
             strategyConfigOptions.additionalAuthorizeParams = objectJSON['additionalAuthorizeParams'];
         }
-        strategyConfigOptions.decryptionPvk = fs.readFileSync('/opt/gluu-server-3.1.1//etc/certs/openldap.key', 'utf-8');
+        strategyConfigOptions.decryptionPvk = fs.readFileSync('/etc/certs/openldap.key', 'utf-8');
         strategyConfigOptions.passReqToCallback = true;
         strategyConfigOptions.validateInResponseTo = true;
 
         var strategy = new SamlStrategy(strategyConfigOptions,
             function (req, profile, done) {
+                logger.info("profile : "+prfile);
                 var idp = req.originalUrl.replace("/passport/auth/saml/","").replace("/callback","");
                 var mapping =global.saml_config[idp].reverseMapping;
                 logger.info(req.body.SAMLResponse);
+                logger.info("mapping : "+mapping);
                 var userProfile = {
                     id: profile[mapping["id"]] || '',
                     name: profile[mapping["name"]] || '',
@@ -69,14 +71,14 @@ var setCredentials = function () {
         fs.truncate(path.join(idpMetaPath, key + '.xml'), 0, function (err) {
 
         });
-            var decryptionCert = fs.readFileSync('/opt/gluu-server-3.1.1//etc/certs/openldap.crt', 'utf-8');
+        var decryptionCert = fs.readFileSync('/etc/certs/openldap.crt', 'utf-8');
 
         var metaData = strategy.generateServiceProviderMetadata(decryptionCert);
         logger.info(metaData);
 
         fs.writeFile(path.join(idpMetaPath, key + '.xml'), metaData, function (err) {
             if (err) {
-                logger.info("failed to save" + path.join(idpMetaPath, key + '.xml'));
+                logger.info("failed to save" + path.join(idpMetaPath, key + '.xml' +"error :"+err));
             } else {
                 logger.info("succeeded in saving" + path.join(idpMetaPath, key + '.xml'));
             }
