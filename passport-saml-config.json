@@ -1,10 +1,11 @@
 {
         "idp1": {
-                "entryPoint": "https://dev1.gluu.org/idp/profile/SAML2/POST/SSO",
+                "entryPoint": "https://test.gluu.org/idp/profile/SAML2/POST/SSO",
                 "issuer": "urn:test",
                 "identifierFormat": "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
                 "authnRequestBinding": "HTTP-POST",
                 "additionalAuthorizeParams": "{ providerId: 'test' }",
+                "cert":"MIIDbDCCAlQCCQCuwqx2PNP....YsMw==",
                 "skipRequestCompression": "true",
                 "reverseMapping": {
                         "email" : "email",
@@ -21,16 +22,18 @@
                 "entryPoint": "https://",
                 "issuer": "urn:test",
                 "identifierFormat": "urn:oasis:names:tc:SAML:2.0:attrname-format:basic",
-                "cert" : "QIEwJDTzEPMA0GA1UEBxMGRGVudmVyMRYwFAYDVQQKEw1QaW5nIElkZW50aXR5MSkwJwYDVQQDEyAxODIwNmM0NWRiN2Y0MjA2YWNkN2ViZWU5MjhjN2YzZDAeFw0xNzA4MTExMjEyMDZaFw0yMDA4MTAxMjEyMDZaMG4xCzAJBgNVBAYTAlVTMQswCQYDVQQIEwJDTzEPMA0GA1UEBxMGRGVudmVyMRYwFAYDVQQKEw1QaW5nIElkZW50aXR5MSkwJwYDVQQDEyAxODIwNmM0NWRiN2Y0MjA2YWNkN2ViZWU5MjhjN2YzZDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAKP+nrt+plM5Q+AKSYkwSaUq94KhwU/FiZE+gch+F7Wh74knITeXv4+GUgudJGwMHFfLF5Fqf+O5AOLnRTmvwGKqc/cXHApvVtkq4sAP/8oNCD73DBTRYgKDHaAp54IPZEVNBGF4T0gxZ917+YuaDnCxC5mZfmmndnZudon645BzZfIa0PFkvjer/r3w4+zha1Vc868GkQLQ2VsxUjbsQ0iR+ipXxSkeiQe/vc6KZBbLMnf1RhY0F31vSgg0N/TROAP5dDNn9a6tyGyr9QNxy8c4FwuHiUjlbPD7u6whvz7h70nhg0svxzfMZpzvzY6wsFmeR3DOnpC03o1LjyoxmSkCAwEAATANBgkqhkiG9w0BAQsFAAOCAQEAFbybi6dwyGA2+QOZdGynoa/oUF4Zb94dm90zavCMPum9PnlsbBTHVq11Ph7jj3CQD1fNu7WUKsPJXtoy2dpWO+B4+a8JLXkoDYZaAta3vyT6/8sRB97vQne82jQeICuqabqSEV2UKDvuYaffvkc0aZ5e0sGw64+f56pQCuzy5iATuNxdNEXptmNvgR6jFfW2JKB27kXmNkIZHh3VOLZ28PxoQydqxtFvx/0vuLfTBLtAd5C8/r3eEWRYFjeActg5Q7M5LnzMUZajYCC+BQbkgvmQ5zH/2cb26nkpqT7gKAXJd2Tl48CuAJDMoD2kJQ2Jw51aeXRCKq/biyEm2dehtw==",
+                "authnRequestBinding": "HTTP-POST",
+                "cert":"MIIDbDCCAlQCCQCuwqx2PNP....YsMw==",
+                "skipRequestCompression": "true",
                 "reverseMapping": {
                         "email" : "email",
-                        "username": "firstname",
-                        "displayName": "firstname",
-                        "id":  "firstname",
-                        "name": "firstname",
-                        "givenName": "firstname",
-                        "familyName": "lastName",
-                        "provider" :"provider"
+                        "username": "urn:oid:0.9.2342.19200300.100.1.1",
+                        "displayName": "urn:oid:2.16.840.1.113730.3.1.241",
+                        "id":  "urn:oid:0.9.2342.19200300.100.1.1",
+                        "name": "urn:oid:2.5.4.42",
+                        "givenName": "urn:oid:2.5.4.42",
+                        "familyName": "urn:oid:2.5.4.4",
+                        "provider" :"issuer"
                 }
 
         }
