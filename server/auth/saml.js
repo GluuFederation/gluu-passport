@@ -44,7 +44,7 @@ var setCredentials = function () {
 
         var strategy = new SamlStrategy(strategyConfigOptions,
             function (req, profile, done) {
-                logger.info("profile : "+prfile);
+                logger.info("profile : "+profile);
                 var idp = req.originalUrl.replace("/passport/auth/saml/","").replace("/callback","");
                 var mapping =global.saml_config[idp].reverseMapping;
                 logger.info(req.body.SAMLResponse);
