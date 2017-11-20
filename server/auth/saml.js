@@ -38,7 +38,24 @@ var setCredentials = function () {
         if (objectJSON.hasOwnProperty('additionalAuthorizeParams')) {
             strategyConfigOptions.additionalAuthorizeParams = objectJSON['additionalAuthorizeParams'];
         }
-        strategyConfigOptions.decryptionPvk = fs.readFileSync('/etc/certs/openldap.key', 'utf-8');
+        if(objectJSON.hasOwnProperty('forceAuthn')){
+            strategyConfigOptions.additionalAuthorizeParams = objectJSON['forceAuthn'];
+        }
+        if(objectJSON.hasOwnProperty('providerName')){
+            strategyConfigOptions.additionalAuthorizeParams = objectJSON['providerName'];
+        }
+        if(objectJSON.hasOwnProperty('signatureAlgorithm')){
+            strategyConfigOptions.additionalAuthorizeParams = objectJSON['signatureAlgorithm'];
+        }
+        if(objectJSON.hasOwnProperty('requestIdExpirationPeriodMs')){
+            strategyConfigOptions.additionalAuthorizeParams = objectJSON['requestIdExpirationPeriodMs'];
+        }
+        else {
+            strategyConfigOptions.additionalAuthorizeParams = 3600000;
+
+        }
+
+        strategyConfigOptions.decryptionPvk = fs.readFileSync('/etc/certs/passport-sp.key', 'utf-8');
         strategyConfigOptions.passReqToCallback = true;
         strategyConfigOptions.validateInResponseTo = true;
 
@@ -71,7 +88,7 @@ var setCredentials = function () {
         fs.truncate(path.join(idpMetaPath, key + '.xml'), 0, function (err) {
 
         });
-        var decryptionCert = fs.readFileSync('/etc/certs/openldap.crt', 'utf-8');
+        var decryptionCert = fs.readFileSync('/etc/certs/passport-sp.crt', 'utf-8');
 
         var metaData = strategy.generateServiceProviderMetadata(decryptionCert);
         logger.info(metaData);
