@@ -39,19 +39,19 @@ var setCredentials = function () {
             strategyConfigOptions.additionalAuthorizeParams = objectJSON['additionalAuthorizeParams'];
         }
         if(objectJSON.hasOwnProperty('forceAuthn')){
-            strategyConfigOptions.additionalAuthorizeParams = objectJSON['forceAuthn'];
+            strategyConfigOptions.forceAuthn = objectJSON['forceAuthn'];
         }
         if(objectJSON.hasOwnProperty('providerName')){
-            strategyConfigOptions.additionalAuthorizeParams = objectJSON['providerName'];
+            strategyConfigOptions.providerName = objectJSON['providerName'];
         }
         if(objectJSON.hasOwnProperty('signatureAlgorithm')){
-            strategyConfigOptions.additionalAuthorizeParams = objectJSON['signatureAlgorithm'];
+            strategyConfigOptions.signatureAlgorithm = objectJSON['signatureAlgorithm'];
         }
         if(objectJSON.hasOwnProperty('requestIdExpirationPeriodMs')){
-            strategyConfigOptions.additionalAuthorizeParams = objectJSON['requestIdExpirationPeriodMs'];
+            strategyConfigOptions.requestIdExpirationPeriodMs = objectJSON['requestIdExpirationPeriodMs'];
         }
         else {
-            strategyConfigOptions.additionalAuthorizeParams = 3600000;
+            strategyConfigOptions.requestIdExpirationPeriodMs = 3600000;
 
         }
 
