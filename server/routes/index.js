@@ -196,6 +196,38 @@ for (key in entitiesJSON) {
 }
 
 
+router.get("/saml_config",function(req,res){
+
+    const res_str = JSON.stringify(global.saml_config);
+    var tmp = JSON.parse(res_str);
+    for(v in tmp){
+        tmp[v].entryPoint = "";
+        tmp[v].issuer = "";
+        tmp[v].identifierFormat = "";
+        tmp[v].authnRequestBinding = "";
+        tmp[v].additionalAuthorizeParams = "";
+        tmp[v].cert = "";
+
+    }
+    res.status(200).send(JSON.stringify(tmp));
+
+	});
+
+
+router.get('/passportstrategies',
+    function (req,res) {
+        const res_str = JSON.stringify(global.getpassportStrategies);
+        var tmp = JSON.parse(res_str);
+        for(v in tmp){
+            tmp[v].clientID = "";
+            tmp[v].clientSecret = "";
+        }
+        res.status(200).send(JSON.stringify(tmp));
+    });
+
+
+
+
 router.get('/auth/meta/idp/:idp',
     function (req, res) {
         var idp = req.params.idp;
