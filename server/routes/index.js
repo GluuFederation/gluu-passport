@@ -170,7 +170,7 @@ router.get('/auth/dropbox/:token',
 var entitiesJSON = global.saml_config;
 for (key in entitiesJSON) {
 
-    if (entitiesJSON[key].cert && entitiesJSON[key].cert.length > 5) {
+    if (entitiesJSON[key].cert && entitiesJSON[key].cert.length > 5 && entitiesJSON[key].enable.match("true")) {
         router.post('/auth/saml/' + key + '/callback',
             passportSAML.authenticate(key, {
                 failureRedirect: '/passport/login'
@@ -185,9 +185,9 @@ for (key in entitiesJSON) {
         router.get('/auth/saml/' + key + '/:token',
             validateToken,
             function (req, res) {
-            err = {
-              message:"cert param is required to validate signature of saml assertions response"
-            };
+                err = {
+                    message: "cert param is required to validate signature of saml assertions response"
+                };
                 logger.log('error', 'Cert Error: ' + JSON.stringify(err));
                 logger.sendMQMessage('Cert Error: ' + JSON.stringify(err));
                 res.status(400).send("Internal Error");
@@ -195,30 +195,27 @@ for (key in entitiesJSON) {
     }
 }
 
-
-router.get("/saml_config",function(req,res){
+router.get("/saml_config", function (req, res) {
 
     const res_str = JSON.stringify(global.saml_config);
     var tmp = JSON.parse(res_str);
-    for(v in tmp){
+    for (v in tmp) {
         tmp[v].entryPoint = "";
         tmp[v].issuer = "";
         tmp[v].identifierFormat = "";
         tmp[v].authnRequestBinding = "";
         tmp[v].additionalAuthorizeParams = "";
         tmp[v].cert = "";
-
     }
     res.status(200).send(JSON.stringify(tmp));
-
-	});
+});
 
 
 router.get('/passportstrategies',
-    function (req,res) {
+    function (req, res) {
         const res_str = JSON.stringify(global.getpassportStrategies);
         var tmp = JSON.parse(res_str);
-        for(v in tmp){
+        for (v in tmp) {
             tmp[v].clientID = "";
             tmp[v].clientSecret = "";
         }
@@ -226,19 +223,18 @@ router.get('/passportstrategies',
     });
 
 
-
-
 router.get('/auth/meta/idp/:idp',
     function (req, res) {
         var idp = req.params.idp;
         logger.info(idp);
-        fs.readFile(__dirname + '/../idp-metadata/' + idp + '.xml', (e, data) => {
-            if (e)
+        fs.readFile(__dirname + '/../idp-metadata/' + idp + '.xml', (e, data) = > {
+            if(e)
                 res.status(404).send("Internal Error");
             else
                 res.status(200).set('Content-Type', 'text/xml').send(String(data));
         });
-    });
+});
+
 //======== catch 404 and forward to login ========
 router.all('/*', function (req, res, next) {
     var err = new Error('Not Found');
