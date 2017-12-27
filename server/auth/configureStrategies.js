@@ -5,9 +5,14 @@ var LinkedinStrategy = require('./linkedin');
 var TumblrStrategy = require('./tumblr');
 var TwitterStrategy = require('./twitter');
 var YahooStrategy = require('./yahoo');
+var SamlStrategy = require("./saml");
 var logger = require("../utils/logger");
 
+global.getpassportStrategies = null;
+
 exports.setConfiguratins = function(data){
+    SamlStrategy.setCredentials();
+    getpassportStrategies = data.passportStrategies;
     if (data && data.passportStrategies) {
 
         //FacebookStrategy
@@ -57,6 +62,11 @@ exports.setConfiguratins = function(data){
             logger.log('info', 'Yahoo Strategy details received');
             logger.sendMQMessage('info: Yahoo Strategy details received');
             YahooStrategy.setCredentials(data.passportStrategies.yahoo);
+        }
+        //SamlStrategy
+        if (data.passportStrategies.saml) {
+            logger.log('info', 'Saml Strategy details received');
+            logger.sendMQMessage('info: Saml Strategy details received');
         }
 
     } else {
