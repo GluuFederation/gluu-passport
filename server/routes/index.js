@@ -227,13 +227,14 @@ router.get('/auth/meta/idp/:idp',
     function (req, res) {
         var idp = req.params.idp;
         logger.info(idp);
-        fs.readFile(__dirname + '/../idp-metadata/' + idp + '.xml', (e, data) = > {
+        fs.readFile(__dirname + '/../idp-metadata/' + idp + '.xml', (e, data) => {
             if(e)
-                res.status(404).send("Internal Error");
-            else
-                res.status(200).set('Content-Type', 'text/xml').send(String(data));
-        });
-});
+            res.status(404).send("Internal Error");
+    else
+        res.status(200).set('Content-Type', 'text/xml').send(String(data));
+    })
+        ;
+    });
 
 //======== catch 404 and forward to login ========
 router.all('/*', function (req, res, next) {
