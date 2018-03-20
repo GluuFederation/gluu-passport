@@ -35,7 +35,8 @@
     "stomp-client": "^0.8.1",
     "swig": "^1.4.2",
     "winston": "^2.3.0",
-    "winston-daily-rotate-file": "^1.4.0",
-    "www-authenticate": "^0.6.2"
+    "winston-daily-rotate-file": "^3.0.0",
+    "www-authenticate": "^0.6.2",
+    "dateformat": "^3.0.3"
   }
 }

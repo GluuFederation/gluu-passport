@@ -3,6 +3,7 @@ var fs = require('fs'),
     winston = require('winston'),
     dir = process.env.NODE_LOGGING_DIR || __dirname + '/logs';
 require('winston-daily-rotate-file');
+var dateFormat = require('dateformat');
 
 if (!fs.existsSync(dir)){
     fs.mkdirSync(dir);
@@ -12,12 +13,23 @@ winston.emitErrs = true;
 
 var logOpts = {
     level: 'info',
-    filename: dir + '/passport.log',
+    filename: dir + '/passport-%DATE%.log',
     handleExceptions: true,
-    json: true,
-    maxsize: 5242880, //5MB
+    json: false,
     colorize: false,
-    datePattern: '.yyyy-MM-dd'
+    tailable: true,
+    datePattern: 'YYYY-MM-DD-HH',
+    zippedArchive: true,
+    maxSize: '20m',
+    maxFiles: '14d',
+    timestamp: function() {
+        return dateFormat(new Date(), 'isoDateTime');
+    },
+    formatter: function(options) {
+        return options.timestamp() + ' [' + options.level.toUpperCase() + '] ' +
+            (options.message ? options.message : '') +
+            (options.meta && Object.keys(options.meta).length ? '\n\t'+ JSON.stringify(options.meta) : '' );
+    }
 };
 
 var transport = new winston.transports.DailyRotateFile(logOpts);
