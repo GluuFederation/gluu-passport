@@ -65,8 +65,8 @@ function getTicketAndConfig(data) {
                 }
 
                 global.UMAConfig = data;
-                logger.log('info', 'UMAConfigurations were received');
-                logger.sendMQMessage('info: UMAConfigurations were received');
+                logger.log('info', 'Passprot config were received');
+                logger.sendMQMessage('info: Passprot config were received');
                 resolve(global.UMAConfig.token_endpoint);
             })
             .catch(function (error) {
@@ -80,7 +80,8 @@ function getTicketAndConfig(data) {
 
                 }
                 else {
-                    logger.sendMQMessage('error: Error in getting ticket from AS. error:' + error);
+                    logger.log('error', 'error: Error in getting Passport config. error:' + error);
+                    logger.sendMQMessage('error: Error in getting Passport config. error:' + error);
                     reject(data.toString());
 
 
