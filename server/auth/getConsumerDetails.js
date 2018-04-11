@@ -65,8 +65,8 @@ function getTicketAndConfig(data) {
                 }
 
                 global.UMAConfig = data;
-                logger.log('info', 'Passprot config were received');
-                logger.sendMQMessage('info: Passprot config were received');
+                logger.log('info', 'Passport config were received');
+                logger.sendMQMessage('info: Passport config were received');
                 resolve(global.UMAConfig.token_endpoint);
             })
             .catch(function (error) {
