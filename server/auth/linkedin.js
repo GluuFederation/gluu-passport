@@ -15,7 +15,7 @@ var setCredentials = function(credentials) {
                 id: profile.id,
                 name: profile.displayName,
                 username: profile.username || profile.id,
-                email: profile.email,
+                email: profile._json.emailAddress,
                 givenName: profile.name.givenName,
                 familyName: profile.name.familyName,
                 provider: profile.provider,
