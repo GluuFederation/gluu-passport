@@ -7,6 +7,7 @@ var setCredentials = function(credentials) {
             consumerKey: credentials.clientID,
             consumerSecret: credentials.clientSecret,
             callbackURL: callbackURL,
+            includeEmail: true,
             profileFields: ['id', 'name', 'displayName', 'email']
         },
         function(accessToken, refreshToken, profile, done) {
@@ -14,7 +15,7 @@ var setCredentials = function(credentials) {
                 id: profile.id,
                 name: profile.displayName || profile.username,
                 username: profile.username || profile.id,
-                email: profile.email || "",
+                email: profile._json.email || "",
                 givenName: profile.first_name || "",
                 familyName: profile.last_name || "",
                 provider: profile.provider,
