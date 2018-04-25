@@ -14,6 +14,11 @@ var passportDropbox = require('../auth/dropbox').passport;
 var logger = require("../utils/logger");
 var passportSAML = require('../auth/saml').passport;
 var fs = require('fs');
+
+var response_part1 = "<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\">\n    <head>\n        </head>\n    <body onload=\"document.forms[0].submit()\">\n        <noscript>\n            <p>\n                <strong>Note:</strong> Since your browser does not support JavaScript,\n                you must press the Continue button once to proceed.\n            </p>\n        </noscript>\n        \n        <form action=\"";
+var response_part2 = "\" method=\"post\">\n            <div>\n                                \n                                \n                <input type=\"hidden\" name=\"user\" value=\"";
+var response_part3 = "\"/>                \n            </div>\n            <noscript>\n                <div>\n                    <input type=\"submit\" value=\"Continue\"/>\n                </div>\n            </noscript>\n        </form>\n            </body>\n</html>";
+
 var validateToken = function (req, res, next) {
 
     var token = req.body && req.body.token || req.params && req.params.token || req.headers['x-access-token'];
@@ -46,9 +51,12 @@ var callbackResponse = function (req, res) {
     }
     logger.log('info', 'User authenticated with: ' + req.user.provider + 'Strategy with userid: ' + req.user.id);
     logger.sendMQMessage('info: User authenticated with: ' + req.user.provider + 'Strategy with userid: ' + req.user.id);
-    var queryUserString = encodeURIComponent(JSON.stringify(req.user));
+    var queryUserString = Buffer.from(JSON.stringify(req.user)).toString('base64');
     logger.log('info', 'User redirected with: ' + global.config.applicationEndpoint + '?user=' + queryUserString);
-    return res.redirect(global.config.applicationEndpoint + '?user=' + queryUserString);
+    var response_body = response_part1 + global.config.applicationEndpoint + response_part2 + queryUserString + response_part3;
+    res.set('content-type', 'text/html;charset=UTF-8');
+    return res.send(response_body);
+
 };
 
 router.get('/', function (req, res, next) {
