@@ -68,6 +68,7 @@ var setCredentials = function () {
                 logger.info("mapping : "+mapping);
                 var userProfile = {
                     id: profile[mapping["id"]] || '',
+                    memberOf: profile[mapping["memberOf"]] || '',
                     name: profile[mapping["name"]] || '',
                     username: profile[mapping["username"]] || '',
                     email: profile[mapping["email"]],
