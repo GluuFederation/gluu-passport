@@ -5,6 +5,7 @@ var LinkedinStrategy = require('./linkedin');
 var TumblrStrategy = require('./tumblr');
 var TwitterStrategy = require('./twitter');
 var YahooStrategy = require('./yahoo');
+var DropboxOAuth2Strategy = require('./dropbox');
 var SamlStrategy = require("./saml");
 var logger = require("../utils/logger");
 
@@ -28,6 +29,13 @@ exports.setConfiguratins = function(data){
             logger.sendMQMessage('info: Github Strategy details received');
             GitHubStrategy.setCredentials(data.passportStrategies.github);
         }
+
+        //DropboxOAuth2Strategy
+        if (data.passportStrategies.dropbox) {
+              logger.log('info', 'DropboxOAuth2 Strategy details received');
+              logger.sendMQMessage('info: DropboxOAuth2 Strategy details received');
+              DropboxOAuth2Strategy.setCredentials(data.passportStrategies.dropbox);
+         }
 
         //GoogleStrategy
         if (data.passportStrategies.google) {

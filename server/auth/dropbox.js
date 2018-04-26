@@ -1,15 +1,23 @@
 var passport = require('passport');
-var DropboxStrategy = require('passport-dropbox').Strategy;
+var DropboxOAuth2Strategy = require('passport-dropbox-oauth2').Strategy;
 
 var setCredentials = function(credentials) {
     var callbackURL = global.applicationHost.concat("/passport/auth/dropbox/callback");
-    passport.use(new DropboxStrategy({
-            consumerKey: credentials.clientID,
-            consumerSecret: credentials.clientSecret,
+    passport.use(new DropboxOAuth2Strategy({
+            apiVersion: '2',
+            clientID: credentials.clientID,
+            clientSecret: credentials.clientSecret,
             callbackURL: callbackURL
         },
         function(accessToken, refreshToken, profile, done) {
-            return done(null, profile);
+            var userProfile = {
+               id: profile.id,
+               displayName: profile.displayName,
+               email: profile.emails[0].value,
+               givenName: profile.givenName,
+               familyName: profile.familyName
+            }  
+            return done(null, userProfile);
         }
     ));
 };
