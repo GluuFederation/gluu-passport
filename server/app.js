@@ -90,7 +90,7 @@ app.use('/passport', require('./routes/index.js'));
 // *** error handlers *** //
 app.use(function (err, req, res, next) {
     if (err) {
-        logger.log('error', 'Unknown Error: ' + JSON.stringify(err));
+        logger.log('error', 'Error: ' + err);
         logger.sendMQMessage('error: Unknown Error: ' + JSON.stringify(err));
         res.redirect('/passport/login');
     }
@@ -107,7 +107,7 @@ if (('development' == app.get('env')) || true) { // To make sure that the reques
 
 var listener = server.createServer(app).listen(global.config.serverWebPort, getConsumerDetails.getDetailsAndConfigureStrategies(function (err, data) {
     if (err) {
-        logger.log('error', 'Error in starting the server. error:- ', err);
+        logger.log('error', 'Error in starting the server:'+ err);
         logger.sendMQMessage('error: Error in starting the server. error:- ' + JSON.stringify(err));
     } else {
         logger.log('info', 'Server listening on http://localhost:' + global.config.serverWebPort);
