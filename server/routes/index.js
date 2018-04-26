@@ -165,14 +165,14 @@ router.get('/auth/windowslive/:token',
 
 //================== dropbox ==================
 router.get('/auth/dropbox/callback',
-    passportDropbox.authenticate('dropbox', {
+    passportDropbox.authenticate('dropbox-oauth2', {
         failureRedirect: '/passport/login'
     }),
     callbackResponse);
 
 router.get('/auth/dropbox/:token',
     validateToken,
-    passportDropbox.authenticate('dropbox'));
+    passportDropbox.authenticate('dropbox-oauth2'));
 
 //===================saml ====================
 var entitiesJSON = global.saml_config;
