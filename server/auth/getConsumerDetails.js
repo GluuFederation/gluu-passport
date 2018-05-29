@@ -1,102 +1,177 @@
-var request = require('request-promise');
-var fs = require('fs');
-var uuid = require('uuid');
-var jwt = require('jsonwebtoken');
-var configureStrategies = require("./configureStrategies");
-var logger = require("../utils/logger");
-var www_authenticate = require('www-authenticate');
-var parsers = require('www-authenticate').parsers;
+var request = require('request-promise')
+var uuid = require('uuid')
+var jwt = require('jsonwebtoken')
 
-var UMAConfigURL = 'https://' + global.config.serverURI + '/.well-known/uma2-configuration';
+var configureStrategies = require('./configureStrategies')
+var logger = require('../utils/logger')
+var www_authenticate = require('www-authenticate')
+var parsers = require('www-authenticate').parsers
 
-var ticket, as_URI;
-Promise = require('bluebird');
+var Promise = require("bluebird")
+var readFile = Promise.promisify(require('fs').readFile)
+
+var rpt
+
+function reloadConfiguration(processUnauthorizedResponse) {
+
+	getStrategies(global.config.passportConfigAPI)
+		.then(obj => {
+				if (obj.ticket && obj.as_uri) {
+					if (processUnauthorizedResponse) {
+						//No need to return here
+						processAuthorization(obj.ticket, obj.as_uri)
+					} else {
+						throw new Error('reloadConfiguration. Received a response with ticket. Expecting actual URL contents')
+					}
+				} else {
+					try {
+						configureStrategies.setConfigurations(obj)
+						logger.info('reloadConfiguration. Passport strategies have been parsed')
+					} catch (err) {
+						logger.log('error', err.toString())
+					}
+				}
+			})
+		.catch(e => {
+				//In most cases, error caught here is caused by oxauth/oxtrust not being ready yet
+				logger.log('warn', e.toString())
+				logger.sendMQMessage('warn ' + e.toString())
+				logger.log('info', 'An attempt to get passport configurations will be tried again soon')
+			})
+
+}
+
+function getStrategies(strategiesURL) {
+
+	logger.log('debug', 'getStrategies called')
+    var headers = {}
+    if (rpt) {
+		headers.authorization = 'Bearer ' + rpt.access_token
+        headers.pct = rpt.pct
+    }
+    var options = {
+		simple: false,
+		resolveWithFullResponse: true,
+		headers: headers,
+        method: 'GET',
+        url: strategiesURL
+	}
+	return request(options)
+		.then(response => {
+				var msg
+
+				switch (response.statusCode) {
+					case 401:
+						var parsed = new parsers.WWW_Authenticate(response.headers['www-authenticate'])
+						msg = 'getStrategies. Got www-authenticate in header with ticket ' + parsed.parms.ticket
+
+						logger.log('debug', msg)
+						logger.sendMQMessage(msg)
+
+						return parsed.parms
+					break;
+					case 200:
+						msg = 'getStrategies. Passport strategies were received'
+						logger.log('info', msg)
+						logger.sendMQMessage(msg)
+
+						logger.log('debug', 'getStrategies. Content: %s', response.body)
+						return JSON.parse(response.body)
+					break;
+					default:
+						msg = 'Received unexpected HTTP status code of ' + response.statusCode
+						throw new Error(msg)
+				}
+			})
+
+}
+
+function processAuthorization(ticket, as_uri) {
+	//NOTE: this function does not need to return anything
+	logger.log('debug', 'processAuthorization called')
+
+	getTokenEndpoint(as_uri)
+		.then(endpoint => getRPT(endpoint, ticket))
+		.then(token => {
+				//update global variable
+				rpt = token
+				//Attempt again without further 401 error handling
+				reloadConfiguration(false)
+			})
+		.catch(e => {
+			var msg = e.toString()
+			logger.log('error', msg)
+			logger.sendMQMessage('error ' + msg)
+
+			msg = 'processAuthorization. No RPT token could be obtained. An attempt to get passport configurations will be tried again soon'
+			logger.log('error', msg)
+			logger.sendMQMessage('error ' + msg)
+		})
+
+}
 
 function getTokenEndpoint(UMAConfigURL) {
-    var options = {
-        method: 'GET',
-        url: UMAConfigURL
-    };
 
-    return new Promise(function (resolve, reject) {
-        request(options)
-            .then(function (umaConfigurations) {
-                try {
-                    umaConfigurations = JSON.parse(umaConfigurations);
-                } catch (ex) {
-                    logger.log('error', 'Error in parsing JSON in getTokenEndpoint: ', JSON.stringify(ex));
-                    logger.sendMQMessage('error: Error in parsing JSON in getTokenEndpoint: ' + JSON.stringify(ex));
-                    logger.log('error', 'Error received in getTokenEndpoint: ', umaConfigurations.toString());
-                    logger.sendMQMessage('error: Error received in getTokenEndpoint: ' + umaConfigurations.toString());
-                    reject(umaConfigurations.toString());
-                }
-
-                global.UMAConfig = umaConfigurations;
-                logger.log('info', 'UMAConfigurations were received');
-                logger.sendMQMessage('info: UMAConfigurations were received');
-                resolve(global.UMAConfig.token_endpoint);
-            })
-            .catch(function (error) {
-                logger.log('error', 'Error in requesting uma configurations');
-                logger.sendMQMessage('error: Error in requesting uma configurations');
-                reject(error);
-            });
-    });
+	logger.log('debug', 'getTokenEndpoint called')
+	return request.get(UMAConfigURL)
+		.then(urlContents => {
+				var endpoint = JSON.parse(urlContents).token_endpoint
+				if (endpoint) {
+					logger.log('info', 'getTokenEndpoint. Found endpoint at %s', endpoint)
+					return endpoint
+				} else {
+					var msg = "getTokenEndpoint. No token endpoint was found"
+					logger.log('error', msg)
+                    logger.sendMQMessage('error: ' + msg)
+					throw new Error(msg)
+				}
+			})
 }
 
-function getTicketAndConfig(data) {
-    var options = {
-        method: 'GET',
-        url: global.config.passportConfigAPI
+function getRPT(token_endpoint, ticket) {
 
-    };
+	logger.log('debug', 'getRPT called')
+	return readFile(global.config.keyPath, 'utf8') 	// get private key and replace headers to sign jwt
+			.then(content => content.replace("-----BEGIN RSA PRIVATE KEY-----", "-----BEGIN PRIVATE KEY-----")
+									.replace("-----END RSA PRIVATE KEY-----", "-----END PRIVATE KEY-----")
+					)
+			.then(passportCert => {
+					var clientId = global.config.clientId
+					var token = getSignedJWT(clientId, token_endpoint, passportCert)
 
-    return new Promise(function (resolve, reject) {
-        request(options)
-            .then(function (data) {
-                try {
-                    data = JSON.parse(data);
-                } catch (ex) {
-                    logger.log('error', 'Error in parsing JSON in getTokenEndpoint: ', JSON.stringify(ex));
-                    logger.sendMQMessage('error: Error in parsing JSON in getTokenEndpoint: ' + JSON.stringify(ex));
-                    logger.log('error', 'Error received in getTokenEndpoint: ', data.toString());
-                    logger.sendMQMessage('error: Error received in getTokenEndpoint: ' + data.toString());
-                    reject(data.toString());
-                }
+					var options = {
+						method: 'POST',
+						url: token_endpoint,
+						form: {
+							grant_type: 'urn:ietf:params:oauth:grant-type:uma-ticket',
+							scope: 'uma_authorization',
+							client_assertion_type: 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
+							client_assertion: token,
+							client_id: clientId,
+							ticket: ticket
+						}
+					}
 
-                global.UMAConfig = data;
-                logger.log('info', 'Passport config were received');
-                logger.sendMQMessage('info: Passport config were received');
-                resolve(global.UMAConfig.token_endpoint);
-            })
-            .catch(function (error) {
-                if (error.statusCode == 401) {
-                    var parsed = new parsers.WWW_Authenticate(error.response.headers['www-authenticate']);
-                    logger.sendMQMessage('Got ticket in error header :' + error.response.headers['www-authenticate']);
+					return request(options)
+							.then(rptDetails => {
+									var msg = 'getRPT. RPT details were received'
+									logger.log('info', msg)
+									logger.sendMQMessage('info: ' + msg)
 
-                    ticket = parsed.parms.ticket;
-                    as_URI = parsed.parms.as_uri;
-                    resolve(error);
+									var rpt = JSON.parse(rptDetails)
+									msg= 'getRPT. RPT contents parsed'
 
-                }
-                else {
-                    logger.log('error', 'error: Error in getting Passport config. error:' + error);
-                    logger.sendMQMessage('error: Error in getting Passport config. error:' + error);
-                    reject(data.toString());
+									logger.log('info', msg)
+									logger.sendMQMessage('info: ' + msg)
 
+									return rpt
+								})
+				})
 
-                }
-            });
-    });
 }
 
-function getAAT(token_endpoint) {
+function getSignedJWT(sub, aud, cert) {
 
-    var passportCert = fs.readFileSync(global.config.keyPath, 'utf8'); // get private key and replace headers to sign jwt
-    passportCert = passportCert.replace("-----BEGIN RSA PRIVATE KEY-----", "-----BEGIN PRIVATE KEY-----");
-    passportCert = passportCert.replace("-----END RSA PRIVATE KEY-----", "-----END PRIVATE KEY-----");
-
-    var clientId = global.config.clientId;
     var options = {
         algorithm: global.config.keyAlg,
         header: {
@@ -104,127 +179,18 @@ function getAAT(token_endpoint) {
             "alg": global.config.keyAlg,
             "kid": global.config.keyId
         }
-    };
-    var token = jwt.sign({
-        iss: clientId,
-        sub: clientId,
-        aud: global.UMAConfig.token_endpoint,
+    }
+    var now = new Date().getTime()
+
+    return jwt.sign({
+        iss: sub,
+        sub: sub,
+        aud: aud,
         jti: uuid(),
-        exp: (new Date().getTime() / 1000 + 30),
-        iat: (new Date().getTime())
-    }, passportCert, options);
+        exp: now / 1000 + 30,
+        iat: now
+    }, cert, options)
 
-    var optionsForRequest = {
-        method: 'POST',
-        url: global.UMAConfig.token_endpoint,
-        headers: {
-            'content-type': 'application/x-www-form-urlencoded'
-        },
-        form: {
-            grant_type: 'urn:ietf:params:oauth:grant-type:uma-ticket',
-            scope: 'uma_authorization',
-            client_assertion_type: 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
-            client_assertion: token,
-            client_id: clientId,
-            ticket: ticket,
-            claim_token: null,
-            claim_token_format: null,
-            pct: null,
-            rpt: null,
-            scope: null
-        }
-    };
-
-    return new Promise(function (resolve, reject) {
-        request(optionsForRequest)
-            .then(function (AATDetails) {
-                try {
-                    AATDetails = JSON.parse(AATDetails);
-                } catch (ex) {
-                    logger.log('error', 'Error in parsing JSON in getAAT: ', JSON.stringify(ex));
-                    logger.sendMQMessage('error: Error in parsing JSON in getAAT: ' + JSON.stringify(ex));
-                    logger.log('error', 'Error received in getAAT: ', AATDetails.toString());
-                    logger.sendMQMessage('error: Error received in getAAT: ' + AATDetails.toString());
-                    reject(AATDetails.toString());
-                }
-
-                if (AATDetails.error) {
-                    logger.log('error', 'Error in response from AAT: ', JSON.stringify(AATDetails.error));
-                    logger.sendMQMessage('error: Error in response from AAT:: ' + JSON.stringify(AATDetails.error));
-                    reject(AATDetails.error);
-                }
-
-                logger.log('info', 'AATDetails were received');
-                logger.sendMQMessage('info: AATDetails were received');
-                resolve(AATDetails);
-            })
-            .catch(function (error) {
-                logger.log('error', 'Error in requesting AAT');
-                logger.sendMQMessage('error: Error in requesting AAT');
-                reject(error);
-            });
-    });
 }
 
-
-function getJSON(rpt) {
-
-    var options = {
-        method: 'GET',
-        url: global.config.passportConfigAPI,
-        headers: {
-            'authorization': 'Bearer '.concat(rpt.access_token),
-            'pct': rpt.pct
-        }
-    };
-
-    return new Promise(function (resolve, reject) {
-        request(options)
-            .then(function (passportStrategies) {
-                try {
-                    passportStrategies = JSON.parse(passportStrategies);
-                } catch (ex) {
-                    logger.log('error', 'Error in parsing JSON in getJSON: ', JSON.stringify(ex));
-                    logger.sendMQMessage('error: Error in parsing JSON in getJSON: ', JSON.stringify(ex));
-                    logger.log('error', 'Error received in getJSON: ', passportStrategies.toString());
-                    logger.sendMQMessage('error: Error received in getJSON: ', passportStrategies.toString());
-                    reject(passportStrategies.toString());
-                }
-
-                if (passportStrategies.error) {
-                    logger.log('error', 'Error in response from getJSON: ', JSON.stringify(passportStrategies.error));
-                    logger.sendMQMessage('error: Error in response from getJSON: ', JSON.stringify(passportStrategies.error));
-                    reject(passportStrategies.error);
-                }
-                logger.log('info', 'Passport strategies were received');
-                logger.sendMQMessage('info: Passport strategies were received');
-                configureStrategies.setConfiguratins(passportStrategies);
-                resolve(passportStrategies);
-            })
-            .catch(function (error) {
-                logger.log('error', 'Error in requesting getJSON');
-                logger.sendMQMessage('error: Error in requesting getJSON');
-                reject(error);
-            });
-    });
-}
-
-exports.getDetailsAndConfigureStrategies = function (callback) {
-    getTokenEndpoint(UMAConfigURL)
-        .then(function (data) {
-            return getTicketAndConfig(data);
-        })
-        .then(function (umaConfigurations) {
-            return getAAT(umaConfigurations);
-        })
-        .then(function (rpt) {
-            return getJSON(rpt);
-        })
-        .then(function (passportStrategies) {
-            configureStrategies.setConfiguratins(passportStrategies);
-            callback(null, passportStrategies);
-        })
-        .catch(function (error) {
-            callback(error, null);
-        });
-};
+exports.reloadConfiguration = reloadConfiguration
