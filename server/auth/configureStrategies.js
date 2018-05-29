@@ -11,7 +11,7 @@ var logger = require("../utils/logger");
 
 global.getpassportStrategies = null;
 
-exports.setConfiguratins = function(data){
+exports.setConfigurations = function(data){
     SamlStrategy.setCredentials();
     getpassportStrategies = data.passportStrategies;
     if (data && data.passportStrategies) {
