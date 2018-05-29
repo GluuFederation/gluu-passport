@@ -12,13 +12,13 @@ if (!fs.existsSync(dir)){
 winston.emitErrs = true;
 
 var logOpts = {
-    level: 'info',
+    level: global.config.logLevel ? global.config.logLevel : 'info',
     filename: dir + '/passport-%DATE%.log',
     handleExceptions: true,
     json: false,
     colorize: false,
     tailable: true,
-    datePattern: 'YYYY-MM-DD-HH',
+    datePattern: 'YYYY-MM-DD',
     zippedArchive: true,
     maxSize: '20m',
     maxFiles: '14d',
