@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var jwt = require('jsonwebtoken');
+var util = require('util')
 
 var passportLinkedIn = require('../auth/linkedin').passport;
 var passportGithub = require('../auth/github').passport;
@@ -254,6 +255,10 @@ router.get('/passportstrategies',
         for (v in tmp) {
             tmp[v].clientID = "";
             tmp[v].clientSecret = "";
+            if (!tmp[v].logo_img) {
+                //Assume the logo resides in default passport image folder
+                tmp[v].logo_img = util.format('img/%s.png', v);
+            }
         }
         res.status(200).send(JSON.stringify(tmp));
     });
