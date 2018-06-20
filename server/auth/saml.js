@@ -9,7 +9,7 @@ var setCredentials = function () {
     var entitiesJSON = global.saml_config;
     for (key in entitiesJSON) {
 
-        logger.info(key);
+        logger.debug('Generating metadata for SAML provider "%s"', key)
         var objectJSON = entitiesJSON[key];
         var strategyConfigOptions = {};
         strategyConfigOptions.callbackUrl = global.applicationHost.concat("/passport/auth/saml/" + key + "/callback");
@@ -26,7 +26,7 @@ var setCredentials = function () {
             strategyConfigOptions.cert = objectJSON['cert'];
         }
         else {
-            logger.info('"cert"  is not present so' + key + " will not work" +objectJSON);
+            logger.warn('"cert" property is not present. Provider "%s" will not work', key)
             return
         }
         if (objectJSON.hasOwnProperty('skipRequestCompression')) {
@@ -61,11 +61,11 @@ var setCredentials = function () {
 
         var strategy = new SamlStrategy(strategyConfigOptions,
             function (req, profile, done) {
-                logger.info("profile : "+profile);
+                logger.debug("profile: %s", profile)
                 var idp = req.originalUrl.replace("/passport/auth/saml/","").replace("/callback","");
                 var mapping =global.saml_config[idp].reverseMapping;
-                logger.info(req.body.SAMLResponse);
-                logger.info("mapping : "+mapping);
+                logger.silly("SAML reponse in body:\n%s", req.body.SAMLResponse)
+
                 var userProfile = {
                     id: profile[mapping["id"]] || '',
                     memberOf: profile[mapping["memberOf"]] || '',
@@ -86,19 +86,18 @@ var setCredentials = function () {
             fs.mkdirSync(idpMetaPath);
         }
 
-        fs.truncate(path.join(idpMetaPath, key + '.xml'), 0, function (err) {
-
-        });
+        fs.truncate(path.join(idpMetaPath, key + '.xml'), 0, function (err) { });
         var decryptionCert = fs.readFileSync('/etc/certs/passport-sp.crt', 'utf-8');
 
         var metaData = strategy.generateServiceProviderMetadata(decryptionCert);
-        logger.info(metaData);
+        logger.silly('Metadata is:\n%s', metaData)
 
         fs.writeFile(path.join(idpMetaPath, key + '.xml'), metaData, function (err) {
             if (err) {
-                logger.info("failed to save" + path.join(idpMetaPath, key + '.xml' +"error :"+err));
+                logger.error('Failed saving %s', path.join(idpMetaPath, key + '.xml'))
+                logger.error(err)
             } else {
-                logger.info("succeeded in saving" + path.join(idpMetaPath, key + '.xml'));
+                logger.info("%s saved successfully", path.join(idpMetaPath, key + '.xml'))
             }
         })
     }
