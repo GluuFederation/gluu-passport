@@ -1,9 +1,9 @@
 var request = require('request-promise')
 var uuid = require('uuid')
-var jwt = require('jsonwebtoken')
 
 var configureStrategies = require('./configureStrategies')
 var logger = require('../utils/logger')
+var misc = require('../utils/misc')
 var www_authenticate = require('www-authenticate')
 var parsers = require('www-authenticate').parsers
 
@@ -43,7 +43,7 @@ function reloadConfiguration(processUnauthorizedResponse) {
 
 function getStrategies(strategiesURL) {
 
-	logger.log('debug', 'getStrategies called')
+	logger.debug('getStrategies called')
     var headers = {}
     if (rpt) {
 		headers.authorization = 'Bearer ' + rpt.access_token
@@ -112,7 +112,7 @@ function processAuthorization(ticket, as_uri) {
 
 function getTokenEndpoint(UMAConfigURL) {
 
-	logger.log('debug', 'getTokenEndpoint called')
+	logger.debug('getTokenEndpoint called')
 	return request.get(UMAConfigURL)
 		.then(urlContents => {
 				var endpoint = JSON.parse(urlContents).token_endpoint
@@ -130,66 +130,45 @@ function getTokenEndpoint(UMAConfigURL) {
 
 function getRPT(token_endpoint, ticket) {
 
-	logger.log('debug', 'getRPT called')
-	return readFile(global.config.keyPath, 'utf8') 	// get private key and replace headers to sign jwt
-			.then(content => content.replace("-----BEGIN RSA PRIVATE KEY-----", "-----BEGIN PRIVATE KEY-----")
-									.replace("-----END RSA PRIVATE KEY-----", "-----END PRIVATE KEY-----")
-					)
-			.then(passportCert => {
-					var clientId = global.config.clientId
-					var token = getSignedJWT(clientId, token_endpoint, passportCert)
-
-					var options = {
-						method: 'POST',
-						url: token_endpoint,
-						form: {
-							grant_type: 'urn:ietf:params:oauth:grant-type:uma-ticket',
-							scope: 'uma_authorization',
-							client_assertion_type: 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
-							client_assertion: token,
-							client_id: clientId,
-							ticket: ticket
-						}
-					}
-
-					return request(options)
-							.then(rptDetails => {
-									var msg = 'getRPT. RPT details were received'
-									logger.log('info', msg)
-									logger.sendMQMessage('info: ' + msg)
-
-									var rpt = JSON.parse(rptDetails)
-									msg= 'getRPT. RPT contents parsed'
-
-									logger.log('info', msg)
-									logger.sendMQMessage('info: ' + msg)
-
-									return rpt
-								})
+	logger.debug('getRPT called')
+	var clientId = global.config.clientId
+    var now = new Date().getTime()
+	var token = misc.getJWT({
+					iss: clientId,
+					sub: clientId,
+					aud: token_endpoint,
+					jti: uuid(),
+					exp: now / 1000 + 30,
+					iat: now
 				})
 
-}
+	var options = {
+		method: 'POST',
+		url: token_endpoint,
+		form: {
+			grant_type: 'urn:ietf:params:oauth:grant-type:uma-ticket',
+			scope: 'uma_authorization',
+			client_assertion_type: 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
+			client_assertion: token,
+			client_id: clientId,
+			ticket: ticket
+		}
+	}
 
-function getSignedJWT(sub, aud, cert) {
+	return request(options)
+			.then(rptDetails => {
+					var msg = 'getRPT. RPT details were received'
+					logger.info(msg)
+					logger.sendMQMessage('info: ' + msg)
 
-    var options = {
-        algorithm: global.config.keyAlg,
-        header: {
-            "typ": "JWT",
-            "alg": global.config.keyAlg,
-            "kid": global.config.keyId
-        }
-    }
-    var now = new Date().getTime()
+					var rpt = JSON.parse(rptDetails)
+					msg= 'getRPT. RPT contents parsed'
 
-    return jwt.sign({
-        iss: sub,
-        sub: sub,
-        aud: aud,
-        jti: uuid(),
-        exp: now / 1000 + 30,
-        iat: now
-    }, cert, options)
+					logger.log('info', msg)
+					logger.sendMQMessage('info: ' + msg)
+
+					return rpt
+				})
 
 }
 

@@ -8,14 +8,16 @@ var swig = require('swig');
 var passport = require('passport');
 var session = require('express-session');
 var jwt = require('jsonwebtoken');
-var fs = require('fs');
 var uuid = require('uuid');
 var util = require('util')
 
 global.config = require('/etc/gluu/conf/passport-config.json');
 global.saml_config = require('/etc/gluu/conf/passport-saml-config.json');
+
 var getConsumerDetails = require('./auth/getConsumerDetails');
 var logger = require("./utils/logger");
+//Ensure misc initializes before any usage
+require('./utils/misc')()
 
 global.applicationHost = "https://" + global.config.serverURI;
 global.applicationSecretKey = uuid();
@@ -116,7 +118,5 @@ server.createServer(app).listen(global.config.serverWebPort, () => {
 
 function pollConfiguration() {
 	 getConsumerDetails.reloadConfiguration(true)
-	 setTimeout(pollConfiguration, 30000)	 //30 seconds timer
+	 setTimeout(pollConfiguration, 60000)	 //1 minute timer
 }
-
-//MIIDbDCCAlQCCQCuwqx2PNP/eTANBgkqhkiG9w0BAQsFADB4MQswCQYDVQQGEwJVUzELMAkGA1UECAwCVFgxDzANBgNVBAcMBkF1c3RpbjESMBAGA1UECgwJR2x1dSBJbmMuMRkwFwYDVQQDDBBhcnZpbmQyLmdsdXUub3JnMRwwGgYJKoZIhvcNAQkBFg1pbmZvQGdsdXUub3JnMB4XDTE3MTEwNjA3MjQwMloXDTE4MTEwNjA3MjQwMloweDELMAkGA1UEBhMCVVMxCzAJBgNVBAgMAlRYMQ8wDQYDVQQHDAZBdXN0aW4xEjAQBgNVBAoMCUdsdXUgSW5jLjEZMBcGA1UEAwwQYXJ2aW5kMi5nbHV1Lm9yZzEcMBoGCSqGSIb3DQEJARYNaW5mb0BnbHV1Lm9yZzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAKLPEepcCvxE9PXEm5z65hBLagCiDsaay8ImEwWMxnGdgRPxk+WFYXk15eHOKkmW0B+/6u/bV4BHg4NEDSbm1UmKbg+g7icaJQJimtibMfpY/qJQmqCBwN3Wtj0buUkkrLdjcgPab24I5FMEcRDxoXEnvvdNZR1ZxM5eXt6dTMPuLEGCXqRTHjdBCbF3JigfKk6K6/yxWzU0ztJG/susN3uOW+aLrZAbIGYbVhhqcQ7g1ec7eJXwmotdRK9zycHi7ULdFoj/PnzxdU6qwFYzG4/QgZ5z+mtQyOxcYlCkeGDPRh6D6SkwsDmuWbmtvF5JVgsc9Ow2BkkLvrpfE3H9vSkCAwEAATANBgkqhkiG9w0BAQsFAAOCAQEAZGPZPCRBkPdSw8G9NKza4L2ji/q0GnCJsyAKHu7O1jl9PGR48T+13MZ0fsZgE1jhrV+YOaxIiz0lUe2oKYykBRBFRDxU0WV4XczOjhpSbXy04F4NIQS4tVpjmGlWxaaMC2xxm8bVWOT7rVGiuo3TA+OFlaSyKAf4AmFWRjVpFhh9BjaQ7nFf0HT16u+NW3Myyuag8x3Hi19u9E9nMRUQqB8W3UXxuZC7Oi1M7pzu0ycGPqjM1fz97W2ldYmvby51HV/g8F7kbewjzBRT2XsLA0+ATMBugORAEzJ6WUrr0WxphU1f7qoLc7djNztG/8Q5WhSU8L6W/smzmHDP2/YsMw==

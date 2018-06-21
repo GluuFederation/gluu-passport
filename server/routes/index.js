@@ -12,10 +12,11 @@ var passportYahoo = require('../auth/yahoo').passport;
 var passportGoogle = require('../auth/google').passport;
 var passportWindowsLive = require('../auth/windowslive').passport;
 var passportDropbox = require('../auth/dropbox').passport;
-var logger = require("../utils/logger");
 var passportSAML = require('../auth/saml').passport;
 var fs = require('fs');
 var uuid = require('uuid');
+var logger = require("../utils/logger")
+var misc = require('../utils/misc')
 
 var validateToken = function (req, res, next) {
 
@@ -44,40 +45,29 @@ var validateToken = function (req, res, next) {
 };
 
 function getUserJwt(data, subject) {
-    var passportCert = fs.readFileSync(global.config.keyPath, 'utf8'); // get private key and replace headers to sign jwt
-    passportCert = passportCert.replace("-----BEGIN RSA PRIVATE KEY-----", "-----BEGIN PRIVATE KEY-----");
-    passportCert = passportCert.replace("-----END RSA PRIVATE KEY-----", "-----END PRIVATE KEY-----");
 
-    var clientId = global.config.clientId;
-    var options = {
-        algorithm: global.config.keyAlg,
-        header: {
-            "typ": "JWT",
-            "alg": global.config.keyAlg,
-            "kid": global.config.keyId
-        }
-    };
-    var token = jwt.sign({
-        iss: clientId,
-        sub: subject,
-        aud: global.config.applicationEndpoint,
-        jti: uuid(),
-        exp: (new Date().getTime() / 1000 + 30),
-        iat: (new Date().getTime()),
-        data: data
-    }, passportCert, options);
-
-    return token;
 }
 
 var callbackResponse = function (req, res) {
+
     if (!req.user) {
         return res.redirect(global.config.applicationStartpoint + '?failure=Unauthorized');
     }
-    logger.log('info', 'User authenticated with: ' + req.user.provider + 'Strategy with userid: ' + req.user.id);
-    logger.sendMQMessage('info: User authenticated with: ' + req.user.provider + 'Strategy with userid: ' + req.user.id);
-    var jwt = getUserJwt(req.user, req.user.id);
-    logger.log('info', 'Preparing to send user data to: ' + global.config.applicationEndpoint + ' with JWT=' + jwt);
+    var subject = req.user.id
+    logger.info('User authenticated with: %s. Strategy with userid: %s', req.user.provider, subject);
+    logger.sendMQMessage('info: User authenticated with: ' + req.user.provider + '. Strategy with userid: ' + subject);
+
+    var now = new Date().getTime()
+    var jwt = misc.getJWT({
+				iss: global.config.clientId,
+				sub: subject,
+				aud: global.config.applicationEndpoint,
+				jti: uuid(),
+				exp: now / 1000 + 30,
+				iat: now,
+				data: req.user
+    		})
+    logger.verbose('Preparing to send user data to: %s with JWT=%s', global.config.applicationEndpoint, jwt);
 
     var response_body = `
 		<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
