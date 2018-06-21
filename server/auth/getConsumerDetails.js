@@ -41,7 +41,6 @@ function reloadConfiguration(processUnauthorizedResponse) {
 }
 
 function getStrategies(strategiesURL) {
-
 	logger.log2('verbose', 'getStrategies called')
     var headers = {}
     if (rpt) {
@@ -98,7 +97,6 @@ function processAuthorization(ticket, as_uri) {
 }
 
 function getTokenEndpoint(UMAConfigURL) {
-
 	logger.log2('verbose', 'getTokenEndpoint called')
 	return request.get(UMAConfigURL)
 		.then(urlContents => {
@@ -114,7 +112,6 @@ function getTokenEndpoint(UMAConfigURL) {
 }
 
 function getRPT(token_endpoint, ticket) {
-
 	logger.log2('verbose', 'getRPT called')
 	var clientId = global.config.clientId
     var now = new Date().getTime()
@@ -146,6 +143,7 @@ function getRPT(token_endpoint, ticket) {
 					var rpt = JSON.parse(rptDetails)
 
 					logger.log2('info', 'getRPT. RPT contents parsed')
+
 					return rpt
 				})
 
