@@ -80,7 +80,7 @@ app.get('/passport/token', function (req, res) {
     var token = jwt.sign({
         "jwt": uuid()
     }, global.applicationSecretKey, {
-        expiresIn: 1440
+        expiresIn: 120
     });
     return res.send(200, {
         "token_": token
