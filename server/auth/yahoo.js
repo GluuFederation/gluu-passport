@@ -11,14 +11,13 @@ var setCredentials = function(credentials) {
         function(id, profile, profileMethods, done) {
             var displayname = profile.displayName.split(" ");
             var userProfile = {
-                id: id,
-                name: profile.displayName,
-                username: profile.username || id,
-                email: profile.emails[0].value,
+                id: id || "",
+                name: profile.displayName || "",
+                username: profile.username || id || "",
+                email: profile.emails[0].value || "",
                 givenName: displayname[0] || profile.name.givenName || "",
                 familyName: displayname[1] || profile.name.familyName || "",
-                provider: profile.provider || "yahoo",
-                accessToken: profile.accessToken || ""
+                provider: "yahoo"
             };
             return done(null, userProfile);
         }

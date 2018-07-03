@@ -52,7 +52,6 @@ var setCredentials = function () {
         }
         else {
             strategyConfigOptions.requestIdExpirationPeriodMs = 3600000;
-
         }
 
         strategyConfigOptions.decryptionPvk = fs.readFileSync('/etc/certs/passport-sp.key', 'utf-8');
@@ -63,7 +62,7 @@ var setCredentials = function () {
             function (req, profile, done) {
                 logger.debug("profile: %s", profile)
                 var idp = req.originalUrl.replace("/passport/auth/saml/","").replace("/callback","");
-                var mapping =global.saml_config[idp].reverseMapping;
+                var mapping = global.saml_config[idp].reverseMapping;
                 logger.silly("SAML reponse in body:\n%s", req.body.SAMLResponse)
 
                 var userProfile = {
@@ -74,8 +73,7 @@ var setCredentials = function () {
                     email: profile[mapping["email"]],
                     givenName: profile[mapping["givenName"]] || '',
                     familyName: profile[mapping["familyName"]] || '',
-                    provider: profile[mapping["provider"]] || '',
-                    accessToken: "accesstoken"
+                    provider: profile[mapping["provider"]] || ''
                 };
                 return done(null, userProfile);
             });
