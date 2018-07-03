@@ -12,14 +12,13 @@ var setCredentials = function(credentials) {
         },
         function(accessToken, refreshToken, profile, done) {
             var userProfile = {
-                id: profile._json.id,
-                name: profile.displayName,
+                id: profile._json.id || "",
+                name: profile.displayName || "",
                 username: profile.username || profile._json.id,
-                email: profile._json.email,
-                givenName: profile._json.first_name,
-                familyName: profile._json.last_name,
-                provider: profile.provider,
-                accessToken: accessToken
+                email: profile._json.email || "",
+                givenName: profile._json.first_name || "",
+                familyName: profile._json.last_name || "",
+                provider: "facebook"
             };
             return done(null, userProfile);
         }

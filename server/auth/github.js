@@ -11,14 +11,13 @@ var setCredentials = function(credentials) {
         },
         function(accessToken, refreshToken, profile, done) {
             var userProfile = {
-                id: profile.id,
-                name: profile.displayName || profile.username,
-                username: profile.username || profile.id,
+                id: profile.id || "",
+                name: profile.displayName || profile.username || "",
+                username: profile.username || profile.id || "",
                 email: profile.emails[0].value || "",
                 givenName: profile.first_name || "",
                 familyName: profile.last_name || "",
-                provider: profile.provider,
-                accessToken: accessToken
+                provider: "github"
             };
             return done(null, userProfile);
         }

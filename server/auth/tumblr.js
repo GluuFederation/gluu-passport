@@ -10,14 +10,13 @@ var setCredentials = function(credentials) {
         },
         function(accessToken, refreshToken, profile, done) {
             var userProfile = {
-                id: profile.id || accessToken,
-                name: profile._json.response.user.name,
-                username: profile.username || profile.id,
+                id: profile.id || "",
+                name: profile._json.response.user.name || "",
+                username: profile.username || profile.id || "",
                 email: profile.email || "",
                 givenName: profile.givenName || "",
                 familyName: profile.familyName || "",
-                provider: profile.provider || "tumblr",
-                accessToken: accessToken
+                provider: "tumblr"
             };
             return done(null, userProfile);
         }

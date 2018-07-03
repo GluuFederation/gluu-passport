@@ -12,14 +12,13 @@ var setCredentials = function(credentials) {
         },
         function(token, tokenSecret, profile, done) {
             var userProfile = {
-                id: profile.id,
-                name: profile.displayName,
-                username: profile.username || profile.id,
-                email: profile._json.emailAddress,
-                givenName: profile.name.givenName,
-                familyName: profile.name.familyName,
-                provider: profile.provider,
-                accessToken: token
+                id: profile.id || "",
+                name: profile.displayName || "",
+                username: profile.username || profile.id || "",
+                email: profile._json.emailAddress || "",
+                givenName: profile.name.givenName || "",
+                familyName: profile.name.familyName || "",
+                provider: "linkedin"
             };
             return done(null, userProfile);
         }
