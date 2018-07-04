@@ -14,7 +14,7 @@ var setCredentials = function(credentials) {
                 id: profile.id || "",
                 name: profile.displayName || profile.username || "",
                 username: profile.username || profile.id || "",
-                email: profile.emails[0].value || "",
+                email: profile.email || (profile.emails && profile.emails[0] && profile.emails[0].value) || "",
                 givenName: profile.first_name || "",
                 familyName: profile.last_name || "",
                 provider: "github"
