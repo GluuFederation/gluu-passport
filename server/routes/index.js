@@ -12,14 +12,11 @@ var passportYahoo = require('../auth/yahoo').passport;
 var passportGoogle = require('../auth/google').passport;
 var passportWindowsLive = require('../auth/windowslive').passport;
 var passportDropbox = require('../auth/dropbox').passport;
-var logger = require("../utils/logger");
 var passportSAML = require('../auth/saml').passport;
 var fs = require('fs');
 var uuid = require('uuid');
-
-var response_part1 = "<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\">\n    <head>\n        </head>\n    <body onload=\"document.forms[0].submit()\">\n        <noscript>\n            <p>\n                <strong>Note:</strong> Since your browser does not support JavaScript,\n                you must press the Continue button once to proceed.\n            </p>\n        </noscript>\n        \n        <form action=\"";
-var response_part2 = "\" method=\"post\">\n            <div>\n                                \n                                \n                <input type=\"hidden\" name=\"user\" value=\"";
-var response_part3 = "\"/>                \n            </div>\n            <noscript>\n                <div>\n                    <input type=\"submit\" value=\"Continue\"/>\n                </div>\n            </noscript>\n        </form>\n            </body>\n</html>";
+var logger = require("../utils/logger")
+var misc = require('../utils/misc')
 
 var validateToken = function (req, res, next) {
 
@@ -40,49 +37,108 @@ var validateToken = function (req, res, next) {
         });
 
     } else {
-
-        // if there is no token
-        // returning an error
+        // if there is no token, return an error
         return res.redirect(global.config.applicationStartpoint + '?failure=No token provided');
     }
 };
 
-function getUserJwt(data, subject) {
-    var passportCert = fs.readFileSync(global.config.keyPath, 'utf8'); // get private key and replace headers to sign jwt
-    passportCert = passportCert.replace("-----BEGIN RSA PRIVATE KEY-----", "-----BEGIN PRIVATE KEY-----");
-    passportCert = passportCert.replace("-----END RSA PRIVATE KEY-----", "-----END PRIVATE KEY-----");
+var casaCallback = function (req, res) {
 
-    var clientId = global.config.clientId;
-    var options = {
-        algorithm: global.config.keyAlg,
-        header: {
-            "typ": "JWT",
-            "alg": global.config.keyAlg,
-            "kid": global.config.keyId
-        }
-    };
-    var token = jwt.sign({
-        iss: clientId,
-        sub: subject,
-        aud: global.config.applicationEndpoint,
-        jti: uuid(),
-        exp: (new Date().getTime() / 1000 + 30),
-        iat: (new Date().getTime()),
-        data: data
-    }, passportCert, options);
+	var provider = req.params.provider
+	res.cookie('casa-' + provider, req.decoded.exp, {
+		httpOnly: true,
+		maxAge: 120000,	//2min expiration
+		secure: true
+		})
+	var obj
 
-    return token;
+	switch (provider) {
+		case 'github':
+			obj = passportGithub
+			break
+		case 'twitter':
+			obj = passportTwitter
+			break
+		case 'facebook':
+			obj = passportFacebook
+			break
+		case 'tumblr':
+			obj = passportTumblr
+			break
+		case 'yahoo':
+			obj = passportYahoo
+			break
+		case 'google':
+			obj = passportGoogle
+			break
+		case 'windowslive':
+			obj = passportWindowsLive
+			break
+		case 'dropbox':
+			obj = passportDropbox
+			break
+	}
+	if (!obj) {
+		res.redirect(util.format('/casa/idp-linking?failure=Provider %s not recognized in passport-casa mapping', provider))
+	} else {
+		logger.debug('At casaCallback, proceeding with linking procedure for provider %s', provider)
+		obj.authenticate(provider, { failureRedirect: '/passport/login' })(req,res)
+	}
+
 }
 
 var callbackResponse = function (req, res) {
+
     if (!req.user) {
         return res.redirect(global.config.applicationStartpoint + '?failure=Unauthorized');
     }
-    logger.log('info', 'User authenticated with: ' + req.user.provider + 'Strategy with userid: ' + req.user.id);
-    logger.sendMQMessage('info: User authenticated with: ' + req.user.provider + 'Strategy with userid: ' + req.user.id);
-    var jwt = getUserJwt(req.user, req.user.id);
-    logger.log('info', 'Preparing to send user data to: ' + global.config.applicationEndpoint + ' with JWT=' + jwt);
-    var response_body = response_part1 + global.config.applicationEndpoint + response_part2 + jwt + response_part3;
+
+	var provider = req.user.provider
+	var postUrl
+	if (req.cookies['casa-' + provider]) {
+		postUrl = '/casa/idp-linking/' + provider
+	} else {
+		postUrl = global.config.applicationEndpoint
+	}
+
+    var subject = req.user.id
+    logger.info('User authenticated with: %s. Strategy with userid: %s', provider, subject);
+    logger.sendMQMessage('info: User authenticated with: ' + provider + '. Strategy with userid: ' + subject);
+
+    var now = new Date().getTime()
+    var jwt = misc.getJWT({
+				iss: global.config.clientId,
+				sub: subject,
+				aud: postUrl,
+				jti: uuid(),
+				exp: now / 1000 + 30,
+				iat: now,
+				data: req.user
+    		})
+    logger.verbose('Preparing to send user data to: %s with JWT=%s', postUrl, jwt);
+
+    var response_body = `
+		<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+			<head>
+			</head>
+			<body onload="document.forms[0].submit()">
+				<noscript>
+					<p>
+						<strong>Note:</strong> Since your browser does not support JavaScript, you must press the Continue
+						button once to proceed.
+					</p>
+				</noscript>
+
+				<form action="${postUrl}" method="post">
+					<div>
+						<input type="hidden" name="user" value="${jwt}"/>
+						<noscript>
+							<input type="submit" value="Continue"/>
+						</noscript>
+					</div>
+				</form>
+			</body>
+		</html>	`
     res.set('content-type', 'text/html;charset=UTF-8');
     return res.send(response_body);
 
@@ -97,6 +153,10 @@ router.get('/', function (req, res, next) {
 router.get('/login', function (req, res, next) {
     res.redirect(global.config.applicationStartpoint + '?failure=Go back and register!');
 });
+
+router.get('/casa/:provider/:token',
+    validateToken,
+    casaCallback)
 
 //=================== linkedin =================
 router.get('/auth/linkedin/callback',
@@ -269,12 +329,12 @@ router.get('/auth/meta/idp/:idp',
         var idp = req.params.idp;
         logger.info(idp);
         fs.readFile(__dirname + '/../idp-metadata/' + idp + '.xml', (e, data) => {
-            if(e)
-            res.status(404).send("Internal Error");
-    else
-        res.status(200).set('Content-Type', 'text/xml').send(String(data));
-    })
-        ;
+            if (e) {
+            	res.status(404).send("Internal Error")
+			} else {
+				res.status(200).set('Content-Type', 'text/xml').send(String(data))
+			}
+	    })
     });
 
 //======== catch 404 and forward to login ========
