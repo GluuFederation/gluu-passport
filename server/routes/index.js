@@ -37,14 +37,53 @@ var validateToken = function (req, res, next) {
         });
 
     } else {
-
-        // if there is no token
-        // returning an error
+        // if there is no token, return an error
         return res.redirect(global.config.applicationStartpoint + '?failure=No token provided');
     }
 };
 
-function getUserJwt(data, subject) {
+var casaCallback = function (req, res) {
+
+	var provider = req.params.provider
+	res.cookie('casa-' + provider, req.decoded.exp, {
+		httpOnly: true,
+		maxAge: 120000,	//2min expiration
+		secure: true
+		})
+	var obj
+
+	switch (provider) {
+		case 'github':
+			obj = passportGithub
+			break
+		case 'twitter':
+			obj = passportTwitter
+			break
+		case 'facebook':
+			obj = passportFacebook
+			break
+		case 'tumblr':
+			obj = passportTumblr
+			break
+		case 'yahoo':
+			obj = passportYahoo
+			break
+		case 'google':
+			obj = passportGoogle
+			break
+		case 'windowslive':
+			obj = passportWindowsLive
+			break
+		case 'dropbox':
+			obj = passportDropbox
+			break
+	}
+	if (!obj) {
+		res.redirect(util.format('/casa/idp-linking?failure=Provider %s not recognized in passport-casa mapping', provider))
+	} else {
+		logger.debug('At casaCallback, proceeding with linking procedure for provider %s', provider)
+		obj.authenticate(provider, { failureRedirect: '/passport/login' })(req,res)
+	}
 
 }
 
@@ -53,21 +92,30 @@ var callbackResponse = function (req, res) {
     if (!req.user) {
         return res.redirect(global.config.applicationStartpoint + '?failure=Unauthorized');
     }
+
+	var provider = req.user.provider
+	var postUrl
+	if (req.cookies['casa-' + provider]) {
+		postUrl = '/casa/idp-linking/' + provider
+	} else {
+		postUrl = global.config.applicationEndpoint
+	}
+
     var subject = req.user.id
-    logger.info('User authenticated with: %s. Strategy with userid: %s', req.user.provider, subject);
-    logger.sendMQMessage('info: User authenticated with: ' + req.user.provider + '. Strategy with userid: ' + subject);
+    logger.info('User authenticated with: %s. Strategy with userid: %s', provider, subject);
+    logger.sendMQMessage('info: User authenticated with: ' + provider + '. Strategy with userid: ' + subject);
 
     var now = new Date().getTime()
     var jwt = misc.getJWT({
 				iss: global.config.clientId,
 				sub: subject,
-				aud: global.config.applicationEndpoint,
+				aud: postUrl,
 				jti: uuid(),
 				exp: now / 1000 + 30,
 				iat: now,
 				data: req.user
     		})
-    logger.verbose('Preparing to send user data to: %s with JWT=%s', global.config.applicationEndpoint, jwt);
+    logger.verbose('Preparing to send user data to: %s with JWT=%s', postUrl, jwt);
 
     var response_body = `
 		<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
@@ -81,7 +129,7 @@ var callbackResponse = function (req, res) {
 					</p>
 				</noscript>
 
-				<form action="${global.config.applicationEndpoint}" method="post">
+				<form action="${postUrl}" method="post">
 					<div>
 						<input type="hidden" name="user" value="${jwt}"/>
 						<noscript>
@@ -105,6 +153,10 @@ router.get('/', function (req, res, next) {
 router.get('/login', function (req, res, next) {
     res.redirect(global.config.applicationStartpoint + '?failure=Go back and register!');
 });
+
+router.get('/casa/:provider/:token',
+    validateToken,
+    casaCallback)
 
 //=================== linkedin =================
 router.get('/auth/linkedin/callback',
@@ -277,12 +329,12 @@ router.get('/auth/meta/idp/:idp',
         var idp = req.params.idp;
         logger.info(idp);
         fs.readFile(__dirname + '/../idp-metadata/' + idp + '.xml', (e, data) => {
-            if(e)
-            res.status(404).send("Internal Error");
-    else
-        res.status(200).set('Content-Type', 'text/xml').send(String(data));
-    })
-        ;
+            if (e) {
+            	res.status(404).send("Internal Error")
+			} else {
+				res.status(200).set('Content-Type', 'text/xml').send(String(data))
+			}
+	    })
     });
 
 //======== catch 404 and forward to login ========
