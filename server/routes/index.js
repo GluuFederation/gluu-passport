@@ -14,6 +14,7 @@ var passportDropbox = require('../auth/dropbox').passport;
 var logger = require("../utils/logger");
 var passportSAML = require('../auth/saml').passport;
 var fs = require('fs');
+var uuid = require('uuid');
 
 var response_part1 = "<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\">\n    <head>\n        </head>\n    <body onload=\"document.forms[0].submit()\">\n        <noscript>\n            <p>\n                <strong>Note:</strong> Since your browser does not support JavaScript,\n                you must press the Continue button once to proceed.\n            </p>\n        </noscript>\n        \n        <form action=\"";
 var response_part2 = "\" method=\"post\">\n            <div>\n                                \n                                \n                <input type=\"hidden\" name=\"user\" value=\"";
@@ -45,15 +46,42 @@ var validateToken = function (req, res, next) {
     }
 };
 
+function getUserJwt(data, subject) {
+    var passportCert = fs.readFileSync(global.config.keyPath, 'utf8'); // get private key and replace headers to sign jwt
+    passportCert = passportCert.replace("-----BEGIN RSA PRIVATE KEY-----", "-----BEGIN PRIVATE KEY-----");
+    passportCert = passportCert.replace("-----END RSA PRIVATE KEY-----", "-----END PRIVATE KEY-----");
+
+    var clientId = global.config.clientId;
+    var options = {
+        algorithm: global.config.keyAlg,
+        header: {
+            "typ": "JWT",
+            "alg": global.config.keyAlg,
+            "kid": global.config.keyId
+        }
+    };
+    var token = jwt.sign({
+        iss: clientId,
+        sub: subject,
+        aud: global.config.applicationEndpoint,
+        jti: uuid(),
+        exp: (new Date().getTime() / 1000 + 30),
+        iat: (new Date().getTime()),
+        data: data
+    }, passportCert, options);
+
+    return token;
+}
+
 var callbackResponse = function (req, res) {
     if (!req.user) {
         return res.redirect(global.config.applicationStartpoint + '?failure=Unauthorized');
     }
     logger.log('info', 'User authenticated with: ' + req.user.provider + 'Strategy with userid: ' + req.user.id);
     logger.sendMQMessage('info: User authenticated with: ' + req.user.provider + 'Strategy with userid: ' + req.user.id);
-    var queryUserString = Buffer.from(JSON.stringify(req.user)).toString('base64');
-    logger.log('info', 'User redirected with: ' + global.config.applicationEndpoint + '?user=' + queryUserString);
-    var response_body = response_part1 + global.config.applicationEndpoint + response_part2 + queryUserString + response_part3;
+    var jwt = getUserJwt(req.user, req.user.id);
+    logger.log('info', 'Preparing to send user data to: ' + global.config.applicationEndpoint + ' with JWT=' + jwt);
+    var response_body = response_part1 + global.config.applicationEndpoint + response_part2 + jwt + response_part3;
     res.set('content-type', 'text/html;charset=UTF-8');
     return res.send(response_body);
 
