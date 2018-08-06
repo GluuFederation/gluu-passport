@@ -9,7 +9,7 @@ var setCredentials = function () {
     var entitiesJSON = global.saml_config;
     for (key in entitiesJSON) {
 
-        logger.debug('Generating metadata for SAML provider "%s"', key)
+        logger.log2('verbose', 'Generating metadata for SAML provider "%s"', key)
         var objectJSON = entitiesJSON[key];
         var strategyConfigOptions = {};
         strategyConfigOptions.callbackUrl = global.applicationHost.concat("/passport/auth/saml/" + key + "/callback");
@@ -24,9 +24,8 @@ var setCredentials = function () {
         }
         if (objectJSON.hasOwnProperty('cert')) {
             strategyConfigOptions.cert = objectJSON['cert'];
-        }
-        else {
-            logger.warn('"cert" property is not present. Provider "%s" will not work', key)
+        } else {
+            logger.log2('warn', '"cert" property is not present. Provider "%s" will not work', key)
             return
         }
         if (objectJSON.hasOwnProperty('skipRequestCompression')) {
@@ -60,10 +59,10 @@ var setCredentials = function () {
 
         var strategy = new SamlStrategy(strategyConfigOptions,
             function (req, profile, done) {
-                logger.debug("profile: %s", profile)
+                logger.log2('verbose', 'profile: %s', profile)
                 var idp = req.originalUrl.replace("/passport/auth/saml/","").replace("/callback","");
                 var mapping = global.saml_config[idp].reverseMapping;
-                logger.silly("SAML reponse in body:\n%s", req.body.SAMLResponse)
+                logger.log2('debug', 'SAML reponse in body:\n%s', req.body.SAMLResponse)
 
                 var userProfile = {
                     id: profile[mapping["id"]] || '',
@@ -88,14 +87,14 @@ var setCredentials = function () {
         var decryptionCert = fs.readFileSync('/etc/certs/passport-sp.crt', 'utf-8');
 
         var metaData = strategy.generateServiceProviderMetadata(decryptionCert);
-        logger.silly('Metadata is:\n%s', metaData)
+        logger.log2('debug', 'Metadata is:\n%s', metaData)
 
         fs.writeFile(path.join(idpMetaPath, key + '.xml'), metaData, function (err) {
             if (err) {
-                logger.error('Failed saving %s', path.join(idpMetaPath, key + '.xml'))
-                logger.error(err)
+                logger.log2('error', 'Failed saving %s', path.join(idpMetaPath, key + '.xml'))
+                logger.log2('error', err)
             } else {
-                logger.info("%s saved successfully", path.join(idpMetaPath, key + '.xml'))
+                logger.log2('info', '%s saved successfully', path.join(idpMetaPath, key + '.xml'))
             }
         })
     }

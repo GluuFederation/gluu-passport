@@ -81,7 +81,7 @@ var casaCallback = function (req, res) {
 	if (!obj) {
 		res.redirect(util.format('/casa/idp-linking?failure=Provider %s not recognized in passport-casa mapping', provider))
 	} else {
-		logger.debug('At casaCallback, proceeding with linking procedure for provider %s', provider)
+		logger.log2('verbose', 'At casaCallback, proceeding with linking procedure for provider %s', provider)
 		obj.authenticate(provider, { failureRedirect: '/passport/login' })(req,res)
 	}
 
@@ -102,8 +102,7 @@ var callbackResponse = function (req, res) {
 	}
 
     var subject = req.user.id
-    logger.info('User authenticated with: %s. Strategy with userid: %s', provider, subject);
-    logger.sendMQMessage('info: User authenticated with: ' + provider + '. Strategy with userid: ' + subject);
+    logger.log2('info', 'User authenticated with userid "%s" and strategy "%s"', subject, provider)
 
     var now = new Date().getTime()
     var jwt = misc.getJWT({
@@ -115,7 +114,7 @@ var callbackResponse = function (req, res) {
 				iat: now,
 				data: req.user
     		})
-    logger.verbose('Preparing to send user data to: %s with JWT=%s', postUrl, jwt);
+    logger.log2('debug', 'Preparing to send user data to: %s with JWT=%s', postUrl, jwt)
 
     var response_body = `
 		<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
@@ -285,8 +284,7 @@ for (key in entitiesJSON) {
                 err = {
                     message: "cert param is required to validate signature of saml assertions response"
                 };
-                logger.log('error', 'Cert Error: ' + JSON.stringify(err));
-                logger.sendMQMessage('Cert Error: ' + JSON.stringify(err));
+                logger.log2('error', 'Cert Error: %s', JSON.stringify(err))
                 res.status(400).send("Internal Error");
             });
     }
@@ -327,7 +325,7 @@ router.get('/passportstrategies',
 router.get('/auth/meta/idp/:idp',
     function (req, res) {
         var idp = req.params.idp;
-        logger.info(idp);
+        logger.log2('verbose', 'Metadata request for %s', idp);
         fs.readFile(__dirname + '/../idp-metadata/' + idp + '.xml', (e, data) => {
             if (e) {
             	res.status(404).send("Internal Error")

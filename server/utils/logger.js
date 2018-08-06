@@ -59,15 +59,36 @@ var MQDetails = {
     }
 };
 
-var sendMQMessage = function sendMessage() {
+var sendMQMessage = function () {
     if(mqSetUp){
-        var stompClient = new Stomp(MQDetails);
+        var stompClient = new Stomp(MQDetails)
         stompClient.connect(function (sessionId) {
 			messageToPublish = util.format.apply(util, Array.prototype.slice.apply(arguments))
-            this.publish('/' + MQDetails.CLIENT_QUEUE_NAME, messageToPublish);
-        });
+            this.publish('/' + MQDetails.CLIENT_QUEUE_NAME, messageToPublish)
+        })
     }
-};
+}
+
+var log2 = function (level, msg) {
+
+	level = level ? level.toLowerCase() : 'info'
+	level = (level == 'error' || level == 'warn' || level == 'info' || level == 'verbose' || level == 'debug' || level == 'silly') ? level : 'info'
+	msg = msg || ''
+
+	arguments['0'] = level
+	arguments['1'] = msg
+
+	//Log it to winston logger
+	args = Array.prototype.slice.apply(arguments)
+	logger.log(util.format.apply(util, args))
+
+	//Log it to MQ
+	args[1] = level + ": " + args[1]
+	args.shift()
+	sendMQMessage.apply(this, args)
+
+}
+
 
 module.exports = logger;
 module.exports.stream = {
@@ -75,4 +96,5 @@ module.exports.stream = {
         logger.info(message.slice(0, -1));
     }
 };
-module.exports.sendMQMessage = sendMQMessage;
+module.exports.sendMQMessage = sendMQMessage
+module.exports.log2 = log2

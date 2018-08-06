@@ -26,24 +26,23 @@ function reloadConfiguration(processUnauthorizedResponse) {
 				} else {
 					try {
 						configureStrategies.setConfigurations(obj)
-						logger.info('reloadConfiguration. Passport strategies have been parsed')
+						logger.log2('info', 'reloadConfiguration. Passport strategies have been parsed')
 					} catch (err) {
-						logger.log('error', err.toString())
+						logger.log2('error', err.toString())
 					}
 				}
 			})
 		.catch(e => {
 				//In most cases, error caught here is caused by oxauth/oxtrust not being ready yet
-				logger.log('warn', e.toString())
-				logger.sendMQMessage('warn ' + e.toString())
-				logger.log('info', 'An attempt to get passport configurations will be tried again soon')
+				logger.log2('warn', e.toString())
+				logger.log2('info', 'An attempt to get passport configurations will be tried again soon')
 			})
 
 }
 
 function getStrategies(strategiesURL) {
 
-	logger.debug('getStrategies called')
+	logger.log2('verbose', 'getStrategies called')
     var headers = {}
     if (rpt) {
 		headers.authorization = 'Bearer ' + rpt.access_token
@@ -63,19 +62,12 @@ function getStrategies(strategiesURL) {
 				switch (response.statusCode) {
 					case 401:
 						var parsed = new parsers.WWW_Authenticate(response.headers['www-authenticate'])
-						msg = 'getStrategies. Got www-authenticate in header with ticket ' + parsed.parms.ticket
-
-						logger.log('debug', msg)
-						logger.sendMQMessage(msg)
-
+						logger.log2('verbose', 'getStrategies. Got www-authenticate in header with ticket %s', parsed.parms.ticket)
 						return parsed.parms
 					break;
 					case 200:
-						msg = 'getStrategies. Passport strategies were received'
-						logger.log('info', msg)
-						logger.sendMQMessage(msg)
-
-						logger.log('debug', 'getStrategies. Content: %s', response.body)
+						logger.log2('info', 'getStrategies. Passport strategies were received')
+						logger.log2('verbose', 'getStrategies. Content: %s', response.body)
 						return JSON.parse(response.body)
 					break;
 					default:
@@ -88,7 +80,7 @@ function getStrategies(strategiesURL) {
 
 function processAuthorization(ticket, as_uri) {
 	//NOTE: this function does not need to return anything
-	logger.log('debug', 'processAuthorization called')
+	logger.log2('verbose', 'processAuthorization called')
 
 	getTokenEndpoint(as_uri)
 		.then(endpoint => getRPT(endpoint, ticket))
@@ -99,30 +91,23 @@ function processAuthorization(ticket, as_uri) {
 				reloadConfiguration(false)
 			})
 		.catch(e => {
-			var msg = e.toString()
-			logger.log('error', msg)
-			logger.sendMQMessage('error ' + msg)
-
-			msg = 'processAuthorization. No RPT token could be obtained. An attempt to get passport configurations will be tried again soon'
-			logger.log('error', msg)
-			logger.sendMQMessage('error ' + msg)
+			logger.log2('error', e.toString())
+			logger.log2('error', 'processAuthorization. No RPT token could be obtained. An attempt to get passport configurations will be tried again soon')
 		})
 
 }
 
 function getTokenEndpoint(UMAConfigURL) {
 
-	logger.debug('getTokenEndpoint called')
+	logger.log2('verbose', 'getTokenEndpoint called')
 	return request.get(UMAConfigURL)
 		.then(urlContents => {
 				var endpoint = JSON.parse(urlContents).token_endpoint
 				if (endpoint) {
-					logger.log('info', 'getTokenEndpoint. Found endpoint at %s', endpoint)
+					logger.log2('info', 'getTokenEndpoint. Found endpoint at %s', endpoint)
 					return endpoint
 				} else {
-					var msg = "getTokenEndpoint. No token endpoint was found"
-					logger.log('error', msg)
-                    logger.sendMQMessage('error: ' + msg)
+					logger.log2('error', 'getTokenEndpoint. No token endpoint was found')
 					throw new Error(msg)
 				}
 			})
@@ -130,7 +115,7 @@ function getTokenEndpoint(UMAConfigURL) {
 
 function getRPT(token_endpoint, ticket) {
 
-	logger.debug('getRPT called')
+	logger.log2('verbose', 'getRPT called')
 	var clientId = global.config.clientId
     var now = new Date().getTime()
 	var token = misc.getJWT({
@@ -157,16 +142,10 @@ function getRPT(token_endpoint, ticket) {
 
 	return request(options)
 			.then(rptDetails => {
-					var msg = 'getRPT. RPT details were received'
-					logger.info(msg)
-					logger.sendMQMessage('info: ' + msg)
-
+					logger.log2('info', 'getRPT. RPT details were received')
 					var rpt = JSON.parse(rptDetails)
-					msg= 'getRPT. RPT contents parsed'
 
-					logger.log('info', msg)
-					logger.sendMQMessage('info: ' + msg)
-
+					logger.log2('info', 'getRPT. RPT contents parsed')
 					return rpt
 				})
 
