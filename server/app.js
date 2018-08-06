@@ -9,7 +9,6 @@ var passport = require('passport');
 var session = require('express-session');
 var jwt = require('jsonwebtoken');
 var uuid = require('uuid');
-var util = require('util')
 
 global.config = require('/etc/gluu/conf/passport-config.json');
 global.saml_config = require('/etc/gluu/conf/passport-saml-config.json');
@@ -23,8 +22,7 @@ global.applicationHost = "https://" + global.config.serverURI;
 global.applicationSecretKey = uuid();
 
 if (!process.env.NODE_LOGGING_DIR) {
-    logger.log('error', 'NODE_LOGGING_DIR was not set, Default log folder will be used');
-    logger.sendMQMessage('error: NODE_LOGGING_DIR was not set, Default log folder will be used');
+    logger.log2('error', 'NODE_LOGGING_DIR was not set, Default log folder will be used')
 }
 
 // *** express instance *** //
@@ -77,6 +75,7 @@ passport.deserializeUser(function (user, done) {
 });
 
 app.get('/passport/token', function (req, res) {
+	logger.log2('verbose', 'Issuing token')
     var token = jwt.sign({
         "jwt": uuid()
     }, global.applicationSecretKey, {
@@ -93,25 +92,21 @@ app.use('/passport', require('./routes/index.js'));
 // *** error handlers *** //
 app.use(function (err, req, res, next) {
     if (err) {
-        logger.log('error', 'Error: ' + err);
-        logger.sendMQMessage('error: Unknown Error: ' + JSON.stringify(err));
-        res.redirect('/passport/login');
+        logger.log2('error', 'Unknown Error: %s', JSON.stringify(err))
+        res.redirect('/passport/login')
     }
 });
 
 process.on('uncaughtException', function (err) {
-    logger.log('error', 'Uncaught Exception: ' + JSON.stringify(err));
-    logger.sendMQMessage('error: Unknown Exception: ' + JSON.stringify(err));
+    logger.log2('error', 'Uncaught Exception: %s', JSON.stringify(err))
 });
 
-if (('development' == app.get('env')) || true) { // To make sure that the requests are not rejected
+if (('development' == app.get('env')) || true) { // To make sure that requests are not rejected
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 }
 
 server.createServer(app).listen(global.config.serverWebPort, () => {
-		var msg = util.format('Server listening on %s:%s', global.config.serverURI, global.config.serverWebPort)
-		logger.log('info', msg)
-		logger.sendMQMessage('info: ' + msg)
+		logger.log2('info', 'Server listening on %s:%s', global.config.serverURI, global.config.serverWebPort)
 		pollConfiguration()
 	}
 )
