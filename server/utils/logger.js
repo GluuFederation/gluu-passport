@@ -80,7 +80,7 @@ var log2 = function (level, msg) {
 
 	//Log it to winston logger
 	args = Array.prototype.slice.apply(arguments)
-	logger.log(util.format.apply(util, args))
+	logger.log.apply(logger, args)
 
 	//Log it to MQ
 	args[1] = level + ": " + args[1]
