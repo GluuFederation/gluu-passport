@@ -1,4 +1,5 @@
-var fs = require('fs'),
+var	util = require('util'),
+	fs = require('fs'),
     Stomp = require('stomp-client'),
     winston = require('winston'),
     dir = process.env.NODE_LOGGING_DIR || __dirname + '/logs';
@@ -59,10 +60,11 @@ var MQDetails = {
     }
 };
 
-var sendMQMessage = function sendMessage(messageToPublish) {
+var sendMQMessage = function sendMessage() {
     if(mqSetUp){
         var stompClient = new Stomp(MQDetails);
         stompClient.connect(function (sessionId) {
+			messageToPublish = util.format.apply(util, Array.prototype.slice.apply(arguments))
             this.publish('/' + MQDetails.CLIENT_QUEUE_NAME, messageToPublish);
         });
     }
