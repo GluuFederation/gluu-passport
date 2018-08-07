@@ -4,8 +4,10 @@ var OIDCStrategy = require('passport-openidconnect').Strategy
 
 var setCredentials = function(credentials) {
 	var callbackURL = global.applicationHost.concat("/passport/auth/openidconnect/callback")
-	//credentials object is assumed to already have populated the properties: issuer, authorizationURL, tokenURL, userInfoURL, clientID, clientSecret
+	//IMPORTANT NOTE: credentials object is assumed to already have populated the properties:
+	//		issuer, authorizationURL, tokenURL, userInfoURL, clientID, clientSecret
 	//please fill any missing via oxTrust: Configuration > Manage Authentication > Passport authentication method
+	//you can also fill optional property acr_values in oxTrust, e.g. otp
 	credentials.callbackURL= callbackURL
 	credentials.scope = 'profile user_name email'
 
