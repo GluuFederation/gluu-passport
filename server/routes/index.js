@@ -13,6 +13,8 @@ var passportGoogle = require('../auth/google').passport;
 var passportWindowsLive = require('../auth/windowslive').passport;
 var passportDropbox = require('../auth/dropbox').passport;
 var passportSAML = require('../auth/saml').passport;
+var passportOIDC = require('../auth/openidconnect').passport
+
 var fs = require('fs');
 var uuid = require('uuid');
 var logger = require("../utils/logger")
@@ -76,6 +78,9 @@ var casaCallback = function (req, res) {
 			break
 		case 'dropbox':
 			obj = passportDropbox
+			break
+		case 'openidconnect':
+			obj = passportOIDC
 			break
 	}
 	if (!obj) {
@@ -261,6 +266,17 @@ router.get('/auth/dropbox/callback',
 router.get('/auth/dropbox/:token',
     validateToken,
     passportDropbox.authenticate('dropbox-oauth2'));
+
+//=================== OIDC ===================
+router.get('/auth/openidconnect/callback',
+        passportOIDC.authenticate('openidconnect', {
+            failureRedirect: '/passport/login'
+        }),
+        callbackResponse);
+
+    router.get('/auth/openidconnect/:token',
+        validateToken,
+        passportOIDC.authenticate('openidconnect'))
 
 //===================saml ====================
 var entitiesJSON = global.saml_config;

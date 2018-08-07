@@ -6,6 +6,7 @@ var TumblrStrategy = require('./tumblr');
 var TwitterStrategy = require('./twitter');
 var YahooStrategy = require('./yahoo');
 var DropboxOAuth2Strategy = require('./dropbox');
+var OIDCStrategy = require('./openidconnect')
 var SamlStrategy = require("./saml");
 var logger = require("../utils/logger")
 
@@ -63,6 +64,12 @@ exports.setConfigurations = function(data){
         if (data.passportStrategies.yahoo) {
 			logger.log2('info', 'Yahoo Strategy details received')
             YahooStrategy.setCredentials(data.passportStrategies.yahoo)
+        }
+
+        //OIDCStrategy
+        if (data.passportStrategies.openidconnect) {
+			logger.log2('info', 'OIDC details received')
+            OIDCStrategy.setCredentials(data.passportStrategies.openidconnect)
         }
 
         //SamlStrategy
