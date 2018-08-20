@@ -84,7 +84,7 @@ var casaCallback = function (req, res) {
 			break
 	}
 	if (!obj) {
-		res.redirect(util.format('/casa/idp-linking?failure=Provider %s not recognized in passport-casa mapping', provider))
+		res.redirect(util.format('/casa/rest/idp-linking?failure=Provider %s not recognized in passport-casa mapping', provider))
 	} else {
 		logger.log2('verbose', 'At casaCallback, proceeding with linking procedure for provider %s', provider)
 		obj.authenticate(provider, { failureRedirect: '/passport/login' })(req,res)
@@ -101,7 +101,7 @@ var callbackResponse = function (req, res) {
 	var provider = req.user.provider
 	var postUrl
 	if (req.cookies['casa-' + provider]) {
-		postUrl = '/casa/idp-linking/' + provider
+		postUrl = '/casa/rest/idp-linking/' + provider
 	} else {
 		postUrl = global.config.applicationEndpoint
 	}
