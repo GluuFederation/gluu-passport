@@ -72,7 +72,8 @@ var setCredentials = function () {
                     email: profile[mapping["email"]],
                     givenName: profile[mapping["givenName"]] || '',
                     familyName: profile[mapping["familyName"]] || '',
-                    provider: profile[mapping["provider"]] || ''
+                    provider: profile[mapping["provider"]] || '',
+                    providerKey: key
                 };
                 return done(null, userProfile);
             });
