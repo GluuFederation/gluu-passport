@@ -155,7 +155,7 @@ router.get('/', function (req, res, next) {
 });
 
 router.get('/login', function (req, res, next) {
-    res.redirect(global.config.applicationStartpoint + '?failure=Go back and register!');
+    res.redirect(global.config.applicationStartpoint + '?failure=An error occurred');
 });
 
 router.get('/casa/:provider/:token',
