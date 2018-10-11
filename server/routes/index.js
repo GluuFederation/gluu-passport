@@ -111,9 +111,9 @@ var callbackResponse = function (req, res) {
 
     var now = new Date().getTime()
     var jwt = misc.getJWT({
-				iss: global.config.clientId,
+				iss: postUrl,
 				sub: subject,
-				aud: postUrl,
+				aud: global.config.clientId,
 				jti: uuid(),
 				exp: now / 1000 + 30,
 				iat: now,
@@ -146,6 +146,38 @@ var callbackResponse = function (req, res) {
     res.set('content-type', 'text/html;charset=UTF-8');
     return res.send(response_body);
 
+};
+
+var callbackAuthzResponse = function (req, res) {
+	if (!req.user) {
+		return res.redirect(global.config.applicationStartpoint + '?failure=Unauthorized');
+	}
+
+	// TODO: How to get Saml configuration entry here ??.
+	// TODO: In saml.js we need to call openid.getAuthorizationEndpoint if Saml entiry_id has OpenId setting
+	client = "open_id_client_mapped_to_entity_id"
+
+		authorizationUrl = opeid.authorizationUrl(client.authorization_endpoint, client.authorization_params)
+
+		var subject = req.user.id
+		logger.log2('info', 'User authenticated with userid "%s" and strategy "%s"', subject, provider)
+
+		var now = new Date().getTime()
+		var jwt = misc.getJWT({
+			iss: client.server_uri,
+			sub: subject,
+			aud: global.config.clientId,
+			jti: uuid(),
+			exp: now / 1000 + 30,
+			iat: now,
+			data: req.user
+		})
+		logger.log2('debug', 'Preparing to send authorization request with user data to: %s with JWT=%s', authorizationUrl, jwt)
+
+		authorizationRequest = openid.getAuthorizationQuery(client, jwt)
+
+		res.set('content-type', 'text/html;charset=UTF-8');
+	return res.redirect(authorizationUrl + "?" + authorizationRequest);
 };
 
 router.get('/', function (req, res, next) {
@@ -288,6 +320,12 @@ for (key in entitiesJSON) {
                 failureRedirect: '/passport/login'
             }),
             callbackResponse);
+
+        router.post('/auth/saml/' + key + '/callback/inbound',
+                passportSAML.authenticate(key, {
+                    failureRedirect: '/passport/login'
+                }),
+                callbackAuthzResponse);
 
         router.get('/auth/saml/' + key + '/:token',
             validateToken,
