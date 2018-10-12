@@ -153,7 +153,7 @@ var callbackAuthzResponse = function (req, res) {
 	if (!req.user) {
 		return res.redirect(global.config.applicationStartpoint + '?failure=Unauthorized');
 	}
-
+	logger.log2("callbackAuthzResponse. Full req is\n%s", JSON.stringify(req))
 	var provider = req.user.providerKey
 	var idp_initiated_config = global.saml_idp_init_config[provider]
 	//TODO: is sp_id part of req? no idea where to grab it from?
@@ -161,8 +161,6 @@ var callbackAuthzResponse = function (req, res) {
 
 	if (idp_initiated_config && idp_initiated_config[sp_id]) {
 
-		// TODO: what?
-		// TODO: In saml.js we need to call openid.getAuthorizationEndpoint if Saml entiry_id has OpenId setting
 		client = idp_initiated_config[sp_id].openidclient
 		authorization_params = idp_initiated_config[sp_id].authorization_params
 
@@ -189,10 +187,6 @@ var callbackAuthzResponse = function (req, res) {
 			data: req.user
 		})
 		logger.log2('debug', 'Preparing to send authorization request with user data to: %s with JWT=%s', authorization_endpoint, jwt)
-
-		//TODO: I commented the immediate line below, not sure how the impl of getAuthorizationQuery is and why client param is needed
-		//authorizationRequest = openid.getAuthorizationQuery(client, jwt)
-		//TODO: This is how I understand it could be, it's missing properly url encoding
 
 		authorization_params_cloned = JSON.parse(JSON.stringify(authorization_params))
 		authorization_params_cloned['session_state'] = JSON.stringify(jwt)
