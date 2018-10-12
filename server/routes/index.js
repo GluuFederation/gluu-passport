@@ -19,6 +19,9 @@ var fs = require('fs');
 var uuid = require('uuid');
 var logger = require("../utils/logger")
 var misc = require('../utils/misc')
+var openid = require('../openid/openid')
+
+var gluuAuthzEndpoint
 
 var validateToken = function (req, res, next) {
 
@@ -153,18 +156,26 @@ var callbackAuthzResponse = function (req, res) {
 		return res.redirect(global.config.applicationStartpoint + '?failure=Unauthorized');
 	}
 
-	// TODO: How to get Saml configuration entry here ??.
-	// TODO: In saml.js we need to call openid.getAuthorizationEndpoint if Saml entiry_id has OpenId setting
-	client = "open_id_client_mapped_to_entity_id"
+	var provider = req.user.providerKey
+	var idp_initiated_config = global.saml_idp_init_config[provider]
+	//TODO: is sp_id part of req? no idea where to grab it from?
+	var sp_id = undefined
 
-		authorizationUrl = opeid.authorizationUrl(client.authorization_endpoint, client.authorization_params)
+	if (idp_initiated_config && idp_initiated_config[sp_id]) {
+
+		// TODO: what?
+		// TODO: In saml.js we need to call openid.getAuthorizationEndpoint if Saml entiry_id has OpenId setting
+		client = idp_initiated_config[sp_id].openidclient
+
+		gluuAuthzEndpoint = gluuAuthzEndpoint ? gluuAuthzEndpoint : openid.getAuthorizationEndpoint()
+		authorizationUrl = openid.getAuthorizationUrl(gluuAuthzEndpoint, client)
 
 		var subject = req.user.id
 		logger.log2('info', 'User authenticated with userid "%s" and strategy "%s"', subject, provider)
 
 		var now = new Date().getTime()
 		var jwt = misc.getJWT({
-			iss: client.server_uri,
+			iss: util.format("https://%s", global.config.serverURI),
 			sub: subject,
 			aud: global.config.clientId,
 			jti: uuid(),
@@ -174,10 +185,16 @@ var callbackAuthzResponse = function (req, res) {
 		})
 		logger.log2('debug', 'Preparing to send authorization request with user data to: %s with JWT=%s', authorizationUrl, jwt)
 
-		authorizationRequest = openid.getAuthorizationQuery(client, jwt)
+		//TODO: I commented the immediate line below, not sure how the impl of getAuthorizationQuery is and why client param is needed
+		//authorizationRequest = openid.getAuthorizationQuery(client, jwt)
+		//TODO: This is how I understand it could be, it's missing properly url encoding
+		authorizationRequest = 'session_state=' + JSON.stringify({"user_profile" : jwt})
 
 		res.set('content-type', 'text/html;charset=UTF-8');
-	return res.redirect(authorizationUrl + "?" + authorizationRequest);
+		return res.redirect(authorizationUrl + "&" + authorizationRequest);
+	} else {
+		return res.redirect(util.format('%s?failure=Unknown IDP %s or service provider %s', global.config.applicationStartpoint, provider, sp_id))
+	}
 };
 
 router.get('/', function (req, res, next) {
