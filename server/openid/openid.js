@@ -21,7 +21,7 @@ function getAuthorizationEndpoint(openIdConfigURL) {
 }
 
 function authorizationParams(params) {
-	assert(_.isPlainObject(params), 'pass a plain object as the first argument')
+	assert(_.isPlainObject(params), 'Pass a plain object as the first argument')
 
 	//TODO: what to use in state param?
 	const authParams = Object.assign({	scope: 'openid',
@@ -40,7 +40,7 @@ function authorizationParams(params) {
 
 	assert(
 			['none', 'code'].includes(authParams.response_type) || authParams.nonce,
-			'nonce MUST be provided for implicit and hybrid flows'
+			'Nonce MUST be provided for implicit and hybrid flows'
 	)
 
 	return authParams;
