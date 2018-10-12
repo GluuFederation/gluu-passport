@@ -194,7 +194,7 @@ var callbackAuthzResponse = function (req, res) {
 		//authorizationRequest = openid.getAuthorizationQuery(client, jwt)
 		//TODO: This is how I understand it could be, it's missing properly url encoding
 
-		authorization_params_cloned = authorization_params
+		authorization_params_cloned = JSON.parse(JSON.stringify(authorization_params))
 		authorization_params_cloned['session_state'] = JSON.stringify(jwt)
 		authorization_url = openid.getAuthorizationUrl(authorization_endpoint, authorization_params_cloned)
 
