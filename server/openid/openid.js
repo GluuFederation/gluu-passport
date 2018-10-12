@@ -1,11 +1,11 @@
-const assert = require('assert');
-const url = require('url');
+const assert = require('assert')
+const url = require('url')
 const request = require('request-promise')
-const _ = require('lodash');
-const forEach = require('../utils/for_each');
+const _ = require('lodash')
+const forEach = require('../utils/for_each')
 const logger = require('../utils/logger')
 
-function authorizationEndpoint(openIdConfigURL) {
+function getAuthorizationEndpoint(openIdConfigURL) {
 	logger.log2('verbose', 'getAuthorizationEndpoint called')
 	return request.get(openIdConfigURL)
 	.then(urlContents => {
@@ -21,12 +21,12 @@ function authorizationEndpoint(openIdConfigURL) {
 }
 
 function authorizationParams(params) {
-	assert(_.isPlainObject(params), 'pass a plain object as the first argument');
+	assert(_.isPlainObject(params), 'pass a plain object as the first argument')
 
-	const authParams = Object.assign(
-			{ client_id: this.client_id, scope: 'openid', response_type: 'code' },
-			params
-	);
+	//TODO: what to use in state param?
+	const authParams = Object.assign({	scope: 'openid',
+										response_type: 'code',
+										acr_values: 'passport_saml' }, params)
 
 	forEach(authParams, (value, key) => {
 		if (value === null || value === undefined) {
@@ -36,22 +36,23 @@ function authorizationParams(params) {
 		} else if (typeof value !== 'string') {
 			authParams[key] = String(value);
 		}
-	});
+	})
 
 	assert(
 			['none', 'code'].includes(authParams.response_type) || authParams.nonce,
 			'nonce MUST be provided for implicit and hybrid flows'
-	);
+	)
 
 	return authParams;
 }
 
-function authorizationUrl(authorization_endpoint, params) {
-	const target = url.parse(this.issuer.authorization_endpoint, true);
+function getAuthorizationUrl(authorization_endpoint, params) {
+	const target = url.parse(authorization_endpoint, true);
 	target.search = null;
+	//TODO: calling authorizationParams(params) does the same as below?
 	Object.assign(target.query, authorizationParams.call(this, params));
 	return url.format(target);
 }
 
-module.exports.authorizationEndpoint = authorizationEndpoint
-module.exports.authorizationUrl = authorizationUrl
+module.exports.getAuthorizationEndpoint = getAuthorizationEndpoint
+module.exports.getAuthorizationUrl = getAuthorizationUrl
