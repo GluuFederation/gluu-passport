@@ -59,8 +59,8 @@ var setCredentials = function () {
 
         var strategy = new SamlStrategy(strategyConfigOptions,
             function (req, profile, done) {
-                logger.log2('verbose', 'profile: %s', profile)
-                var idp = req.originalUrl.replace("/passport/auth/saml/","").replace("/callback","");
+                logger.log2('verbose', 'Initial profile: %s', JSON.stringify(profile))
+                var idp = req.originalUrl.replace("/passport/auth/saml/","").replace("/callback","").replace("/inbound","");
                 var mapping = global.saml_config[idp].reverseMapping;
                 logger.log2('debug', 'SAML reponse in body:\n%s', req.body.SAMLResponse)
 
@@ -75,8 +75,11 @@ var setCredentials = function () {
                     provider: profile[mapping["provider"]] || '',
                     providerKey: key
                 };
+                logger.log2('verbose', 'Profile after mapping: %s', JSON.stringify(userProfile))
+
                 return done(null, userProfile);
             });
+
         passport.use(key, strategy);
 
         var idpMetaPath = path.join(__dirname, '..', 'idp-metadata');

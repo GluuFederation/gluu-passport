@@ -150,54 +150,68 @@ var callbackResponse = function (req, res) {
 };
 
 var callbackAuthzResponse = function (req, res) {
+	logger.log2('verbose', "callbackAuthzResponse. Entry point")
 	if (!req.user) {
 		return res.redirect(global.config.applicationStartpoint + '?failure=Unauthorized');
 	}
-	logger.log2("callbackAuthzResponse. Full req is\n%s", JSON.stringify(req))
+
 	var provider = req.user.providerKey
+	var user = req.user
+	var subject = user.id
+	logger.log2('info', 'User authenticated with userid "%s" and strategy "%s"', subject, provider)
+
+	logger.log2('verbose', 'callbackAuthzResponse. Full req is\n%s', util.inspect(req, {showHidden: false, depth: 2}))
 	var idp_initiated_config = global.saml_idp_init_config[provider]
-	//TODO: is sp_id part of req? no idea where to grab it from?
-	var sp_id = undefined
+	logger.log2('verbose', 'Using inboung IDP config: %s', JSON.stringify(idp_initiated_config))
 
-	if (idp_initiated_config && idp_initiated_config[sp_id]) {
-
-		client = idp_initiated_config[sp_id].openidclient
-		authorization_params = idp_initiated_config[sp_id].authorization_params
+	if (idp_initiated_config) {
+		client = idp_initiated_config['openid_client']
+		authorization_params = idp_initiated_config['authorization_params']
 
 		// Cache authorization_endpoint
-		authorization_endpoint = null;
-		if (idp_initiated_config[authorization_endpoint]) {
-			authorization_endpoint = idp_initiated_config[authorization_endpoint]
+		authorization_endpoint = undefined
+		if (idp_initiated_config[provider]) {
+			authorization_endpoint = idp_initiated_config[provider]
+			logger.log2('debug', 'Get cached authorization_endpoint: %s', authorization_endpoint)
+			redirectToAuthorizationEndpoint(res, client, authorization_endpoint, authorization_params, user)
 		} else {
-			authorization_endpoint = openid.getAuthorizationEndpoint()
-			idp_initiated_config[authorization_endpoint] = authorization_endpoint
+			openid.getAuthorizationEndpoint(client['server_uri'])
+				.then(authorization_endpoint => {
+					logger.log2('debug', 'Get authorization_endpoint: %s', authorization_endpoint)
+					idp_initiated_config[provider] = authorization_endpoint
+
+					redirectToAuthorizationEndpoint(res, client, authorization_endpoint, authorization_params, user)
+				})
 		}
 
-		var subject = req.user.id
-		logger.log2('info', 'User authenticated with userid "%s" and strategy "%s"', subject, provider)
-
-		var now = new Date().getTime()
-		var jwt = misc.getJWT({
-			iss: util.format("https://%s", global.config.serverURI),
-			sub: subject,
-			aud: authorization_params['client_id'],
-			jti: uuid(),
-			exp: now / 1000 + 30,
-			iat: now,
-			data: req.user
-		})
-		logger.log2('debug', 'Preparing to send authorization request with user data to: %s with JWT=%s', authorization_endpoint, jwt)
-
-		authorization_params_cloned = JSON.parse(JSON.stringify(authorization_params))
-		authorization_params_cloned['session_state'] = JSON.stringify(jwt)
-		authorization_url = openid.getAuthorizationUrl(authorization_endpoint, authorization_params_cloned)
-
-		res.set('content-type', 'text/html;charset=UTF-8');
-		return res.redirect(authorization_url);
 	} else {
-		return res.redirect(util.format('%s?failure=Unknown IDP %s or service provider %s', global.config.applicationStartpoint, provider, sp_id))
+		return res.redirect(util.format('%s?failure=Unknown IDP %s or service provider %s', global.config.applicationStartpoint, provider, ""))
 	}
 };
+
+function redirectToAuthorizationEndpoint(res, client, authorization_endpoint, authorization_params, user) {
+	logger.log2('debug', 'Call to redirectToAuthorizationEndpoint')
+	var subject = user.id
+
+	var now = new Date().getTime()
+	var jwt = misc.getJWT({
+		iss: client['server_uri'],
+		sub: subject,
+		aud: authorization_params['client_id'],
+		jti: uuid(),
+		exp: now / 1000 + 30,
+		iat: now,
+		data: user
+	})
+	logger.log2('debug', 'Preparing to send authorization request with user data to: %s with JWT=%s', authorization_endpoint, jwt)
+
+	authorization_params_cloned = JSON.parse(JSON.stringify(authorization_params))
+	authorization_params_cloned['session_state'] = JSON.stringify(jwt)
+	authorization_url = openid.getAuthorizationUrl(authorization_endpoint, authorization_params_cloned)
+
+	res.set('content-type', 'text/html;charset=UTF-8');
+	return res.redirect(authorization_url);
+}
 
 router.get('/', function (req, res, next) {
     res.render('index', {
