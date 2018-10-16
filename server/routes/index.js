@@ -206,7 +206,7 @@ function redirectToAuthorizationEndpoint(res, client, authorization_endpoint, au
 	logger.log2('debug', 'Preparing to send authorization request with user data to: %s with JWT=%s', authorization_endpoint, jwt)
 
 	authorization_params_cloned = JSON.parse(JSON.stringify(authorization_params))
-	authorization_params_cloned['session_state'] = JSON.stringify(jwt)
+	authorization_params_cloned['state'] = jwt
 	authorization_url = openid.getAuthorizationUrl(authorization_endpoint, authorization_params_cloned)
 
 	res.set('content-type', 'text/html;charset=UTF-8');
