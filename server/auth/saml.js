@@ -8,7 +8,7 @@ var path = require('path');
 var setCredentials = function () {
     var entitiesJSON = global.saml_config;
     var inboundEntitiesJSON = global.saml_idp_init_config;
-    for (key in entitiesJSON) {
+    for (let key in entitiesJSON) {
 
         logger.log2('verbose', 'Generating metadata for SAML provider "%s"', key)
         var objectJSON = entitiesJSON[key];
