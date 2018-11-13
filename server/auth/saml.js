@@ -66,8 +66,10 @@ var setCredentials = function () {
         var strategy = new SamlStrategy(strategyConfigOptions,
             function (req, profile, done) {
                 logger.log2('verbose', 'Initial profile: %s', JSON.stringify(profile))
+                logger.log2('verbose', 'Original Url: %s', req.originalUrl)
                 var idp = req.originalUrl.replace("/passport/auth/saml/","").replace("/callback","").replace("/inbound","");
                 var mapping = global.saml_config[idp].reverseMapping;
+                logger.log2('verbose', 'Found mapping for idp "%s": %s', idp, JSON.stringify(mapping))
                 logger.log2('debug', 'SAML reponse in body:\n%s', req.body.SAMLResponse)
 
                 var userProfile = {
@@ -79,7 +81,7 @@ var setCredentials = function () {
                     givenName: profile[mapping["givenName"]] || '',
                     familyName: profile[mapping["familyName"]] || '',
                     provider: profile[mapping["provider"]] || '',
-                    providerKey: key
+                    providerKey: idp
                 };
                 logger.log2('verbose', 'Profile after mapping: %s', JSON.stringify(userProfile))
 
@@ -87,6 +89,7 @@ var setCredentials = function () {
             });
 
         passport.use(key, strategy);
+        logger.log2('verbose', 'Generating strategy for  provider "%s":\n %s', key, JSON.stringify(strategy))
 
         var idpMetaPath = path.join(__dirname, '..', 'idp-metadata');
         if (!fs.existsSync(idpMetaPath)) {
@@ -99,15 +102,19 @@ var setCredentials = function () {
         var metaData = strategy.generateServiceProviderMetadata(decryptionCert);
         logger.log2('debug', 'Metadata is:\n%s', metaData)
 
-        fs.writeFile(path.join(idpMetaPath, key + '.xml'), metaData, function (err) {
-            if (err) {
-                logger.log2('error', 'Failed saving %s', path.join(idpMetaPath, key + '.xml'))
-                logger.log2('error', err)
-            } else {
-                logger.log2('info', '%s saved successfully', path.join(idpMetaPath, key + '.xml'))
-            }
-        })
+        fs.writeFile(path.join(idpMetaPath, key + '.xml'), metaData, getWriteFileCallback(idpMetaPath, key));
     }
+};
+
+var getWriteFileCallback = function(idpMetaPath, key) {
+    return function(err) {
+        if (err) {
+            logger.log2('error', 'Failed saving %s', path.join(idpMetaPath, key + '.xml'))
+            logger.log2('error', err)
+        } else {
+            logger.log2('info', '%s saved successfully', path.join(idpMetaPath, key + '.xml'))
+        }
+    };
 };
 
 module.exports = {
