@@ -3,6 +3,7 @@ var	util = require('util'),
     Stomp = require('stomp-client'),
     winston = require('winston'),
     dir = process.env.NODE_LOGGING_DIR || __dirname + '/logs';
+
 require('winston-daily-rotate-file');
 var dateFormat = require('dateformat');
 
@@ -18,9 +19,7 @@ var logOpts = {
     handleExceptions: true,
     json: false,
     colorize: false,
-    tailable: true,
     datePattern: 'YYYY-MM-DD',
-    zippedArchive: true,
     maxSize: '20m',
     maxFiles: '14d',
     timestamp: function() {
@@ -33,14 +32,45 @@ var logOpts = {
     }
 };
 
-var transport = new winston.transports.DailyRotateFile(logOpts);
+var flogOpts = {
+    level: logOpts.level,
+    filename: dir + '/passport.log',
+    json: logOpts.json,
+    maxSize: logOpts.maxSize,
+    maxFiles: 5,
+    timestamp: logOpts.timestamp,
+    formatter: logOpts.formatter,
+    options: { flags : "w" }
+}
+
+var stdoutOpts = {
+    level: logOpts.level,
+    json: logOpts.json
+}
+
+var transport = new winston.transports.DailyRotateFile(logOpts)
+var fileTransport = new winston.transports.File(flogOpts)
+var consoleTransport = new winston.transports.Console(stdoutOpts)
 
 var logger = new (winston.Logger)({
-    transports: [
-        transport
-    ],
+    transports: [ ],
     exitOnError: false
 });
+
+
+if (global.config.consoleLogOnly) {
+	logger.add(consoleTransport, {}, true)
+} else {
+	logger.add(transport, {}, true)
+	logger.add(fileTransport, {}, true)
+
+	transport.on('rotate', function(oldFilename, newFilename) {
+		//Flushes plain passport.log file
+		logger.remove(fileTransport)
+		fileTransport = new winston.transports.File(flogOpts)
+		logger.add(fileTransport, {}, true)
+	})
+}
 
 var mqSetUp = global.config.activeMQConf
                 && global.config.activeMQConf.isEnabled
