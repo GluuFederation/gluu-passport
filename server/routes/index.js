@@ -108,7 +108,7 @@ var callbackResponse = function (req, res) {
 	var provider = req.user.provider
 	var postUrl
 	if (req.cookies['casa-' + provider]) {
-		postUrl = '/casa/rest/pl/social-plugin/idp-linking/' + provider
+		postUrl = '/casa/rest/pl/account-linking/idp-linking/' + provider
 	} else {
 		postUrl = global.config.applicationEndpoint
 	}
