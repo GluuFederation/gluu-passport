@@ -83,11 +83,17 @@ var casaCallback = function (req, res) {
 			obj = passportOIDC
 			break
 	}
+	if (!obj && (provider in global.saml_config)) {
+		obj = passportSAML
+	}
+	var lurl = '/casa/rest/pl/account-linking/idp-linking'
 	if (!obj) {
-		res.redirect(util.format('/casa/rest/idp-linking?failure=Provider %s not recognized in passport-casa mapping', provider))
+		res.redirect(util.format('%s?failure=Provider %s not recognized in passport-casa mapping', lurl, provider))
 	} else {
 		logger.log2('verbose', 'At casaCallback, proceeding with linking procedure for provider %s', provider)
-		obj.authenticate(provider, { failureRedirect: '/passport/login' })(req,res)
+		obj.authenticate(provider,
+			{ failureRedirect: util.format('%s?failure=An error occurred triggering authentication for %s', lurl, provider) }
+			)(req,res)
 	}
 
 }
@@ -101,7 +107,7 @@ var callbackResponse = function (req, res) {
 	var provider = req.user.provider
 	var postUrl
 	if (req.cookies['casa-' + provider]) {
-		postUrl = '/casa/rest/idp-linking/' + provider
+		postUrl = '/casa/rest/pl/account-linking/idp-linking/' + provider
 	} else {
 		postUrl = global.config.applicationEndpoint
 	}
