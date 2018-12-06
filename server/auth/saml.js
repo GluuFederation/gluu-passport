@@ -35,13 +35,17 @@ var setCredentials = function () {
             return
         }
         if (objectJSON.hasOwnProperty('skipRequestCompression')) {
-            strategyConfigOptions.skipRequestCompression = objectJSON['skipRequestCompression'];
+            strategyConfigOptions.skipRequestCompression = objectJSON['skipRequestCompression'].toLowerCase() == "true";
         }
         if (objectJSON.hasOwnProperty('authnRequestBinding')) {
             strategyConfigOptions.authnRequestBinding = objectJSON['authnRequestBinding'];
         }
         if (objectJSON.hasOwnProperty('additionalAuthorizeParams')) {
-            strategyConfigOptions.additionalAuthorizeParams = objectJSON['additionalAuthorizeParams'];
+            strategyConfigOptions.additionalAuthorizeParams = {}
+            try {
+				strategyConfigOptions.additionalAuthorizeParams = JSON.parse(objectJSON['additionalAuthorizeParams'])
+			} catch(e) {
+			}
         }
         if(objectJSON.hasOwnProperty('forceAuthn')){
             strategyConfigOptions.forceAuthn = objectJSON['forceAuthn'];
