@@ -41,11 +41,7 @@ var setCredentials = function () {
             strategyConfigOptions.authnRequestBinding = objectJSON['authnRequestBinding'];
         }
         if (objectJSON.hasOwnProperty('additionalAuthorizeParams')) {
-            strategyConfigOptions.additionalAuthorizeParams = {}
-            try {
-				strategyConfigOptions.additionalAuthorizeParams = JSON.parse(objectJSON['additionalAuthorizeParams'])
-			} catch(e) {
-			}
+            strategyConfigOptions.additionalAuthorizeParams = objectJSON['additionalAuthorizeParams']
         }
         if(objectJSON.hasOwnProperty('forceAuthn')){
             strategyConfigOptions.forceAuthn = objectJSON['forceAuthn'];
