@@ -45,7 +45,9 @@ var flogOpts = {
 
 var stdoutOpts = {
     level: logOpts.level,
-    json: logOpts.json
+    json: logOpts.json,
+    timestamp: logOpts.timestamp,
+    formatter: logOpts.formatter
 }
 
 var transport = new winston.transports.DailyRotateFile(logOpts)
