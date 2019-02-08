@@ -10,9 +10,12 @@ var OIDCStrategy = require('./openidconnect')
 var SamlStrategy = require("./saml");
 var logger = require("../utils/logger")
 
+global.getpassportStrategies = null;
+
 exports.setConfigurations = function(data){
 
     SamlStrategy.setCredentials();
+    getpassportStrategies = data.passportStrategies;
     if (data && data.passportStrategies) {
 
         //FacebookStrategy
