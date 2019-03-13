@@ -109,6 +109,7 @@ if (('development' == app.get('env')) || true) { // To make sure that requests a
 
 server.createServer(app).listen(global.config.serverWebPort, () => {
 		logger.log2('info', 'Server listening on %s:%s', global.config.serverURI, global.config.serverWebPort)
+		console.log('Server listening on %s:%s', global.config.serverURI, global.config.serverWebPort)
 		pollConfiguration()
 	}
 )
