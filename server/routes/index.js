@@ -105,7 +105,7 @@ var callbackResponse = function (req, res) {
         return res.redirect(global.config.applicationStartpoint + '?failure=Unauthorized');
     }
 
-	var provider = req.user.provider
+	var provider = req.params.providerKey || req.user.provider
 	var postUrl
 	if (req.cookies['casa-' + provider]) {
 		postUrl = '/casa/rest/pl/account-linking/idp-linking/' + encodeURIComponent(provider)
