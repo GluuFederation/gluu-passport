@@ -1,119 +1,116 @@
-// *** main dependencies *** //
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-var swig = require('swig');
-var passport = require('passport');
-var session = require('express-session');
-var jwt = require('jsonwebtoken');
-var uuid = require('uuid');
+const
+	server = require('http'),
+	app = require('express')(),
+	session = require('express-session'),
+	MemoryStore = require('memorystore')(session),
+	bodyParser = require('body-parser'),
+	cookieParser = require('cookie-parser'),
+	passport = require('passport'),
+	R = require('ramda'),
+	morgan = require('morgan'),
+	logger = require('./utils/logging'),
+	misc = require('./utils/misc'),
+	confDiscovery = require('./utils/configDiscovery'),
+	routes = require('./routes'),
+	providers = require('./providers'),
+	passportFile = '/etc/gluu/conf/passport-config.json'
 
-global.config = require('/etc/gluu/conf/passport-config.json')
-global.saml_config = require('/etc/gluu/conf/passport-saml-config.json')
-global.saml_idp_init_config = require('/etc/gluu/conf/passport-inbound-idp-initiated.json')
+var httpServer, httpPort = -1
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
 
-var getConsumerDetails = require('./auth/getConsumerDetails');
-var logger = require("./utils/logger");
-//Ensure misc initializes before any usage
-require('./utils/misc')()
+app.use(morgan('short', { stream: logger.logger.stream }))
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(cookieParser())
 
-global.applicationHost = "https://" + global.config.serverURI;
-global.applicationSecretKey = uuid();
-
-if (!process.env.NODE_LOGGING_DIR) {
-    logger.log2('error', 'NODE_LOGGING_DIR was not set, Default log folder will be used')
-}
-
-// *** express instance *** //
-var app = express();
-
-var server = require('http');
-
-// *** view engine *** //
-var swig = new swig.Swig();
-app.engine('html', swig.renderFile);
-app.set('view engine', 'html');
-
-// *** static directory *** //
-app.set('views', path.join(__dirname, 'views'));
-
-//Allow cross origin
-app.use(function (req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Expose-Headers", "Authorization");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-    res.header("Access-Control-Request-Methods", "POST, GET, PUT, DELETE, OPTIONS");
-
-    next();
-});
-
-// *** config middleware *** //
-app.use(require('morgan')('combined', {"stream": logger.stream}));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
-    extended: false
-}));
-
-app.use(cookieParser());
 app.use(session({
-    secret: uuid(),
-    key: uuid(),
+    cookie: {
+        maxAge: 86400000
+    },
+    store: new MemoryStore({
+        checkPeriod: 86400000 // prune expired entries every 24h
+    }),
+    secret: 'wtf',
     resave: false,
-    saveUninitialized: true
-}));
+    saveUninitialized: false
+}))
 
-app.use(passport.initialize());
-app.use(passport.session());
+app.use(passport.initialize())
+app.use(passport.session())
+app.use('/passport', routes)
 
-passport.serializeUser(function (user, done) {
-    done(null, user);
-});
+//Default error handler
+app.use((err, req, res, next) => {
+	logger.log2('error', `Unknown Error: ${err}`)
+	logger.log2('error', err.stack)
+	res.redirect(`${global.basicConfig.failureRedirectUrl}?failure=An error occurred`)
+})
 
-passport.deserializeUser(function (user, done) {
-    done(null, user);
-});
+passport.serializeUser((user, done) => {
+    done(null, user)
+})
 
-app.get('/passport/token', function (req, res) {
-	logger.log2('verbose', 'Issuing token')
-    var token = jwt.sign({
-        "jwt": uuid()
-    }, global.applicationSecretKey, {
-        expiresIn: 120
-    });
-    return res.send(200, {
-        "token_": token
-    });
-});
+passport.deserializeUser((user, done) => {
+    done(null, user)
+})
 
-// *** main routes *** //
-app.use('/passport', require('./routes/index.js'));
 
-// *** error handlers *** //
-app.use(function (err, req, res, next) {
-    if (err) {
-        logger.log2('error', 'Unknown Error: %s', JSON.stringify(err))
-        res.redirect('/passport/login')
-    }
-});
+function recreateHttpServer(serverURI, port) {
 
-process.on('uncaughtException', function (err) {
-    logger.log2('error', 'Uncaught Exception: %s', JSON.stringify(err))
-});
+	//Closes and creates a new server if port has changed
+	if (httpPort != port) {
+		httpPort = port
 
-if (('development' == app.get('env')) || true) { // To make sure that requests are not rejected
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-}
-
-server.createServer(app).listen(global.config.serverWebPort, () => {
-		logger.log2('info', 'Server listening on %s:%s', global.config.serverURI, global.config.serverWebPort)
-		console.log('Server listening on %s:%s', global.config.serverURI, global.config.serverWebPort)
-		pollConfiguration()
+		if (httpServer) {
+			httpServer.close(() => logger.log2('info','Server stopped accepting connections'))
+		}
+		httpServer = server.createServer(app)
+		httpServer.listen(port, () => {
+			logger.log2('info', `Server listening on ${serverURI}:${port}`)
+			console.log(`Server listening on ${serverURI}:${port}`)
+		})
 	}
-)
 
-function pollConfiguration() {
-	 getConsumerDetails.reloadConfiguration(true)
-	 setTimeout(pollConfiguration, 60000)	 //1 minute timer
 }
+
+function reconfigure(cfg) {
+
+	global.config = cfg.conf
+	global.iiconfig = cfg.idpInitiated
+
+	//Apply all runtime configuration changes
+	logger.configure(cfg.conf.logging)
+	providers.setup(cfg.providers)
+	recreateHttpServer(cfg.conf.serverURI, cfg.conf.serverWebPort)
+
+}
+
+function pollConfiguration(configEndpoint) {
+	misc.pipePromise(confDiscovery.retrieve, reconfigure)(configEndpoint)
+			.catch(e => {
+				logger.log2('error', e.toString())
+				logger.log2('error', e.stack)
+				logger.log2('warn', 'An attempt to get configuration data will be tried again soon')
+			})
+	setTimeout(pollConfiguration, 60000, configEndpoint)	 //1 minute timer
+}
+
+function init() {
+
+	//Read the minimal params to start
+	let basicConfig = require(passportFile)
+	//Start logging with basic params
+	logger.configure({level: R.defaultTo('info', basicConfig.logLevel)})
+
+	let props = ['clientId', 'keyPath', 'keyId', 'keyAlg', 'configurationEndpoint', 'failureRedirectUrl']
+	if (misc.hasData(props, basicConfig)) {
+		global.basicConfig = basicConfig
+		//Try to gather the configuration
+		pollConfiguration(basicConfig.configurationEndpoint)
+	} else {
+		logger.log2('error', 'passport-config file is missing data')
+	}
+
+}
+
+init()
