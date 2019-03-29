@@ -4,7 +4,8 @@ const
 	meta = require('./sp-meta'),
 	misc = require('./utils/misc'),
 	logger = require('./utils/logging'),
-	pparams = require('./extra-passport-params')
+	pparams = require('./extra-passport-params'),
+	cacheProvider = require('./cache-provider')
 
 var prevConfigHash = 0
 
@@ -53,8 +54,14 @@ function setupStrategy(prv) {
 	//Create strategy
 	if (moduleId == 'passport-saml') {
 
+		let	options = prv.options,
+			f = R.anyPass([R.isNil, R.isEmpty])
+		//Instantiate custom cache provider if required
+		if (options.validateInResponseTo && !f(options.redisCacheOptions)) {
+			options.cacheProvider = cacheProvider.get(options.redisCacheOptions)
+		}
 		let samlStrategy = new strategy(
-			prv.options,
+			options,
 			(profile, cb) => processProfile(prv, profile, cb, { provider: id, getAssertion: profile.getAssertion })
 		)
 		passport.use(id, samlStrategy)

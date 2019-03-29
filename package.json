@@ -29,6 +29,7 @@
         "passport-windowslive": "^1.0.2",
         "passport-yahoo-oauth2": "^0.2.6",
         "ramda": "^0.26.1",
+        "redis": "^2.8.0",
         "request": "^2.88.0",
         "request-promise": "^4.2.2",
         "sha1": "^1.1.1",
