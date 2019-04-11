@@ -98,9 +98,9 @@ function getRPT(ticket, token_endpoint) {
 function validate(data) {
 
 	//Perform a shallow validation on configuration data gathered
-	let paths = [['conf', 'logging', 'level'], ['conf', 'serverWebPort'], ['providers']]
+	let paths = [['conf', 'logging', 'level'], ['conf', 'serverWebPort']]
 
-	if (misc.pathsHaveData(paths, data)) {
+	if (misc.pathsHaveData(paths, data) && Array.isArray(data.providers)) {
 		logger.log2('info', 'Configuration data has been parsed')
 		return data
 	} else {
