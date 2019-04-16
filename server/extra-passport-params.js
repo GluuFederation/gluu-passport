@@ -16,6 +16,13 @@ const params = R.once(() => [
 		}
 	},
 	{
+		strategy: 'passport-oxd',
+		passportAuthnParams: {
+			scope: ['openid', 'email', 'profile']
+		},
+		options: {}
+	},
+	{
 		strategy: 'passport-dropbox-oauth2',
 		passportAuthnParams: {},
 		options: {
