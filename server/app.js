@@ -6,7 +6,6 @@ const
 	bodyParser = require('body-parser'),
 	cookieParser = require('cookie-parser'),
 	passport = require('passport'),
-	R = require('ramda'),
 	morgan = require('morgan'),
 	logger = require('./utils/logging'),
 	misc = require('./utils/misc'),
@@ -62,7 +61,7 @@ function recreateHttpServer(serverURI, port) {
 		httpPort = port
 
 		if (httpServer) {
-			httpServer.close(() => logger.log2('info','Server stopped accepting connections'))
+			httpServer.close(() => logger.log2('info', 'Server stopped accepting connections'))
 		}
 		httpServer = server.createServer(app)
 		httpServer.listen(port, () => {
@@ -100,7 +99,7 @@ function init() {
 	//Read the minimal params to start
 	let basicConfig = require(passportFile)
 	//Start logging with basic params
-	logger.configure({level: R.defaultTo('info', basicConfig.logLevel)})
+    logger.configure({ level: basicConfig.logLevel, consoleLogOnly: basicConfig.consoleLogOnly })
 
 	let props = ['clientId', 'keyPath', 'keyId', 'keyAlg', 'configurationEndpoint', 'failureRedirectUrl']
 	if (misc.hasData(props, basicConfig)) {
