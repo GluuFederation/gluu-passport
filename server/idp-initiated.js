@@ -3,8 +3,7 @@ const
 	uuid = require('uuid'),
 	url = require('url'),
 	misc = require('./utils/misc'),
-	logger = require("./utils/logging"),
-	oxAuthCustomParam = 'IDPInitiatedFlowProfileParam'
+	logger = require("./utils/logging")
 
 function hasInResponseTo(user) {
 
