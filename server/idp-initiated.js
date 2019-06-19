@@ -50,7 +50,9 @@ function createAuthzRequest(user, iiconfig) {
 					data: user
 				})
 
-		req = R.dissoc('provider', req)
+		let extraParams = R.unless(misc.isObject, () => {}, req.extraParams)
+		req = R.omit(['provider', 'extraParams'], req)
+
 		req.state = jwt
 		req.response_type = R.defaultTo('code', req.response_type)
 
@@ -59,6 +61,9 @@ function createAuthzRequest(user, iiconfig) {
 		req.scope = R.join(' ', R.split(',', req.scope))
 		req.acr_values = iiconfig.openidclient.acrValues
 		req.client_id = clientId
+
+		//Properties in extraParams will overwrite the existing ones in req
+		req = R.mergeRight(req, extraParams)
 
 		//Nonce is needed in implicit flow
 		let nonceNeeded = R.anyPass(R.map(R.propEq('response_type'), ['id_token token', 'id_token']))
