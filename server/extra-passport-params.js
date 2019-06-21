@@ -55,10 +55,10 @@ const params = R.once(() => [
 		options: {}
 	},
 	{
-		strategy: 'passport-linkedin-oauth2',
+		strategy: '@sokratis/passport-linkedin-oauth2',
 		passportAuthnParams: {},
 		options: {
-			scope: ['r_emailaddress', 'r_basicprofile'],
+			scope: ['r_emailaddress', 'r_liteprofile'],
 			state: true
 		}
 	},
