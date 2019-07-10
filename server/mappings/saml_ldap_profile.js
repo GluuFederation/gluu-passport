@@ -6,7 +6,6 @@ module.exports = profile => {
 		cn: profile["urn:oid:2.16.840.1.113730.3.1.241"],
 		displayName: profile["urn:oid:2.16.840.1.113730.3.1.241"],
 		givenName: profile["urn:oid:2.5.4.42"],
-		sn: profile["urn:oid:2.5.4.4"],
-		issuer: profile.issuer
+		sn: profile["urn:oid:2.5.4.4"]
 	}
 }
