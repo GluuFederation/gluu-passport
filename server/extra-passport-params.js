@@ -35,8 +35,7 @@ const params = R.once(() => [
 			scope: ['email']
 		},
 		options: {
-			profileFields: ['id', 'username', 'displayName', 'name', 'emails'],
-			//TODO: verify
+			profileFields: ['id', 'displayName', 'name', 'emails'],
 			enableProof: true
 		}
 	},
