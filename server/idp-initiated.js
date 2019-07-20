@@ -2,26 +2,23 @@ const
 	R = require('ramda'),
 	uuid = require('uuid'),
 	url = require('url'),
+	xpath = require('xpath'),
+	dom = require('xmldom').DOMParser,
 	misc = require('./utils/misc'),
 	logger = require("./utils/logging")
 
 function hasInResponseTo(user) {
 
 	let	val = { present: false }
-		ass = user.getAssertion(),	//See file lib/passport-saml/saml.js in node passport-saml library
-		fns = R.prepend(
-					R.prop('Assertion'),
-					R.intersperse(R.head, [R.prop('Subject'), R.prop('SubjectConfirmation'), R.prop('SubjectConfirmationData'), R.prop('$')])
-				)
 
 	try {
-		let confirmationData = R.apply(R.pipe, fns)(ass)
-		//is InResponseTo present and has non empty value ?
-		if (misc.hasData(['InResponseTo'], confirmationData)) {
-			val.present = true
-		}
+		//See file lib/passport-saml/saml.js in node passport-saml library <= 0.35.0
+		//See setupStrategy function at providers.js
+		let	assertion = user.getAssertionXml(),
+			inResponseTo = xpath.select('//@InResponseTo', new dom().parseFromString(assertion))
+		val.present = inResponseTo.length > 0
 	} catch (e) {
-		logger.log2('error', 'SAML assertion does not have the path: Assertion > Subject > SubjectConfirmation > SubjectConfirmationData')
+		logger.log2('error', 'An error occurred examining InResponseTo in SAML assertion')
 		val.error = e
 	}
 	return val
@@ -37,6 +34,9 @@ function createAuthzRequest(user, iiconfig) {
 		logger.log2('error', `Provider ${provider} not found in idp-initiated configuration.`)
 
 	} else if (misc.hasData('redirect_uri', req)) {
+		//Apply transformation to user object and restore original provider value
+		user = misc.arrify(user)
+		user.provider = provider
 
 		let now = new Date().getTime(),
 			clientId = iiconfig.openidclient.clientId,

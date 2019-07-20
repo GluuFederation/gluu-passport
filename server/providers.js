@@ -62,7 +62,7 @@ function setupStrategy(prv) {
 		}
 		let samlStrategy = new strategy(
 			options,
-			(profile, cb) => processProfile(prv, profile, cb, { provider: id, getAssertion: profile.getAssertion })
+			(profile, cb) => processProfile(prv, profile, cb, { provider: id, getAssertionXml: profile.getAssertionXml })
 		)
 		passport.use(id, samlStrategy)
 		meta.generate(prv, samlStrategy)

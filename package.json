@@ -37,6 +37,7 @@
         "uuid": "^3.3.2",
         "winston": "^3.1.0",
         "winston-daily-rotate-file": "^3.6.0",
-        "www-authenticate": "^0.6.2"
+        "www-authenticate": "^0.6.2",
+        "xpath": "^0.0.24"
     }
 }
