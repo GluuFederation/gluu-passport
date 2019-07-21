@@ -78,7 +78,6 @@ function getRPT(ticket, token_endpoint) {
 			json: true,
 			form: {
 				grant_type: 'urn:ietf:params:oauth:grant-type:uma-ticket',
-				scope: 'uma_authorization',
 				client_assertion_type: 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
 				client_assertion: token,
 				client_id: clientId,
