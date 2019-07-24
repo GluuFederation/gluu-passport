@@ -27,13 +27,13 @@ function hasInResponseTo(user) {
 
 function createAuthzRequest(user, iiconfig) {
 
-	let req = R.find(R.propEq('provider', provider), iiconfig.authorizationParams),
-		provider = user.provider
+	let	provider = user.provider,
+		req = R.find(R.propEq('provider', provider), iiconfig.authorizationParams)
 
 	if (!req) {
 		logger.log2('error', `Provider ${provider} not found in idp-initiated configuration.`)
 
-	} else if (misc.hasData('redirect_uri', req)) {
+	} else if (misc.hasData(['redirect_uri'], req)) {
 		//Apply transformation to user object and restore original provider value
 		user = misc.arrify(user)
 		user.provider = provider
@@ -70,6 +70,7 @@ function createAuthzRequest(user, iiconfig) {
 		if (nonceNeeded(req)) {
 			req.nonce = uuid()
 		}
+		logger.log2('debug', `Request is\n${JSON.stringify(req, null, 4)}`)
 	} else {
 		req = undefined
 	}
@@ -98,7 +99,6 @@ function process(user, relayState, iiconfig, res, next) {
 				//This cookie can be used to restore the value of relay state in the redirect_uri
 				//page of the OIDC client used for this flow
 				res.cookie('relayState', relayState, {
-					httpOnly: false, //true
 					maxAge: 20000,	//20 sec expiration
 					secure: true
 				})

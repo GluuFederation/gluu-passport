@@ -133,11 +133,11 @@ function processIdpInitiated(req, res, next) {
 	let user = req.user,
 		relayState = req.body.RelayState
 
-	logger.log2('debug', `RelayState param:\n{relayState}`)
-	logger.log2('debug', `SAML reponse in body:\n{req.body.SAMLResponse}`)
+	logger.log2('debug', `RelayState value: ${relayState}`)
+	logger.log2('debug', `SAML reponse in body:\n${req.body.SAMLResponse}`)
 
 	abortIfProfileMissing(req, res, user)
-	idpInitiated.process(user, relayState, global.config.iiconfig, res, next)
+	idpInitiated.process(user, relayState, global.iiconfig, res, next)
 }
 
 function callbackResponse(req, res) {
