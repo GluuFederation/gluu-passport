@@ -62,6 +62,7 @@ var setCredentials = function () {
         strategyConfigOptions.decryptionPvk = fs.readFileSync('/etc/certs/passport-sp.key', 'utf-8');
         strategyConfigOptions.passReqToCallback = true;
         strategyConfigOptions.validateInResponseTo = true;
+        //strategyConfigOptions.acceptedClockSkewMs = 10000
 
         var strategy = new SamlStrategy(strategyConfigOptions,
             function (req, profile, done) {
@@ -71,6 +72,7 @@ var setCredentials = function () {
                 var mapping = global.saml_config[idp].reverseMapping;
                 logger.log2('verbose', 'Found mapping for idp "%s": %s', idp, JSON.stringify(mapping))
                 logger.log2('debug', 'SAML reponse in body:\n%s', req.body.SAMLResponse)
+                let rstate = req.body.RelayState
 
                 var userProfile = {
                     id: profile[mapping["id"]] || '',
@@ -83,6 +85,9 @@ var setCredentials = function () {
                     provider: profile[mapping["provider"]] || '',
                     providerKey: idp
                 };
+                if (rstate) {
+                    userProfile.relaystate = rstate
+				}
                 logger.log2('verbose', 'Profile after mapping: %s', JSON.stringify(userProfile))
 
                 return done(null, userProfile);

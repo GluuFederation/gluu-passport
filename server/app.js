@@ -93,7 +93,8 @@ app.use('/passport', require('./routes/index.js'));
 // *** error handlers *** //
 app.use(function (err, req, res, next) {
     if (err) {
-        logger.log2('error', 'Unknown Error: %s', JSON.stringify(err))
+        logger.log2('error', 'Unknown Error: %s', err)
+        logger.log2('debug', err.stack)
         res.redirect('/passport/login')
     }
 });
