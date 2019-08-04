@@ -5,9 +5,9 @@ Custom branch for Cognizant, the following are the steps to deploy this customiz
 1. Stop passport
 1. cd to `/opt/gluu/node/passport` folder
 1. Backup `server` and remove it
-1. copy or `wget` file `https://ox.gluu.org/npm/passport/3.1.5_cognizant.tgz` to current directory
-1. `tar -zxf 3.1.5_cognizant.tgz`
-1. `mv package/server server`
+1. copy or `wget` file `https://github.com/GluuFederation/gluu-passport/archive/3.1.5_cognizant.zip` to current directory
+1. `jar -xf 3.1.5_cognizant.tgz`
+1. `mv gluu-passport-3.1.5_cognizant/server server`
 1. Start passport
 
 <!--
