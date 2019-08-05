@@ -14,6 +14,7 @@ function writeMeta(fn, metadata) {
 		chain = misc.pipePromise(
 					openF('w'),
 					fdesc => {
+						//Save file descriptor in a temp variable (will be needed afterwards)
 						fd = fdesc
 						return fd
 					},
