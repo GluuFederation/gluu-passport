@@ -6,7 +6,6 @@ const
 	misc = require('./utils/misc'),
 	openF = misc.curry2AndFlip(Promise.promisify(fs.open)),
 	writeF = misc.curry2AndFlip(Promise.promisify(fs.write)),
-	readF = misc.curry2AndFlip(Promise.promisify(fs.readFile)),
 	logger = require('./utils/logging')
 
 function writeMeta(fn, metadata) {
@@ -45,7 +44,6 @@ function generate(provider, samlStrategy) {
 	let opts = provider.options,
 		fileName = path.join(metadataDir(), provider.id + '.xml'),
 		chain = misc.pipePromise(
-					readF('utf-8'),
 					dcert => samlStrategy.generateServiceProviderMetadata(dcert, opts.signingCert),
 					writeMeta_(fileName)
 				)

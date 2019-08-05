@@ -1,4 +1,6 @@
-const R = require('ramda')
+const
+	fs = require('fs'),
+	R = require('ramda')
 
 //Extra params supplied per strategy
 //They are not set via oxTrust to keep complexity manageable. These params are not expected to change: admins probably will never have to edit the below
@@ -11,8 +13,8 @@ const params = R.once(() => [
 		options: {
 			validateInResponseTo: true,
 			requestIdExpirationPeriodMs: 3600000,
-			decryptionPvk: global.config.spTLSKey,
-			decryptionCert: global.config.spTLSCert
+			decryptionPvk: fs.readFileSync(global.config.spTLSKey, 'utf-8'),
+			decryptionCert: fs.readFileSync(global.config.spTLSCert, 'utf-8')
 		}
 	},
 	{
