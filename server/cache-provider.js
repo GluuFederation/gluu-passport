@@ -1,5 +1,5 @@
 const
-	//redis = require('redis'),
+	redis = require('redis'),
 	Promise = require('bluebird'),
 	R = require('ramda'),
 	logger = require('./utils/logging'),
