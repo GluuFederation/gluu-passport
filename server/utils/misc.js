@@ -1,7 +1,9 @@
 const
 	R = require('ramda'),
 	sha1 = require('sha1'),
-	jwt = require('jsonwebtoken')
+	jwt = require('jsonwebtoken'),
+	crypto = require('crypto'),
+	fs = require('fs')
 
 const isObject = x => !R.isNil(x) && !Array.isArray(x) && typeof x == 'object'
 
@@ -25,8 +27,7 @@ function pathsHaveData(list, obj) {
 const hasData = (list, obj) => pathsHaveData(R.map(x => [x], list), obj)
 
 const privateKey = R.once(() =>
-		require('fs')
-			.readFileSync(global.basicConfig.keyPath, 'utf8')
+			fs.readFileSync(global.basicConfig.keyPath, 'utf8')
 			.replace("-----BEGIN RSA PRIVATE KEY-----", "-----BEGIN PRIVATE KEY-----")
 			.replace("-----END RSA PRIVATE KEY-----", "-----END PRIVATE KEY-----"))
 
@@ -40,6 +41,11 @@ const defaultRpOptions = R.once(() => ({
 			}))
 
 const secretKey = R.once(() => '' + Math.random())
+
+const encriptionKey = R.once(() => {
+							let salt = fs.readFileSync("/etc/gluu/conf/salt", 'utf8')
+							return /=\s*(\S+)/.exec(salt)[1]
+						})
 
 const getRpJWT = payload => jwt.sign(payload, privateKey(), defaultRpOptions())
 
@@ -75,6 +81,17 @@ function arrify(obj) {
 
 }
 
+function encrypt(obj) {
+
+	//Encryption compatible with Gluu EncryptionService
+	let pt = JSON.stringify(obj)
+	let encrypt = crypto.createCipheriv('des-ede3-ecb', encriptionKey(), "")
+	var encrypted = encrypt.update(pt, 'utf8', 'base64')
+	encrypted += encrypt.final('base64')
+	return encrypted
+
+}
+
 module.exports = {
 	isObject: isObject,
 	hash: hash,
@@ -85,5 +102,6 @@ module.exports = {
 	arrify: arrify,
 	getRpJWT: getRpJWT,
 	getJWT: getJWT,
-	verifyJWT: verifyJWT
+	verifyJWT: verifyJWT,
+	encrypt: encrypt
 }
