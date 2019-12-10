@@ -47,7 +47,7 @@ function createAuthzRequest(user, iiconfig) {
 					jti: uuid(),
 					exp: now / 1000 + 30,
 					iat: now,
-					data: user
+					data: misc.encrypt(user)
 				})
 
 		let extraParams = R.unless(misc.isObject, () => {}, req.extraParams)
