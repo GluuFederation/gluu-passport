@@ -68,6 +68,11 @@ function setupStrategy(prv) {
 		meta.generate(prv, samlStrategy)
 
 	} else {
+		if (moduleId.indexOf('passport-apple') >= 0 && prv.options.key) {
+			//Smells like apple...
+			//TODO: we have to make the UI fields multiline so they can paste the contents and avoid this
+			prv.options.key = require('fs').readFileSync(prv.options.key, 'utf8')
+		}
 		passport.use(id, new strategy(
 			prv.options,
 			(dummy, dummy2, profile, cb) => processProfile(prv, profile, cb, { provider: id })

@@ -19,6 +19,12 @@ router.get('/auth/:provider/callback',
 	authenticateRequestCallback,
     callbackResponse)
 
+router.post('/auth/:provider/callback',
+	validateProvider,
+	require('express').urlencoded(),
+	authenticateRequestCallback,
+    callbackResponse)
+
 router.get('/auth/:provider/:token',
 	validateProvider,
     validateToken,
