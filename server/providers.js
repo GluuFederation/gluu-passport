@@ -136,14 +136,6 @@ function fixDataTypes(ps) {
 			value = {}
 		}
 		p[prop] = value
-
-		//Fixes verifyCallbackArity (number expected)
-		prop = 'verifyCallbackArity'
-		value = p[prop]
-		if (typeof value != 'number') {
-			//In most passport strategies the verify callback has arity 4
-			p[prop] = 4
-		}
 	}
 
 }
@@ -155,16 +147,17 @@ function mergeProperty(strategyId, obj, prop) {
 
 function fillMissingData(ps) {
 
-	let paramsToFill = ['passportAuthnParams', 'options', 'verifyCallbackArity']
+	let paramsToFill = ['passportAuthnParams', 'options']
 
 	R.forEach(p => R.forEach(prop => p[prop] = mergeProperty(p.passportStrategyId, p, prop), paramsToFill), ps)
 
 	for (let p of ps) {
 		let options = p.options,
+			strategyId = p.passportStrategyId,
 			callbackUrl = R.defaultTo(options.callbackUrl, options.callbackURL),
 			prefix = global.config.serverURI + '/passport/auth'
 
-		if (p.passportStrategyId == "passport-saml") {
+		if (strategyId == "passport-saml") {
 			//Different casing in saml
 			options.callbackUrl = R.defaultTo(`${prefix}/saml/${p.id}/callback`, callbackUrl)
 		} else {
@@ -173,6 +166,12 @@ function fillMissingData(ps) {
 			options.consumerKey = options.clientID
 			options.consumerSecret = options.clientSecret
 		}
+
+		//Fills verifyCallbackArity (number expected)
+		prop = 'verifyCallbackArity'
+		value = pparams.get(strategyId, prop)
+		//In most passport strategies the verify callback has arity 4
+		p[prop] = (typeof value == 'number') ? value : 4
 	}
 
 }
