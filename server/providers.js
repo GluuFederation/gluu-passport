@@ -31,52 +31,69 @@ function processProfile(provider, profile, done, extra) {
 
 }
 
+function getVerifyFunction(prv, isSaml) {
+
+	let arity = prv.verifyCallbackArity,
+		extraParams = (isSaml, profile, args) => {
+							//Assume args.lenght==arity
+							let data = { verifyCallbackArgs: args.slice(0, arity-2), provider: prv.id }
+							if (isSaml) {
+								//this property is added so idp-initiated code can parse the SAML assertion,
+								//however it is removed from the profile sent to oxauth afterwards (see misc.arrify)
+								data.getAssertionXml = profile.getAssertionXml
+							}
+							return data
+						}
+
+	//profile and callback are always the last 2 params in passport verify functions
+	let uncurried = (...args) => processProfile(prv,
+									args[arity-2],	//profile
+									args[arity-1],	//cb
+									extraParams(isSaml, args[arity-2], args))
+	//guarantee the function has the arity required
+	return R.curryN(arity, uncurried)
+
+}
+
 function setupStrategy(prv) {
 
 	logger.log2('info', `Setting up strategy for provider ${prv.displayName}`)
 	logger.log2('debug', `Provider data is\n${JSON.stringify(prv, null, 4)}`)
 
-	//if module is not found, load it
 	let id = prv.id,
 		moduleId = prv.passportStrategyId,
 		strategy = R.find(R.propEq('id', id), passportStrategies)
 
+	//if module is not found, load it
 	if (strategy) {
 		strategy = strategy.strategy
 	} else {
 		logger.log2('info', `Loading node module ${moduleId}`)
 		strategy = require(moduleId)
 		strategy = (prv.type == 'oauth' && strategy.OAuth2Strategy) ? strategy.OAuth2Strategy : strategy.Strategy
+
 		logger.log2('verbose', 'Adding to list of known strategies')
 		passportStrategies.push({ id: id, strategy: strategy })
 	}
 
-	//Create strategy
-	if (moduleId == 'passport-saml') {
+	let options = prv.options,
+		isSaml = moduleId == 'passport-saml',
+		verify = getVerifyFunction(prv, isSaml)
 
-		let	options = prv.options,
-			f = R.anyPass([R.isNil, R.isEmpty])
+	//Create strategy
+	if (isSaml) {
+		let	f = R.anyPass([R.isNil, R.isEmpty]),
+			samlStrategy = new strategy(options, verify)
+
 		//Instantiate custom cache provider if required
 		if (options.validateInResponseTo && !f(options.redisCacheOptions)) {
 			options.cacheProvider = cacheProvider.get(options.redisCacheOptions)
 		}
-		let samlStrategy = new strategy(
-			options,
-			(profile, cb) => processProfile(prv, profile, cb, { provider: id, getAssertionXml: profile.getAssertionXml })
-		)
 		passport.use(id, samlStrategy)
 		meta.generate(prv, samlStrategy)
 
 	} else {
-		if (moduleId.indexOf('passport-apple') >= 0 && prv.options.key) {
-			//Smells like apple...
-			//TODO: we have to make the UI fields multiline so they can paste the contents and avoid this
-			prv.options.key = require('fs').readFileSync(prv.options.key, 'utf8')
-		}
-		passport.use(id, new strategy(
-			prv.options,
-			(dummy, dummy2, profile, cb) => processProfile(prv, profile, cb, { provider: id })
-		))
+		passport.use(id, new strategy(options, verify))
 	}
 
 }
@@ -119,6 +136,14 @@ function fixDataTypes(ps) {
 			value = {}
 		}
 		p[prop] = value
+
+		//Fixes verifyCallbackArity (number expected)
+		prop = 'verifyCallbackArity'
+		value = p[prop]
+		if (typeof value != 'number') {
+			//In most passport strategies the verify callback has arity 4
+			p[prop] = 4
+		}
 	}
 
 }
@@ -130,16 +155,17 @@ function mergeProperty(strategyId, obj, prop) {
 
 function fillMissingData(ps) {
 
-	let paramsToFill = ['passportAuthnParams', 'options']
+	let paramsToFill = ['passportAuthnParams', 'options', 'verifyCallbackArity']
 
 	R.forEach(p => R.forEach(prop => p[prop] = mergeProperty(p.passportStrategyId, p, prop), paramsToFill), ps)
 
 	for (let p of ps) {
 		let options = p.options,
+			moduleId = p.passportStrategyId,
 			callbackUrl = R.defaultTo(options.callbackUrl, options.callbackURL),
 			prefix = global.config.serverURI + '/passport/auth'
 
-		if (p.passportStrategyId == "passport-saml") {
+		if (moduleId == "passport-saml") {
 			//Different casing in saml
 			options.callbackUrl = R.defaultTo(`${prefix}/saml/${p.id}/callback`, callbackUrl)
 		} else {
@@ -148,43 +174,18 @@ function fillMissingData(ps) {
 			options.consumerKey = options.clientID
 			options.consumerSecret = options.clientSecret
 		}
-	}
-
-}
-
-//Applies a few validations upon providers configuration, returns the ones passing the check
-function validProviders(ps) {
-
-	for (let p of ps) {
-		let pass = false, id = p.id
-		if (p.enabled && id) {
-
-			logger.log2('info', `Validating ${id}`)
-			let props = []
-
-			if (p.passportStrategyId == 'passport-saml') {
-				props = ['cert']
-			} else if (p.passportStrategyId == 'passport-openidconnect') {
-				props = ['clientID', 'clientSecret', 'issuer', 'authorizationURL', 'tokenURL', 'userInfoURL']
-			} else if (p.passportStrategyId == 'passport-oxd'){
-				props = ['clientID', 'clientSecret', 'oxdID', 'issuer', 'oxdServer']
-			} else if (p.type == 'oauth') {
-				props = ['clientID', 'clientSecret']
-			}
-
-			if (misc.hasData(props, p.options)) {
-				pass = true
-			} else {
-				logger.log2('warn', `Some of ${props} are missing for provider ${id}`)
+		if (moduleId.indexOf('passport-apple') >= 0 && options.key) {
+			//Smells like apple...
+			try {
+				//TODO: we have to make the UI fields multiline so they can paste the contents and avoid this
+				options.key = require('fs').readFileSync(options.key, 'utf8')
+			} catch (e) {
+				logger.log2('warn', `There was a problem reading file ${options.key}. Ensure the file exists and is readable`)
+				logger.log2('error', e.stack)
+				options.key = ''
 			}
 		}
-		if (!pass) {
-			logger.log2('warn', `Provider ${id} - ${p.displayName} is disabled`)
-			p.enabled = false
-		}
 	}
-	//Get rid of disabled ones
-	return R.filter(R.prop('enabled'), ps)
 
 }
 
@@ -204,7 +205,6 @@ function setup(ps) {
 		//"Fix" incoming data
 		fixDataTypes(providers)
 		fillMissingData(providers)
-		providers = validProviders(providers)
 
 		R.forEach(setupStrategy, providers)
 		//Needed for routes.js
