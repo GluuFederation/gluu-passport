@@ -37,19 +37,34 @@ function getVerifyFunction(prv) {
 		extraParams = (provider, profile) => {
 							let data = { provider: provider }
 							if (profile.getAssertionXml) {
-								//this property is added so idp-initiated code can parse the SAML assertion,
+								//this property is attached so idp-initiated code can parse the SAML assertion,
 								//however it is removed from the profile sent to oxauth afterwards (see misc.arrify)
 								data.getAssertionXml = profile.getAssertionXml
 							}
 							return data
 						}
 
-	//profile and callback are always the last 2 params in passport verify functions
-	let uncurried = (...args) => processProfile(prv,
-									args.slice(0, arity-2),	//these are the verify params except profile and cb
-									args[arity-2],	//profile
-									args[arity-1],	//cb
-									extraParams(prv.id, args[arity-2]))
+	let uncurried
+	//profile and callback are the last 2 params in all passport verify functions,
+	//except for passport-openidconnect which does not follow this convention
+
+	if (prv.passportStrategyId == 'passport-openidconnect') {
+		//Check passport-openidconnect/lib/strategy.js
+		uncurried = (...args) => {
+			let index = prv.options.passReqToCallback ? 1 : 0,
+				profile = args[2 + index],
+				additional = args.slice(0, 2 + index)
+
+			additional = additional.concat(args.slice(3 + index, arity - 1))
+			return processProfile(prv, additional, profile, args[arity - 1], extraParams(prv.id, profile))
+		}
+	} else {
+		uncurried = (...args) => processProfile(prv,
+									args.slice(0, arity - 2),	//these are the verify params except profile and cb
+									args[arity - 2],	//profile
+									args[arity - 1],	//cb
+									extraParams(prv.id, args[arity - 2]))
+	}
 	//guarantee the function has the arity required
 	return R.curryN(arity, uncurried)
 
@@ -154,10 +169,11 @@ function fillMissingData(ps) {
 	for (let p of ps) {
 		let options = p.options,
 			strategyId = p.passportStrategyId,
+			isSaml = strategyId == "passport-saml",
 			callbackUrl = R.defaultTo(options.callbackUrl, options.callbackURL),
 			prefix = global.config.serverURI + '/passport/auth'
 
-		if (strategyId == "passport-saml") {
+		if (isSaml) {
 			//Different casing in saml
 			options.callbackUrl = R.defaultTo(`${prefix}/saml/${p.id}/callback`, callbackUrl)
 		} else {
@@ -179,10 +195,12 @@ function fillMissingData(ps) {
 		}
 
 		//Fills verifyCallbackArity (number expected)
-		prop = 'verifyCallbackArity'
-		value = pparams.get(strategyId, prop)
-		//In most passport strategies the verify callback has arity 4
-		p[prop] = (typeof value == 'number') ? value : 4
+		let prop = 'verifyCallbackArity',
+			value = pparams.get(strategyId, prop),
+			toadd = options.passReqToCallback ? 1 : 0
+
+		//In most passport strategies the verify callback has arity 4 except for saml
+		p[prop] = (typeof value == 'number') ? value : (toadd + (isSaml ? 2 : 4))
 	}
 
 }
