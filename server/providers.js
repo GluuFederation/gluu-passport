@@ -177,42 +177,6 @@ function fillMissingData(ps) {
 
 }
 
-//Applies a few validations upon providers configuration, returns the ones passing the check
-function validProviders(ps) {
-
-	for (let p of ps) {
-		let pass = false, id = p.id
-		if (p.enabled && id) {
-
-			logger.log2('info', `Validating ${id}`)
-			let props = []
-
-			if (p.passportStrategyId == 'passport-saml') {
-				props = ['cert']
-			} else if (p.passportStrategyId == 'passport-openidconnect') {
-				props = ['clientID', 'clientSecret', 'issuer', 'authorizationURL', 'tokenURL', 'userInfoURL']
-			} else if (p.passportStrategyId == 'passport-oxd'){
-				props = ['clientID', 'clientSecret', 'oxdID', 'issuer', 'oxdServer']
-			} else if (p.type == 'oauth') {
-				props = ['clientID', 'clientSecret']
-			}
-
-			if (misc.hasData(props, p.options)) {
-				pass = true
-			} else {
-				logger.log2('warn', `Some of ${props} are missing for provider ${id}`)
-			}
-		}
-		if (!pass) {
-			logger.log2('warn', `Provider ${id} - ${p.displayName} is disabled`)
-			p.enabled = false
-		}
-	}
-	//Get rid of disabled ones
-	return R.filter(R.prop('enabled'), ps)
-
-}
-
 function setup(ps) {
 
 	ps = R.defaultTo([], ps)
@@ -229,7 +193,6 @@ function setup(ps) {
 		//"Fix" incoming data
 		fixDataTypes(providers)
 		fillMissingData(providers)
-		providers = validProviders(providers)
 
 		R.forEach(setupStrategy, providers)
 		//Needed for routes.js
