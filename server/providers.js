@@ -55,7 +55,7 @@ function getVerifyFunction(prv) {
 				profile = args[2 + index],
 				additional = args.slice(0, 2 + index)
 
-			additional.push(args.slice(3 + index, arity - 2))
+			additional = additional.concat(args.slice(3 + index, arity - 1))
 			return processProfile(prv, additional, profile, args[arity - 1], extraParams(prv.id, profile))
 		}
 	} else {
@@ -169,10 +169,11 @@ function fillMissingData(ps) {
 	for (let p of ps) {
 		let options = p.options,
 			strategyId = p.passportStrategyId,
+			isSaml = strategyId == "passport-saml",
 			callbackUrl = R.defaultTo(options.callbackUrl, options.callbackURL),
 			prefix = global.config.serverURI + '/passport/auth'
 
-		if (strategyId == "passport-saml") {
+		if (isSaml) {
 			//Different casing in saml
 			options.callbackUrl = R.defaultTo(`${prefix}/saml/${p.id}/callback`, callbackUrl)
 		} else {
@@ -187,8 +188,8 @@ function fillMissingData(ps) {
 			value = pparams.get(strategyId, prop),
 			toadd = options.passReqToCallback ? 1 : 0
 
-		//In most passport strategies the verify callback has arity 4
-		p[prop] = (typeof value == 'number') ? value : (toadd + 4)
+		//In most passport strategies the verify callback has arity 4 except for saml
+		p[prop] = (typeof value == 'number') ? value : (toadd + (isSaml ? 2 : 4))
 	}
 
 }
