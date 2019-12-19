@@ -12,7 +12,7 @@ var prevConfigHash = 0
 //These are the (node) strategies loaded so far: [{id: "...", strategy: ...}, ... ]
 var passportStrategies = []
 
-function processProfile(provider, profile, done, extra) {
+function processProfile(provider, additionalParams, profile, done, extra) {
 
 	let mappedProfile
 	try {
@@ -20,7 +20,7 @@ function processProfile(provider, profile, done, extra) {
 		logger.log2('silly', `Raw profile is ${JSON.stringify(profile._json)}`)
 		logger.log2('info', `Applying mapping '${mapping}' to profile`)
 
-		mappedProfile = require('./mappings/' + mapping)(profile)
+		mappedProfile = require('./mappings/' + mapping)(profile, additionalParams)
 		mappedProfile = R.mergeLeft(mappedProfile, extra)
 	} catch (err) {
 		logger.log2('error', `An error occurred: ${err}`)
@@ -31,13 +31,12 @@ function processProfile(provider, profile, done, extra) {
 
 }
 
-function getVerifyFunction(prv, isSaml) {
+function getVerifyFunction(prv) {
 
 	let arity = prv.verifyCallbackArity,
-		extraParams = (isSaml, profile, args) => {
-							//Assume args.lenght==arity
-							let data = { verifyCallbackArgs: args.slice(0, arity-2), provider: prv.id }
-							if (isSaml) {
+		extraParams = (provider, profile) => {
+							let data = { provider: provider }
+							if (profile.getAssertionXml) {
 								//this property is added so idp-initiated code can parse the SAML assertion,
 								//however it is removed from the profile sent to oxauth afterwards (see misc.arrify)
 								data.getAssertionXml = profile.getAssertionXml
@@ -47,9 +46,10 @@ function getVerifyFunction(prv, isSaml) {
 
 	//profile and callback are always the last 2 params in passport verify functions
 	let uncurried = (...args) => processProfile(prv,
+									args.slice(0, arity-2),	//these are the verify params except profile and cb
 									args[arity-2],	//profile
 									args[arity-1],	//cb
-									extraParams(isSaml, args[arity-2], args))
+									extraParams(prv.id, args[arity-2]))
 	//guarantee the function has the arity required
 	return R.curryN(arity, uncurried)
 
@@ -78,7 +78,7 @@ function setupStrategy(prv) {
 
 	let options = prv.options,
 		isSaml = moduleId == 'passport-saml',
-		verify = getVerifyFunction(prv, isSaml)
+		verify = getVerifyFunction(prv)
 
 	//Create strategy
 	if (isSaml) {
