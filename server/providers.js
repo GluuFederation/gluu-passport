@@ -35,7 +35,6 @@ function getVerifyFunction(prv) {
 
 	let arity = prv.verifyCallbackArity,
 		extraParams = (provider, profile) => {
-							//Assume args.lenght==arity
 							let data = { provider: provider }
 							if (profile.getAssertionXml) {
 								//this property is attached so idp-initiated code can parse the SAML assertion,
@@ -45,12 +44,27 @@ function getVerifyFunction(prv) {
 							return data
 						}
 
-	//profile and callback are always the last 2 params in passport verify functions
-	let uncurried = (...args) => processProfile(prv,
-									args.slice(0, arity-2),	//these are the verify params except profile and cb
-									args[arity-2],	//profile
-									args[arity-1],	//cb
-									extraParams(prv.id, args[arity-2]))
+	let uncurried
+	//profile and callback are the last 2 params in all passport verify functions,
+	//except for passport-openidconnect which does not follow this convention
+
+	if (prv.passportStrategyId == 'passport-openidconnect') {
+		//Check passport-openidconnect/lib/strategy.js
+		uncurried = (...args) => {
+			let index = prv.options.passReqToCallback ? 1 : 0,
+				profile = args[2 + index],
+				additional = args.slice(0, 2 + index)
+
+			additional.push(args.slice(3 + index, arity - 2))
+			return processProfile(prv, additional, profile, args[arity - 1], extraParams(prv.id, profile))
+		}
+	} else {
+		uncurried = (...args) => processProfile(prv,
+									args.slice(0, arity - 2),	//these are the verify params except profile and cb
+									args[arity - 2],	//profile
+									args[arity - 1],	//cb
+									extraParams(prv.id, args[arity - 2]))
+	}
 	//guarantee the function has the arity required
 	return R.curryN(arity, uncurried)
 
@@ -169,10 +183,12 @@ function fillMissingData(ps) {
 		}
 
 		//Fills verifyCallbackArity (number expected)
-		prop = 'verifyCallbackArity'
-		value = pparams.get(strategyId, prop)
+		let prop = 'verifyCallbackArity',
+			value = pparams.get(strategyId, prop),
+			toadd = options.passReqToCallback ? 1 : 0
+
 		//In most passport strategies the verify callback has arity 4
-		p[prop] = (typeof value == 'number') ? value : 4
+		p[prop] = (typeof value == 'number') ? value : (toadd + 4)
 	}
 
 }
