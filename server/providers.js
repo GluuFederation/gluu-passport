@@ -31,47 +31,69 @@ function processProfile(provider, profile, done, extra) {
 
 }
 
+function getVerifyFunction(prv, isSaml) {
+
+	let arity = prv.verifyCallbackArity,
+		extraParams = (isSaml, profile, args) => {
+							//Assume args.lenght==arity
+							let data = { verifyCallbackArgs: args.slice(0, arity-2), provider: prv.id }
+							if (isSaml) {
+								//this property is added so idp-initiated code can parse the SAML assertion,
+								//however it is removed from the profile sent to oxauth afterwards (see misc.arrify)
+								data.getAssertionXml = profile.getAssertionXml
+							}
+							return data
+						}
+
+	//profile and callback are always the last 2 params in passport verify functions
+	let uncurried = (...args) => processProfile(prv,
+									args[arity-2],	//profile
+									args[arity-1],	//cb
+									extraParams(isSaml, args[arity-2], args))
+	//guarantee the function has the arity required
+	return R.curryN(arity, uncurried)
+
+}
+
 function setupStrategy(prv) {
 
 	logger.log2('info', `Setting up strategy for provider ${prv.displayName}`)
 	logger.log2('debug', `Provider data is\n${JSON.stringify(prv, null, 4)}`)
 
-	//if module is not found, load it
 	let id = prv.id,
 		moduleId = prv.passportStrategyId,
 		strategy = R.find(R.propEq('id', id), passportStrategies)
 
+	//if module is not found, load it
 	if (strategy) {
 		strategy = strategy.strategy
 	} else {
 		logger.log2('info', `Loading node module ${moduleId}`)
 		strategy = require(moduleId)
 		strategy = (prv.type == 'oauth' && strategy.OAuth2Strategy) ? strategy.OAuth2Strategy : strategy.Strategy
+
 		logger.log2('verbose', 'Adding to list of known strategies')
 		passportStrategies.push({ id: id, strategy: strategy })
 	}
 
-	//Create strategy
-	if (moduleId == 'passport-saml') {
+	let options = prv.options,
+		isSaml = moduleId == 'passport-saml',
+		verify = getVerifyFunction(prv, isSaml)
 
-		let	options = prv.options,
-			f = R.anyPass([R.isNil, R.isEmpty])
+	//Create strategy
+	if (isSaml) {
+		let	f = R.anyPass([R.isNil, R.isEmpty]),
+			samlStrategy = new strategy(options, verify)
+
 		//Instantiate custom cache provider if required
 		if (options.validateInResponseTo && !f(options.redisCacheOptions)) {
 			options.cacheProvider = cacheProvider.get(options.redisCacheOptions)
 		}
-		let samlStrategy = new strategy(
-			options,
-			(profile, cb) => processProfile(prv, profile, cb, { provider: id, getAssertionXml: profile.getAssertionXml })
-		)
 		passport.use(id, samlStrategy)
 		meta.generate(prv, samlStrategy)
 
 	} else {
-		passport.use(id, new strategy(
-			prv.options,
-			(dummy, dummy2, profile, cb) => processProfile(prv, profile, cb, { provider: id })
-		))
+		passport.use(id, new strategy(options, verify))
 	}
 
 }
@@ -114,6 +136,14 @@ function fixDataTypes(ps) {
 			value = {}
 		}
 		p[prop] = value
+
+		//Fixes verifyCallbackArity (number expected)
+		prop = 'verifyCallbackArity'
+		value = p[prop]
+		if (typeof value != 'number') {
+			//In most passport strategies the verify callback has arity 4
+			p[prop] = 4
+		}
 	}
 
 }
@@ -125,7 +155,7 @@ function mergeProperty(strategyId, obj, prop) {
 
 function fillMissingData(ps) {
 
-	let paramsToFill = ['passportAuthnParams', 'options']
+	let paramsToFill = ['passportAuthnParams', 'options', 'verifyCallbackArity']
 
 	R.forEach(p => R.forEach(prop => p[prop] = mergeProperty(p.passportStrategyId, p, prop), paramsToFill), ps)
 
