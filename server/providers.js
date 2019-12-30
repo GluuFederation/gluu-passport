@@ -44,7 +44,7 @@ function getVerifyFunction(prv) {
 							return data
 						}
 
-	let uncurried
+	let uncurried, providerKey = prv.id
 	//profile and callback are the last 2 params in all passport verify functions,
 	//except for passport-openidconnect which does not follow this convention
 
@@ -55,15 +55,20 @@ function getVerifyFunction(prv) {
 				profile = args[2 + index],
 				additional = args.slice(0, 2 + index)
 
+			profile.providerKey = providerKey
 			additional = additional.concat(args.slice(3 + index, arity - 1))
-			return processProfile(prv, additional, profile, args[arity - 1], extraParams(prv.id, profile))
+			return processProfile(prv, additional, profile, args[arity - 1], extraParams(providerKey, profile))
 		}
 	} else {
-		uncurried = (...args) => processProfile(prv,
-									args.slice(0, arity - 2),	//these are the verify params except profile and cb
-									args[arity - 2],	//profile
+		uncurried = (...args) => {
+			let profile = args[arity - 2]
+
+			profile.providerKey = providerKey
+			return processProfile(prv, args.slice(0, arity - 2),	//these are the verify params except profile and cb
+									profile,			//profile
 									args[arity - 1],	//cb
-									extraParams(prv.id, args[arity - 2]))
+									extraParams(providerKey, profile))
+		}
 	}
 	//guarantee the function has the arity required
 	return R.curryN(arity, uncurried)
