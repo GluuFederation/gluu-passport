@@ -60,14 +60,15 @@ function getVerifyFunction(prv) {
 			return processProfile(prv, additional, profile, args[arity - 1], extraParams(providerKey, profile))
 		}
 	} else {
-		let profile = args[arity - 2]
+		uncurried = (...args) => {
+			let profile = args[arity - 2]
 
-		profile.providerKey = providerKey
-		uncurried = (...args) => processProfile(prv,
-									args.slice(0, arity - 2),	//these are the verify params except profile and cb
+			profile.providerKey = providerKey
+			return processProfile(prv, args.slice(0, arity - 2),	//these are the verify params except profile and cb
 									profile,			//profile
 									args[arity - 1],	//cb
 									extraParams(providerKey, profile))
+		}
 	}
 	//guarantee the function has the arity required
 	return R.curryN(arity, uncurried)
