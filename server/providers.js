@@ -44,31 +44,25 @@ function getVerifyFunction(prv) {
 							return data
 						}
 
-	let uncurried, providerKey = prv.id
-	//profile and callback are the last 2 params in all passport verify functions,
-	//except for passport-openidconnect which does not follow this convention
+	let uncurried = (...args) => {
+		//profile and callback are the last 2 params in all passport verify functions,
+		//except for passport-openidconnect which does not follow this convention
+		let profile, additional
 
-	if (prv.passportStrategyId == 'passport-openidconnect') {
-		//Check passport-openidconnect/lib/strategy.js
-		uncurried = (...args) => {
-			let index = prv.options.passReqToCallback ? 1 : 0,
-				profile = args[2 + index],
-				additional = args.slice(0, 2 + index)
+		if (prv.passportStrategyId == 'passport-openidconnect') {
+			//Check passport-openidconnect/lib/strategy.js
+			let index = prv.options.passReqToCallback ? 1 : 0
 
-			profile.providerKey = providerKey
+			profile = args[2 + index]
+			additional = args.slice(0, 2 + index)
 			additional = additional.concat(args.slice(3 + index, arity - 1))
-			return processProfile(prv, additional, profile, args[arity - 1], extraParams(providerKey, profile))
+		} else {
+			profile = args[arity - 2]
+			additional = args.slice(0, arity - 2)
 		}
-	} else {
-		uncurried = (...args) => {
-			let profile = args[arity - 2]
 
-			profile.providerKey = providerKey
-			return processProfile(prv, args.slice(0, arity - 2),	//these are the verify params except profile and cb
-									profile,			//profile
-									args[arity - 1],	//cb
-									extraParams(providerKey, profile))
-		}
+		profile.providerKey = prv.id
+		return processProfile(prv, additional, profile, args[arity - 1], extraParams(prv.id, profile))
 	}
 	//guarantee the function has the arity required
 	return R.curryN(arity, uncurried)
@@ -102,13 +96,19 @@ function setupStrategy(prv) {
 
 	//Create strategy
 	if (isSaml) {
-		let	f = R.anyPass([R.isNil, R.isEmpty]),
-			samlStrategy = new strategy(options, verify)
+		let	f = R.anyPass([R.isNil, R.isEmpty])
 
 		//Instantiate custom cache provider if required
-		if (options.validateInResponseTo && !f(options.redisCacheOptions)) {
-			options.cacheProvider = cacheProvider.get(options.redisCacheOptions)
+		if (options.validateInResponseTo) {
+			let exp = options.requestIdExpirationPeriodMs / 1000
+
+			if (!f(options.redisCacheOptions)) {
+				options.cacheProvider = cacheProvider.get('redis', options.redisCacheOptions, exp)
+			} else if (!f(options.memcachedCacheOptions)) {
+				options.cacheProvider = cacheProvider.get('memcached', options.memcachedCacheOptions, exp)
+			}
 		}
+		let samlStrategy = new strategy(options, verify)
 		passport.use(id, samlStrategy)
 		meta.generate(prv, samlStrategy)
 
