@@ -40,9 +40,7 @@ const defaultRpOptions = R.once(() => ({
 				}
 			}))
 
-const secretKey = R.once(() => '' + Math.random())
-
-const encriptionKey = R.once(() => {
+const secretKey = R.once(() => {
 							let salt = fs.readFileSync("/etc/gluu/conf/salt", 'utf8')
 							return /=\s*(\S+)/.exec(salt)[1]
 						})
@@ -85,7 +83,7 @@ function encrypt(obj) {
 
 	//Encryption compatible with Gluu EncryptionService
 	let pt = JSON.stringify(obj)
-	let encrypt = crypto.createCipheriv('des-ede3-ecb', encriptionKey(), "")
+	let encrypt = crypto.createCipheriv('des-ede3-ecb', secretKey(), "")
 	var encrypted = encrypt.update(pt, 'utf8', 'base64')
 	encrypted += encrypt.final('base64')
 	return encrypted
