@@ -5,13 +5,15 @@ const
 	fs = require('fs'),
 	R = require('ramda'),
 	idpInitiated = require('./idp-initiated'),
+	providersModule = require('./providers'),
+	webutil = require('./utils/web-utils'),
 	misc = require('./utils/misc'),
 	logger = require("./utils/logging")
 
 router.post('/auth/saml/:provider/callback',
 	validateProvider,
 	authenticateRequestCallback,
-	processIdpInitiated,
+	idpInitiated.process,
     callbackResponse)
 
 router.get('/auth/:provider/callback',
@@ -59,7 +61,7 @@ router.get('/auth/meta/idp/:idp',
         fs.readFile(`${__dirname}/idp-metadata/${idp}.xml`,
         		(e, data) => {
 					if (e) {
-						res.status(500).send(`An error occurred: ${e}`)
+						webutil.handleError(null, res, `An error occurred: ${e}`)
 					} else {
 						res.status(200).set('Content-Type', 'text/xml').send(String(data))
 					}
@@ -67,14 +69,6 @@ router.get('/auth/meta/idp/:idp',
     })
 
 //Supporting functions
-
-function abortIfProfileMissing(req, res, user) {
-	if (!user) {
-		handleError(req, res, 'No user profile was found')
-	} else if (R.keys(user).length == 0) {
-		handleError(req, res, 'User profile is empty')
-	}
-}
 
 function validateProvider(req, res, next) {
 
@@ -86,7 +80,7 @@ function validateProvider(req, res, next) {
 		req.passportAuthenticateParams = providerConfData.passportAuthnParams
 		next()
 	} else {
-		handleError(req, res, `${provider} is not recognized as external identity provider`)
+		webutil.handleError(req, res, `${provider} is not recognized as external identity provider`)
 	}
 
 }
@@ -130,37 +124,31 @@ function validateToken(req, res, next) {
 	} catch (err) {
 		let msg = 'Token did not pass validation.'
 		logger.log2('error', `${msg} token: ${t}, error: ${err}`)
-		handleError(req, res, msg)
+		webutil.handleError(req, res, msg)
 	}
 
 }
 
-function processIdpInitiated(req, res, next) {
-	let user = req.user,
-		relayState = req.body.RelayState
-
-	logger.log2('debug', `RelayState value: ${relayState}`)
-	logger.log2('debug', `SAML reponse in body:\n${req.body.SAMLResponse}`)
-
-	abortIfProfileMissing(req, res, user)
-	idpInitiated.process(user, relayState, global.iiconfig, res, next)
-}
-
 function callbackResponse(req, res) {
 
-	let postUrl, user = req.user
-
-	abortIfProfileMissing(req, res, user)
-
-	let provider = user.provider,
-		sub = user.uid
-    logger.log2('info', `User ${sub} authenticated with provider ${provider}`)
+	let postUrl,
+		user = req.user,
+		provider = user.providerKey
 
 	if (req.cookies['casa-' + provider]) {
 		postUrl = '/casa/rest/pl/account-linking/idp-linking/' + provider
 	} else {
 		postUrl = global.config.postProfileEndpoint
 	}
+
+	user = providersModule.applyMapping(user, provider)
+	if (!user) {
+		webutil.handleError(req, res, 'User profile is empty')
+		return
+	}
+
+	let sub = user.uid,
+	logger.log2('info', `User ${sub} authenticated with provider ${provider}`)
 
 	//Apply transformation to user object and restore original provider value
 	user = misc.arrify(user)
@@ -201,17 +189,6 @@ function callbackResponse(req, res) {
 			</body>
 		</html>	`
 	)
-
-}
-
-function handleError(req, res, msg) {
-
-	if (R.isNil(req)) {
-		res.status(500).send(msg)
-	} else {
-		let failureUrl = R.defaultTo(global.basicConfig.failureRedirectUrl, req.failureUrl)
-		res.redirect(`${failureUrl}?failure=${msg}`)
-	}
 
 }
 

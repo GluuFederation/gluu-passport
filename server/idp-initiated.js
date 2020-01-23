@@ -4,6 +4,8 @@ const
 	url = require('url'),
 	xpath = require('xpath'),
 	dom = require('xmldom').DOMParser,
+	providersModule = require('./providers'),
+	webutil = require('./utils/web-utils'),
 	misc = require('./utils/misc'),
 	logger = require("./utils/logging")
 
@@ -27,7 +29,7 @@ function hasInResponseTo(user) {
 
 function createAuthzRequest(user, iiconfig) {
 
-	let	provider = user.provider,
+	let	provider = user.providerKey,
 		req = R.find(R.propEq('provider', provider), iiconfig.authorizationParams)
 
 	if (!req) {
@@ -78,49 +80,66 @@ function createAuthzRequest(user, iiconfig) {
 
 }
 
-function process(user, relayState, iiconfig, res, next) {
+function process(req, res, next) {
+
+	let	user = req.user,
+		relayState = req.body.RelayState
+
+	logger.log2('debug', `RelayState value: ${relayState}`)
+	logger.log2('debug', `SAML reponse in body:\n${req.body.SAMLResponse}`)
 
 	//Search for "inResponseTo" in the SAML assertion, if absent, jump to IDP-initiated flow
     let irtResult = hasInResponseTo(user),
     	err = irtResult.error
 
     if (err) {
-		res.status(500).send(`An error occurred: ${err}`)
+		webutil.handleError(null, res, `An error occurred: ${err}`)
+		return
+	}
+
+	if (irtResult.present) {
+		logger.log2('info', 'inResponseTo found in SAML assertion')
+		//This is not an IDP-initiated request: hand in control to next middleware in the chain (see routes.js)
+		next()
 	} else {
-		if (irtResult.present) {
-			logger.log2('info', 'inResponseTo found in SAML assertion')
-			//This is not an IDP-initiated request: hand in control to next middleware in the chain (see routes.js)
-			next()
+		if (relayState) {
+			//This cookie can be used to restore the value of relay state in the redirect_uri
+			//page of the OIDC client used for this flow
+			res.cookie('relayState', relayState, {
+				maxAge: 20000,	//20 sec expiration
+				secure: true
+			})
+		}
+
+		let provider = user.providerKey,
+			iiconfig = global.iiconfig
+
+		user = providersModule.applyMapping(user, provider)
+		if (!user) {
+			webutil.handleError(req, res, 'User profile is empty')
+			return
+		}
+
+		logger.log2('info', `User ${user.uid} authenticated with provider ${provider}`)
+		//Create an openId authorization request
+		logger.log2('info', 'Crafting an OIDC authorization request')
+
+		let authzRequestData = createAuthzRequest(user, iiconfig)
+		if (authzRequestData) {
+			let target = url.parse(iiconfig.openidclient.authorizationEndpoint, true)
+			target.search = null
+			target.query = authzRequestData
+
+			//DO the redirection
+			res.redirect(url.format(target))
 		} else {
-    		logger.log2('info', `User ${user.uid} authenticated with provider ${user.provider}`)
-			logger.log2('info', 'Crafting an OIDC authorization request')
-
-			if (relayState) {
-				//This cookie can be used to restore the value of relay state in the redirect_uri
-				//page of the OIDC client used for this flow
-				res.cookie('relayState', relayState, {
-					maxAge: 20000,	//20 sec expiration
-					secure: true
-				})
-			}
-
-			//Create an openId authorization request
-			let authzRequestData = createAuthzRequest(user, iiconfig)
-			if (authzRequestData) {
-				let target = url.parse(iiconfig.openidclient.authorizationEndpoint, true)
-				target.search = null
-				target.query = authzRequestData
-
-				//DO the redirection
-				res.redirect(url.format(target))
-			} else {
-				let msg = 'Not enough data to build an authorization request. At least a redirect URI is needed'
-				logger.log2('error', msg)
-				logger.log2('info', 'Check your configuration of inbound IDP-initiated flow in oxTrust')
-				res.status(500).send(`An error occurred: ${msg}`)
-			}
+			let msg = 'Not enough data to build an authorization request. At least a redirect URI is needed'
+			logger.log2('error', msg)
+			logger.log2('info', 'Check your configuration of inbound IDP-initiated flow in oxTrust')
+			webutil.handleError(null, res, `An error occurred: ${msg}`)
 		}
 	}
+
 
 }
 

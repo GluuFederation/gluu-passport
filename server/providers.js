@@ -12,58 +12,53 @@ var prevConfigHash = 0
 //These are the (node) strategies loaded so far: [{id: "...", strategy: ...}, ... ]
 var passportStrategies = []
 
-function processProfile(provider, additionalParams, profile, done, extra) {
+function applyMapping(profile, provider) {
 
 	let mappedProfile
 	try {
-		let mapping = provider.mapping
+		let mapping = R.find(R.propEq('id', provider), global.providers).mapping,
+			additionalParams = profile.extras
+
+		delete profile.extras
 		logger.log2('silly', `Raw profile is ${JSON.stringify(profile._json)}`)
 		logger.log2('info', `Applying mapping '${mapping}' to profile`)
 
 		mappedProfile = require('./mappings/' + mapping)(profile, additionalParams)
-		mappedProfile = R.mergeLeft(mappedProfile, extra)
+		logger.log2('debug', `Resulting profile data is\n${JSON.stringify(mappedProfile, null, 4)}`)
 	} catch (err) {
 		logger.log2('error', `An error occurred: ${err}`)
-		mappedProfile = {}
 	}
-	logger.log2('debug', `Resulting profile data is\n${JSON.stringify(mappedProfile, null, 4)}`)
-	return done(null, mappedProfile)
+	return mappedProfile
 
 }
 
 function getVerifyFunction(prv) {
 
-	let arity = prv.verifyCallbackArity,
-		extraParams = (provider, profile) => {
-							let data = { provider: provider }
-							if (profile.getAssertionXml) {
-								//this property is attached so idp-initiated code can parse the SAML assertion,
-								//however it is removed from the profile sent to oxauth afterwards (see misc.arrify)
-								data.getAssertionXml = profile.getAssertionXml
-							}
-							return data
-						}
+	let arity = prv.verifyCallbackArity
 
 	let uncurried = (...args) => {
 		//profile and callback are the last 2 params in all passport verify functions,
 		//except for passport-openidconnect which does not follow this convention
-		let profile, additional
+		let profile, extras, cb
 
 		if (prv.passportStrategyId == 'passport-openidconnect') {
 			//Check passport-openidconnect/lib/strategy.js
 			let index = prv.options.passReqToCallback ? 1 : 0
 
 			profile = args[2 + index]
-			additional = args.slice(0, 2 + index)
-			additional = additional.concat(args.slice(3 + index, arity - 1))
+			extras = args.slice(0, 2 + index)
+			extras = extras.concat(args.slice(3 + index, arity - 1))
 		} else {
 			profile = args[arity - 2]
-			additional = args.slice(0, arity - 2)
+			extras = args.slice(0, arity - 2)
 		}
-
+		cb = args[arity - 1]
 		profile.providerKey = prv.id
-		return processProfile(prv, additional, profile, args[arity - 1], extraParams(prv.id, profile))
+		profile.extras = extras
+
+		return cb(null, profile)
 	}
+
 	//guarantee the function has the arity required
 	return R.curryN(arity, uncurried)
 
@@ -235,5 +230,6 @@ function setup(ps) {
 }
 
 module.exports = {
-	setup: setup
+	setup: setup,
+	applyMapping: applyMapping
 }
