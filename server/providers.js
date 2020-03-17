@@ -91,11 +91,17 @@ function setupStrategy(prv) {
 
 	//Create strategy
 	if (isSaml) {
-		let	f = R.anyPass([R.isNil, R.isEmpty])
+		//Turn off inResponseTo validation if the IDP is configured for IDP-initiated:
+		// "an IDP would never do both IDP initiated and SP initiated..."
+		if (!R.find(R.propEq('provider', id), global.iiconfig.authorizationParams)) {
+			options.validateInResponseTo = false
+		}
 
 		//Instantiate custom cache provider if required
 		if (options.validateInResponseTo) {
-			let exp = options.requestIdExpirationPeriodMs / 1000
+
+			let	f = R.anyPass([R.isNil, R.isEmpty]),
+				exp = options.requestIdExpirationPeriodMs / 1000
 
 			if (!f(options.redisCacheOptions)) {
 				options.cacheProvider = cacheProvider.get('redis', options.redisCacheOptions, exp)
@@ -103,6 +109,7 @@ function setupStrategy(prv) {
 				options.cacheProvider = cacheProvider.get('memcached', options.memcachedCacheOptions, exp)
 			}
 		}
+
 		let samlStrategy = new strategy(options, verify)
 		passport.use(id, samlStrategy)
 		meta.generate(prv, samlStrategy)

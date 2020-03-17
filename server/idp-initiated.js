@@ -2,30 +2,10 @@ const
 	R = require('ramda'),
 	uuid = require('uuid'),
 	url = require('url'),
-	xpath = require('xpath'),
-	dom = require('xmldom').DOMParser,
 	providersModule = require('./providers'),
 	webutil = require('./utils/web-utils'),
 	misc = require('./utils/misc'),
 	logger = require("./utils/logging")
-
-function hasInResponseTo(user) {
-
-	let	val = { present: false }
-
-	try {
-		//See file lib/passport-saml/saml.js in node passport-saml library <= 0.35.0
-		//See setupStrategy function at providers.js
-		let	assertion = user.getAssertionXml(),
-			inResponseTo = xpath.select('//@InResponseTo', new dom().parseFromString(assertion))
-		val.present = inResponseTo.length > 0
-	} catch (e) {
-		logger.log2('error', 'An error occurred examining InResponseTo in SAML assertion')
-		val.error = e
-	}
-	return val
-
-}
 
 function createAuthzRequest(user, iiconfig) {
 
@@ -88,16 +68,7 @@ function process(req, res, next) {
 	logger.log2('debug', `RelayState value: ${relayState}`)
 	logger.log2('debug', `SAML reponse in body:\n${req.body.SAMLResponse}`)
 
-	//Search for "inResponseTo" in the SAML assertion, if absent, jump to IDP-initiated flow
-    let irtResult = hasInResponseTo(user),
-    	err = irtResult.error
-
-    if (err) {
-		webutil.handleError(null, res, `An error occurred: ${err}`)
-		return
-	}
-
-	if (irtResult.present) {
+	if (user.inResponseTo) {
 		logger.log2('info', 'inResponseTo found in SAML assertion')
 		//This is not an IDP-initiated request: hand in control to next middleware in the chain (see routes.js)
 		next()
@@ -139,7 +110,6 @@ function process(req, res, next) {
 			webutil.handleError(null, res, `An error occurred: ${msg}`)
 		}
 	}
-
 
 }
 
