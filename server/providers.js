@@ -93,7 +93,7 @@ function setupStrategy(prv) {
 	if (isSaml) {
 		//Turn off inResponseTo validation if the IDP is configured for IDP-initiated:
 		// "an IDP would never do both IDP initiated and SP initiated..."
-		if (!R.find(R.propEq('provider', id), global.iiconfig.authorizationParams)) {
+		if (R.find(R.propEq('provider', id), global.iiconfig.authorizationParams)) {
 			options.validateInResponseTo = false
 		}
 
