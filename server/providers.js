@@ -188,6 +188,8 @@ function fillMissingData(ps) {
 			//Some passport strategies expect consumer* instead of client*
 			options.consumerKey = options.clientID
 			options.consumerSecret = options.clientSecret
+			//Allow state validation in passport-oauth2 based strategies
+			options.state = true
 		}
 		if (strategyId.indexOf('passport-apple') >= 0 && options.key) {
 			//Smells like apple...
