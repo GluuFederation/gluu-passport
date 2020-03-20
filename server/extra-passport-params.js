@@ -25,6 +25,12 @@ const params = R.once(() => [
 		options: {}
 	},
 	{
+		strategy: 'openid-client',
+		passportAuthnParams: {},
+		options: {},
+		verifyCallbackArity: 3
+	},
+	{
 		strategy: 'passport-dropbox-oauth2',
 		passportAuthnParams: {},
 		options: {

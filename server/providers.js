@@ -5,7 +5,8 @@ const
 	misc = require('./utils/misc'),
 	logger = require('./utils/logging'),
 	pparams = require('./extra-passport-params'),
-	cacheProvider = require('./cache-provider')
+	cacheProvider = require('./cache-provider'),
+	oiclienth = require('./utils/openid-client-helper')
 
 var prevConfigHash = 0
 
@@ -191,6 +192,8 @@ function fillMissingData(ps) {
 			//Allow state validation in passport-oauth2 based strategies
 			options.state = true
 		}
+
+		//Strategies with "special" treatments
 		if (strategyId.indexOf('passport-apple') >= 0 && options.key) {
 			//Smells like apple...
 			try {
@@ -201,6 +204,10 @@ function fillMissingData(ps) {
 				logger.log2('error', e.stack)
 				options.key = ''
 			}
+		} else if (strategyId == 'openid-client') {
+			options.redirect_uri = options.callbackURL
+			options = oiclienth.makeOptions(options)
+			p.options = options
 		}
 
 		//Fills verifyCallbackArity (number expected)

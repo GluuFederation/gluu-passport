@@ -147,7 +147,7 @@ function callbackResponse(req, res) {
 		return
 	}
 
-	let sub = user.uid,
+	let sub = user.uid
 	logger.log2('info', `User ${sub} authenticated with provider ${provider}`)
 
 	//Apply transformation to user object and restore original provider value

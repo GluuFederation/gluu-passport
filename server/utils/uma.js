@@ -6,6 +6,8 @@ const
 	misc = require('./misc'),
 	logger = require("./logging")
 
+var rpt
+
 function getTokenEndpoint(umaConfigURL) {
 
 	logger.log2('verbose', 'getTokenEndpoint called')
