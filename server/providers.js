@@ -5,8 +5,8 @@ const
 	misc = require('./utils/misc'),
 	logger = require('./utils/logging'),
 	pparams = require('./extra-passport-params'),
-	cacheProvider = require('./cache-provider'),
-	oiclienth = require('./utils/openid-client-helper')
+	cacheProvider = require('./cache-provider')
+	//oiclienth = require('./utils/openid-client-helper')
 
 var prevConfigHash = 0
 
@@ -204,11 +204,15 @@ function fillMissingData(ps) {
 				logger.log2('error', e.stack)
 				options.key = ''
 			}
-		} else if (strategyId == 'openid-client') {
+		}
+		/*
+		//Disabled temporarily: strategy failing to validate id_tokens, see issue #78
+		else if (strategyId == 'openid-client') {
 			options.redirect_uri = options.callbackURL
 			options = oiclienth.makeOptions(options)
 			p.options = options
 		}
+		*/
 
 		//Fills verifyCallbackArity (number expected)
 		let prop = 'verifyCallbackArity',
