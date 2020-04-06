@@ -21,7 +21,7 @@
     "passport-dropbox-oauth2": "^1.1.0",
     "passport-facebook": "^2.1.1",
     "passport-github": "^1.1.0",
-    "passport-google-oauth2": "^0.1.6",
+    "passport-google-oauth2": "^0.2.0",
     "passport-linkedin-oauth2": "^1.4.1",
     "passport-openidconnect": "0.0.2",
     "passport-saml": "^0.31.0",
