@@ -9,6 +9,7 @@ const
 	webutil = require('./utils/web-utils'),
 	misc = require('./utils/misc'),
 	logger = require("./utils/logging")
+	path = require('path')
 
 router.post('/auth/saml/:provider/callback',
 	validateProvider,
@@ -46,22 +47,39 @@ router.get('/token',
 	function (req, res, next) {
 		logger.log2('verbose', 'Issuing token')
 		let	t = misc.getJWT({ jwt: uuid() }, 120)	//2 min expiration
-		res.status(200).send({ token_: t})
+		res.sgitatus(200).send({ token_: t})
 	}
 )
 
-//Metadata
-
+/*
+* Metadata
+* @todo: receive IDP id as an int and validate
+* @todo: workaround: validate idp string "id" on oxauth/db/file
+*/
 router.get('/auth/meta/idp/:idp',
     function (req, res) {
 
-        let idp = req.params.idp
-        logger.log2('verbose', `Metadata request for IDP ${idp}`)
+		let MetaFileNameNoExt = req.params.idp
+		let fileDir = `${__dirname}/idp-metadata/`
+		let MetaFileName = `${MetaFileNameNoExt}.xml`
 
-        fs.readFile(`${__dirname}/idp-metadata/${idp}.xml`,
-        		(e, data) => {
-					if (e) {
-						webutil.handleError(null, res, `An error occurred: ${e}`)
+		// remove dots from suffix
+		let safeMetaFileName = path.normalize(MetaFileName).replace(/^(\.\.(\/|\\|$))+/, '')
+		let safeFileFullPath = path.join(fileDir, safeMetaFileName)
+
+        logger.log2('verbose', `Metadata request for IDP ${MetaFileNameNoExt}`)
+
+        fs.readFile(safeFileFullPath,
+        		(err, data) => {
+					if (err) {
+						// Handle ENOENT error
+						if (!fs.existsSync(safeFileFullPath)){
+							// ENOENT ERROR
+							EnoentError = `Requested metadata for ${MetaFileNameNoExt} not found`
+							logger.log2('error',EnoentError)
+							res.status(404).send(EnoentError)
+						}
+						res.status(500).send(`An error occurred: ${err}`)
 					} else {
 						res.status(200).set('Content-Type', 'text/xml').send(String(data))
 					}
