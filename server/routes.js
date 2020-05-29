@@ -47,7 +47,7 @@ router.get('/token',
 	function (req, res, next) {
 		logger.log2('verbose', 'Issuing token')
 		let	t = misc.getJWT({ jwt: uuid() }, 120)	//2 min expiration
-		res.sgitatus(200).send({ token_: t})
+		res.status(200).send({ token_: t})
 	}
 )
 
