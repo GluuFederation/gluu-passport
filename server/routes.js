@@ -71,15 +71,15 @@ router.get('/auth/meta/idp/:idp',
         fs.readFile(safeFileFullPath,
         		(err, data) => {
 					if (err) {
-						// Handle ENOENT error
+
 						if (!fs.existsSync(safeFileFullPath)){
-							// ENOENT ERROR
 							EnoentError = `Requested metadata for ${MetaFileNameNoExt} not found`
 							logger.log2('error',EnoentError)
 							res.status(404).send(EnoentError)
 						}
 						res.status(500).send(`An error occurred: ${err}`)
 						logger.log2('error',err)
+						
 					} else {
 						res.status(200).set('Content-Type', 'text/xml').send(String(data))
 					}
