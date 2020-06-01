@@ -61,8 +61,6 @@ router.get('/auth/meta/idp/:idp',
 
 		// normalizes
 		let idp = path.basename(req.params.idp)
-		
-		let normalizedFileName = metaFileNameNoExt + '.xml'
 		let fileDir = `${__dirname}/idp-metadata/`
 		let metaFileName = `${idp}.xml`
 		let safeFileFullPath = path.join(fileDir, metaFileName)
