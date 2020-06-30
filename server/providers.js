@@ -177,7 +177,7 @@ function fillMissingData(ps) {
 	for (let p of ps) {
 		let options = p.options,
 			strategyId = p.passportStrategyId,
-			isSaml = strategyId == "passport-saml",
+			isSaml = strategyId == 'passport-saml',
 			callbackUrl = R.defaultTo(options.callbackUrl, options.callbackURL),
 			prefix = global.config.serverURI + '/passport/auth'
 

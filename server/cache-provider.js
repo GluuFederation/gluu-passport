@@ -26,8 +26,8 @@ function getRedisProvider(options, exp) {
 			msg = host && port ? `${host}:${port}` : ''
 		logger.log2('info', `Redis client has connected to server ${msg}`)
 	})
-	client.on("error", err => logger.log2('error', err))
-	client.on("end", _ => ready = false)
+	client.on('error', err => logger.log2('error', err))
+	client.on('end', _ => ready = false)
 
 	return {
 		save: function(key, value, cb) {
@@ -71,8 +71,8 @@ function getMemcachedProvider(options, exp) {
 	return {
 		save: function(key, value, cb) {
 			setAsync(key, value, exp)
-					.then(_ => cb(null, value))
-					.catch(err => cb(err, null))
+				.then(_ => cb(null, value))
+				.catch(err => cb(err, null))
 		},
 		get: function(key, cb) {
 			getAsync(key)
