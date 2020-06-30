@@ -24,17 +24,17 @@ const
 		options: { flags : 'w' }
 	},
 	logger = winston.createLogger({
-				exitOnError: false,
-				format: format.combine(
-					format.splat(),
-					format.padLevels(),
-					format.timestamp(),
-					format.printf(info => `${info.timestamp} [${info.level.toUpperCase()}] ${info.message}`)
-				)
-			})
+		exitOnError: false,
+		format: format.combine(
+			format.splat(),
+			format.padLevels(),
+			format.timestamp(),
+			format.printf(info => `${info.timestamp} [${info.level.toUpperCase()}] ${info.message}`)
+		)
+	})
 
 logger.stream = {
-    write: (message, enc) => log2('info', message.trim())
+	write: (message, enc) => log2('info', message.trim())
 }
 
 var transport, fileTransport, consoleTransport
@@ -123,7 +123,7 @@ function configure(cfg) {
 }
 
 function sendMQMessage(msg) {
-    if (MQDetails){
+	if (MQDetails){
 		stompClient.publish('/' + MQDetails.CLIENT_QUEUE_NAME, msg)
 	}
 }
@@ -146,7 +146,7 @@ function log2(level, msg) {
 	logger.log.apply(logger, args)
 
 	//Log it to MQ
-	args[1] = level + ": " + args[1]
+	args[1] = level + ': ' + args[1]
 	args.shift()
 
 	sendMQMessage(R.apply(util.format, args))

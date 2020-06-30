@@ -5,7 +5,7 @@ const
 	providersModule = require('./providers'),
 	webutil = require('./utils/web-utils'),
 	misc = require('./utils/misc'),
-	logger = require("./utils/logging")
+	logger = require('./utils/logging')
 
 function createAuthzRequest(user, iiconfig) {
 
@@ -23,14 +23,14 @@ function createAuthzRequest(user, iiconfig) {
 		let now = new Date().getTime(),
 			clientId = iiconfig.openidclient.clientId,
 			jwt = misc.getRpJWT({
-					iss: global.config.serverURI,
-					sub: user.uid,
-					aud: clientId,
-					jti: uuid(),
-					exp: now / 1000 + 30,
-					iat: now,
-					data: misc.encrypt(user)
-				})
+				iss: global.config.serverURI,
+				sub: user.uid,
+				aud: clientId,
+				jti: uuid(),
+				exp: now / 1000 + 30,
+				iat: now,
+				data: misc.encrypt(user)
+			})
 
 		let extraParams = R.unless(misc.isObject, () => {}, req.extraParams)
 		req = R.omit(['provider', 'extraParams'], req)

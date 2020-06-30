@@ -1,6 +1,6 @@
 const
 	misc = require('./misc'),
-	logger = require("./logging"),
+	logger = require('./logging'),
 	uma = require('./uma')
 
 function validate(data) {
@@ -22,12 +22,12 @@ function retrieve(cfgEndpoint){
 	let options = {
 		simple: false,
 		resolveWithFullResponse: true,
-        uri: cfgEndpoint
+		uri: cfgEndpoint
 	}
 	let	chain = misc.pipePromise(
-					uma.request,
-					validate
-				)
+		uma.request,
+		validate
+	)
 	return chain(options)
 
 }

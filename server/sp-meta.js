@@ -12,18 +12,18 @@ function writeMeta(fn, metadata) {
 
 	let fd,
 		chain = misc.pipePromise(
-					openF('w'),
-					fdesc => {
-						//Save file descriptor in a temp variable (will be needed afterwards)
-						fd = fdesc
-						return fd
-					},
-					writeF(metadata),
-					written => {
-						logger.log2('verbose', `${written} bytes were written`)
-						return fs.closeSync(fd)		//returns undefined
-					}
-				)
+			openF('w'),
+			fdesc => {
+				//Save file descriptor in a temp variable (will be needed afterwards)
+				fd = fdesc
+				return fd
+			},
+			writeF(metadata),
+			written => {
+				logger.log2('verbose', `${written} bytes were written`)
+				return fs.closeSync(fd)		//returns undefined
+			}
+		)
 
 	logger.log2('info', `Creating file ${fn}`)
 	return chain(fn)
@@ -33,21 +33,21 @@ function writeMeta(fn, metadata) {
 const
 	writeMeta_ = R.curry(writeMeta),
 	metadataDir = R.once(() => {
-			let idpMetaPath = path.join(__dirname, 'idp-metadata')
-			if (!fs.existsSync(idpMetaPath)) {
-				fs.mkdirSync(idpMetaPath)
-			}
-			return idpMetaPath
-		})
+		let idpMetaPath = path.join(__dirname, 'idp-metadata')
+		if (!fs.existsSync(idpMetaPath)) {
+			fs.mkdirSync(idpMetaPath)
+		}
+		return idpMetaPath
+	})
 
 function generate(provider, samlStrategy) {
 
 	let opts = provider.options,
 		fileName = path.join(metadataDir(), provider.id + '.xml'),
 		chain = misc.pipePromise(
-					dcert => samlStrategy.generateServiceProviderMetadata(dcert, opts.signingCert),
-					writeMeta_(fileName)
-				)
+			dcert => samlStrategy.generateServiceProviderMetadata(dcert, opts.signingCert),
+			writeMeta_(fileName)
+		)
 
 	logger.log2('info', `Generating XML metadata for ${provider.displayName}`)
 	chain(opts.decryptionCert).catch(err => logger.log2('error', `An error occurred: ${err}`))
