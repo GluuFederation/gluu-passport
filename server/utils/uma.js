@@ -18,7 +18,8 @@ function getTokenEndpoint(umaConfigURL) {
 				logger.log2('info', 'getTokenEndpoint. Found endpoint at %s', endpoint)
 				return endpoint
 			} else {
-				logger.log2('error', 'getTokenEndpoint. No token endpoint was found')
+				let msg = 'getTokenEndpoint. No token endpoint was found'
+				logger.log2('error', msg)
 				throw new Error(msg)
 			}
 		})
