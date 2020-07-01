@@ -1,4 +1,5 @@
 const
+	config = require('config'),
 	R = require('ramda'),
 	sha1 = require('sha1'),
 	jwt = require('jsonwebtoken'),
@@ -41,7 +42,7 @@ const defaultRpOptions = R.once(() => ({
 }))
 
 const secretKey = R.once(() => {
-	let salt = fs.readFileSync('/etc/gluu/conf/salt', 'utf8')
+	let salt = fs.readFileSync(config.get('saltFile'), 'utf8')
 	return /=\s*(\S+)/.exec(salt)[1]
 })
 
