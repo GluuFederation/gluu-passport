@@ -23,4 +23,3 @@ describe('productioncfg', function() {
 		assert.exists(productioncfg.saltFile, 'saltFile is not null or undefined')
 	})
 })
-
