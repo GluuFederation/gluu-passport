@@ -94,7 +94,7 @@ function pollConfiguration(configEndpoint) {
 			logger.log2('debug', e.stack)
 			logger.log2('warn', 'An attempt to get configuration data will be tried again soon')
 		})
-	setTimeout(pollConfiguration, 30000, configEndpoint)	 //1 minute timer
+	setTimeout(pollConfiguration, 60000, configEndpoint)	 //1 minute timer
 }
 
 function init() {
