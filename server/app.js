@@ -1,4 +1,5 @@
 const
+	config = require('config'),
 	server = require('http'),
 	app = require('express')(),
 	session = require('express-session'),
@@ -12,10 +13,11 @@ const
 	confDiscovery = require('./utils/configDiscovery'),
 	routes = require('./routes'),
 	providers = require('./providers'),
-	passportFile = '/etc/gluu/conf/passport-config.json'
+	passportFile = config.get('passportFile')
+
 
 var httpServer, httpPort = -1
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
 app.use(morgan('short', { stream: logger.logger.stream }))
 app.use(bodyParser.json())
@@ -23,15 +25,15 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(cookieParser())
 
 app.use(session({
-    cookie: {
-        maxAge: 86400000
-    },
-    store: new MemoryStore({
-        checkPeriod: 86400000 // prune expired entries every 24h
-    }),
-    secret: 'wtf',
-    resave: false,
-    saveUninitialized: false
+	cookie: {
+		maxAge: 86400000
+	},
+	store: new MemoryStore({
+		checkPeriod: 86400000 // prune expired entries every 24h
+	}),
+	secret: 'wtf',
+	resave: false,
+	saveUninitialized: false
 }))
 
 app.use(passport.initialize())
@@ -39,6 +41,7 @@ app.use(passport.session())
 app.use('/passport', routes)
 
 //Default error handler
+// eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
 	logger.log2('error', `Unknown Error: ${err}`)
 	logger.log2('error', err.stack)
@@ -46,11 +49,11 @@ app.use((err, req, res, next) => {
 })
 
 passport.serializeUser((user, done) => {
-    done(null, user)
+	done(null, user)
 })
 
 passport.deserializeUser((user, done) => {
-    done(null, user)
+	done(null, user)
 })
 
 
@@ -86,11 +89,11 @@ function reconfigure(cfg) {
 
 function pollConfiguration(configEndpoint) {
 	misc.pipePromise(confDiscovery.retrieve, reconfigure)(configEndpoint)
-			.catch(e => {
-				logger.log2('error', e.toString())
-				logger.log2('debug', e.stack)
-				logger.log2('warn', 'An attempt to get configuration data will be tried again soon')
-			})
+		.catch(e => {
+			logger.log2('error', e.toString())
+			logger.log2('debug', e.stack)
+			logger.log2('warn', 'An attempt to get configuration data will be tried again soon')
+		})
 	setTimeout(pollConfiguration, 60000, configEndpoint)	 //1 minute timer
 }
 
@@ -99,7 +102,7 @@ function init() {
 	//Read the minimal params to start
 	let basicConfig = require(passportFile)
 	//Start logging with basic params
-    logger.configure({ level: basicConfig.logLevel, consoleLogOnly: basicConfig.consoleLogOnly })
+	logger.configure({ level: basicConfig.logLevel, consoleLogOnly: basicConfig.consoleLogOnly })
 
 	let props = ['clientId', 'keyPath', 'keyId', 'keyAlg', 'configurationEndpoint', 'failureRedirectUrl']
 	if (misc.hasData(props, basicConfig)) {

@@ -1,4 +1,5 @@
 const
+	config = require('config'),
 	R = require('ramda'),
 	sha1 = require('sha1'),
 	jwt = require('jsonwebtoken'),
@@ -27,23 +28,23 @@ function pathsHaveData(list, obj) {
 const hasData = (list, obj) => pathsHaveData(R.map(x => [x], list), obj)
 
 const privateKey = R.once(() =>
-			fs.readFileSync(global.basicConfig.keyPath, 'utf8')
-			.replace("-----BEGIN RSA PRIVATE KEY-----", "-----BEGIN PRIVATE KEY-----")
-			.replace("-----END RSA PRIVATE KEY-----", "-----END PRIVATE KEY-----"))
+	fs.readFileSync(global.basicConfig.keyPath, 'utf8')
+		.replace('-----BEGIN RSA PRIVATE KEY-----', '-----BEGIN PRIVATE KEY-----')
+		.replace('-----END RSA PRIVATE KEY-----', '-----END PRIVATE KEY-----'))
 
 const defaultRpOptions = R.once(() => ({
-				algorithm: global.basicConfig.keyAlg,
-				header: {
-					typ: "JWT",
-					alg: global.basicConfig.keyAlg,
-					kid: global.basicConfig.keyId
-				}
-			}))
+	algorithm: global.basicConfig.keyAlg,
+	header: {
+		typ: 'JWT',
+		alg: global.basicConfig.keyAlg,
+		kid: global.basicConfig.keyId
+	}
+}))
 
 const secretKey = R.once(() => {
-							let salt = fs.readFileSync("/etc/gluu/conf/salt", 'utf8')
-							return /=\s*(\S+)/.exec(salt)[1]
-						})
+	let salt = fs.readFileSync(config.get('saltFile'), 'utf8')
+	return /=\s*(\S+)/.exec(salt)[1]
+})
 
 const getRpJWT = payload => jwt.sign(payload, privateKey(), defaultRpOptions())
 
@@ -83,7 +84,7 @@ function encrypt(obj) {
 
 	//Encryption compatible with Gluu EncryptionService
 	let pt = JSON.stringify(obj)
-	let encrypt = crypto.createCipheriv('des-ede3-ecb', secretKey(), "")
+	let encrypt = crypto.createCipheriv('des-ede3-ecb', secretKey(), '')
 	var encrypted = encrypt.update(pt, 'utf8', 'base64')
 	encrypted += encrypt.final('base64')
 	return encrypted

@@ -8,30 +8,30 @@ const
 	providersModule = require('./providers'),
 	webutil = require('./utils/web-utils'),
 	misc = require('./utils/misc'),
-	logger = require("./utils/logging")
+	logger = require('./utils/logging'),
 	path = require('path')
 
 router.post('/auth/saml/:provider/callback',
 	validateProvider,
 	authenticateRequestCallback,
 	idpInitiated.process,
-    callbackResponse)
+	callbackResponse)
 
 router.get('/auth/:provider/callback',
 	validateProvider,
 	authenticateRequestCallback,
-    callbackResponse)
+	callbackResponse)
 
 router.post('/auth/:provider/callback',
 	validateProvider,
 	require('express').urlencoded(),
 	authenticateRequestCallback,
-    callbackResponse)
+	callbackResponse)
 
 router.get('/auth/:provider/:token',
 	validateProvider,
-    validateToken,
-    authenticateRequest)
+	validateToken,
+	authenticateRequest)
 
 router.get('/casa/:provider/:token',
 	(req, res, next) => {
@@ -39,11 +39,12 @@ router.get('/casa/:provider/:token',
 		next()
 	},
 	validateProvider,
-    validateToken,
-    authenticateRequestCasa)
+	validateToken,
+	authenticateRequestCasa)
 
 //Token generation
 router.get('/token',
+	// eslint-disable-next-line no-unused-vars
 	function (req, res, next) {
 		logger.log2('verbose', 'Issuing token')
 		let	t = misc.getJWT({ jwt: uuid() }, 120)	//2 min expiration
@@ -57,7 +58,7 @@ router.get('/token',
 * @todo: workaround: validate idp string "id" on oxauth/db/file
 */
 router.get('/auth/meta/idp/:idp',
-    function (req, res) {
+	function (req, res) {
 
 		// normalizes
 		let idp = path.basename(req.params.idp)
@@ -65,26 +66,26 @@ router.get('/auth/meta/idp/:idp',
 		let metaFileName = `${idp}.xml`
 		let safeFileFullPath = path.join(fileDir, metaFileName)
 
-        logger.log2('verbose', `Metadata request for IDP ${idp}`)
+		logger.log2('verbose', `Metadata request for IDP ${idp}`)
 
 		// handle ENOENT
-        fs.readFile(safeFileFullPath,
-        		(err, data) => {
-					if (err) {
+		fs.readFile(safeFileFullPath,
+			(err, data) => {
+				if (err) {
 
-						if (!fs.existsSync(safeFileFullPath)){
-							EnoentError = `Requested metadata for ${MetaFileNameNoExt} not found`
-							logger.log2('error',EnoentError)
-							res.status(404).send(EnoentError)
-						}
-						res.status(500).send(`An error occurred: ${err}`)
-						logger.log2('error',err)
-						
-					} else {
-						res.status(200).set('Content-Type', 'text/xml').send(String(data))
+					if (!fs.existsSync(safeFileFullPath)){
+						var EnoentError = `Requested metadata for ${metaFileName} not found`
+						logger.log2('error',EnoentError)
+						res.status(404).send(EnoentError)
 					}
-				})
-    })
+					res.status(500).send(`An error occurred: ${err}`)
+					logger.log2('error',err)
+
+				} else {
+					res.status(200).set('Content-Type', 'text/xml').send(String(data))
+				}
+			})
+	})
 
 //Supporting functions
 
@@ -113,10 +114,10 @@ function authenticateRequestCasa(req, res, next) {
 	let provider = req.params.provider
 
 	res.cookie('casa-' + provider, 'marker cookie', {
-			httpOnly: true,
-			maxAge: 120000,	//2min expiration
-			secure: true
-		})
+		httpOnly: true,
+		maxAge: 120000,	//2min expiration
+		secure: true
+	})
 
 	logger.log2('verbose', `Proceeding with linking procedure for provider ${provider}`)
 	authenticateRequest(req, res, next)
@@ -127,8 +128,8 @@ function authenticateRequestCallback(req, res, next) {
 
 	logger.log2('verbose', `Authenticating request against ${req.params.provider}`)
 	passport.authenticate(
-			req.params.provider, { failureRedirect: global.basicConfig.failureRedirectUrl, failureFlash: true }
-		)(req, res, next)
+		req.params.provider, { failureRedirect: global.basicConfig.failureRedirectUrl, failureFlash: true }
+	)(req, res, next)
 
 }
 
@@ -172,21 +173,21 @@ function callbackResponse(req, res) {
 	user = misc.arrify(user)
 	user.provider = provider
 
-    let now = new Date().getTime(),
-    	jwt = misc.getRpJWT({
-				iss: postUrl,
-				sub: sub,
-				aud: global.basicConfig.clientId,
-				jti: uuid(),
-				exp: now / 1000 + 30,
-				iat: now,
-				data: misc.encrypt(user)
-    		})
+	let now = new Date().getTime(),
+		jwt = misc.getRpJWT({
+			iss: postUrl,
+			sub: sub,
+			aud: global.basicConfig.clientId,
+			jti: uuid(),
+			exp: now / 1000 + 30,
+			iat: now,
+			data: misc.encrypt(user)
+		})
 
-    logger.log2('debug', `Sending user data ${jwt} to: ${postUrl}`)
+	logger.log2('debug', `Sending user data ${jwt} to: ${postUrl}`)
 
-    res.set('content-type', 'text/html;charset=UTF-8')
-    return res.status(200).send(`
+	res.set('content-type', 'text/html;charset=UTF-8')
+	return res.status(200).send(`
 		<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 			<body onload="document.forms[0].submit()">
 				<noscript>

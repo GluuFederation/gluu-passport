@@ -37,5 +37,7 @@ jspm_packages
 # Optional REPL history
 .node_repl_history
 
-package-lock.json
 .project
+
+#ide
+.vscode

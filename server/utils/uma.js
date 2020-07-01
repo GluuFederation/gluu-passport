@@ -4,7 +4,7 @@ const
 	R = require('ramda'),
 	uuid = require('uuid'),
 	misc = require('./misc'),
-	logger = require("./logging")
+	logger = require('./logging')
 
 var rpt
 
@@ -13,15 +13,15 @@ function getTokenEndpoint(umaConfigURL) {
 	logger.log2('verbose', 'getTokenEndpoint called')
 	return reqp({ uri: umaConfigURL, json: true })
 		.then(obj => {
-				let endpoint = obj.token_endpoint
-				if (endpoint) {
-					logger.log2('info', 'getTokenEndpoint. Found endpoint at %s', endpoint)
-					return endpoint
-				} else {
-					logger.log2('error', 'getTokenEndpoint. No token endpoint was found')
-					throw new Error(msg)
-				}
-			})
+			let endpoint = obj.token_endpoint
+			if (endpoint) {
+				logger.log2('info', 'getTokenEndpoint. Found endpoint at %s', endpoint)
+				return endpoint
+			} else {
+				logger.log2('error', 'getTokenEndpoint. No token endpoint was found')
+				throw new Error(msg)
+			}
+		})
 }
 
 function getRPT(ticket, token_endpoint) {
@@ -29,15 +29,15 @@ function getRPT(ticket, token_endpoint) {
 	logger.log2('verbose', 'getRPT called')
 	let
 		clientId = global.basicConfig.clientId,
-    	now = new Date().getTime(),
+		now = new Date().getTime(),
 		token = misc.getRpJWT({
-					iss: clientId,
-					sub: clientId,
-					aud: token_endpoint,
-					jti: uuid(),
-					exp: now / 1000 + 30,
-					iat: now
-				}),
+			iss: clientId,
+			sub: clientId,
+			aud: token_endpoint,
+			jti: uuid(),
+			exp: now / 1000 + 30,
+			iat: now
+		}),
 		options = {
 			method: 'POST',
 			uri: token_endpoint,
@@ -52,61 +52,61 @@ function getRPT(ticket, token_endpoint) {
 		}
 
 	return reqp(options)
-			.then(rptDetails => {
-					logger.log2('info', 'getRPT. RPT details were received')
-					logger.log2('debug', `getRPT. Access token is ${rptDetails.access_token}`)
-					return rptDetails
-				})
+		.then(rptDetails => {
+			logger.log2('info', 'getRPT. RPT details were received')
+			logger.log2('debug', `getRPT. Access token is ${rptDetails.access_token}`)
+			return rptDetails
+		})
 
 }
 
 function doRequest(options) {
 	if (rpt) {
 		let headers = {
-				authorization: `Bearer ${rpt.access_token}`,
-				pct: rpt.pct
-			}
-    	options.headers = R.mergeRight(options.headers, headers)
-    }
+			authorization: `Bearer ${rpt.access_token}`,
+			pct: rpt.pct
+		}
+		options.headers = R.mergeRight(options.headers, headers)
+	}
 	return reqp(options)
 		.then(response => {
-				switch (response.statusCode) {
-					case 401:
-						let parsed = new parsers.WWW_Authenticate(response.headers['www-authenticate'])
-						logger.log2('verbose', `getConfiguration. Got www-authenticate in header with ticket ${parsed.parms.ticket}`)
-						return parsed.parms
-					break
-					case 200:
-						logger.log2('info', 'getConfiguration. Passport configs received')
-						logger.log2('silly', `getConfiguration. Passport configs are: ${response.body}`)
-						return JSON.parse(response.body)
-					break
-					default:
-						throw new Error(`Received unexpected HTTP status code of ${response.statusCode}`)
-				}
-			})
+			switch (response.statusCode) {
+			case 401:
+				let parsed = new parsers.WWW_Authenticate(response.headers['www-authenticate'])
+				logger.log2('verbose', `getConfiguration. Got www-authenticate in header with ticket ${parsed.parms.ticket}`)
+				return parsed.parms
+				break
+			case 200:
+				logger.log2('info', 'getConfiguration. Passport configs received')
+				logger.log2('silly', `getConfiguration. Passport configs are: ${response.body}`)
+				return JSON.parse(response.body)
+				break
+			default:
+				throw new Error(`Received unexpected HTTP status code of ${response.statusCode}`)
+			}
+		})
 }
 
 function processUnauthorized(ticket, as_uri, options) {
 
 	let getRPT_ = R.curry(getRPT),
 		chain = misc.pipePromise(
-					getTokenEndpoint,
-					getRPT_(ticket),
-					token => {
-						//update global variable
-						rpt = token
-						//return value useful for next function in the chain
-						return options
-					},
-					doRequest
-				)
+			getTokenEndpoint,
+			getRPT_(ticket),
+			token => {
+				//update global variable
+				rpt = token
+				//return value useful for next function in the chain
+				return options
+			},
+			doRequest
+		)
 
 	return chain(as_uri)
-			.catch(e => {
-					logger.log2('error', 'processUnauthorized. No RPT token could be obtained')
-					throw e
-				})
+		.catch(e => {
+			logger.log2('error', 'processUnauthorized. No RPT token could be obtained')
+			throw e
+		})
 
 }
 
@@ -122,9 +122,9 @@ function request(options) {
 	}
 
 	let	chain = misc.pipePromise(
-					doRequest,
-					fn
-				)
+		doRequest,
+		fn
+	)
 
 	return chain(options)
 

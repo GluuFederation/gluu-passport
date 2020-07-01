@@ -5,12 +5,11 @@ const
 	providersModule = require('./providers'),
 	webutil = require('./utils/web-utils'),
 	misc = require('./utils/misc'),
-	logger = require("./utils/logging")
+	logger = require('./utils/logging')
 
-function createAuthzRequest(user, iiconfig) {
+function createAuthzRequest(user, iiconfig, provider) {
 
-	let	provider = user.providerKey,
-		req = R.find(R.propEq('provider', provider), iiconfig.authorizationParams)
+	let req = R.find(R.propEq('provider', provider), iiconfig.authorizationParams)
 
 	if (!req) {
 		logger.log2('error', `Provider ${provider} not found in idp-initiated configuration.`)
@@ -23,14 +22,14 @@ function createAuthzRequest(user, iiconfig) {
 		let now = new Date().getTime(),
 			clientId = iiconfig.openidclient.clientId,
 			jwt = misc.getRpJWT({
-					iss: global.config.serverURI,
-					sub: user.uid,
-					aud: clientId,
-					jti: uuid(),
-					exp: now / 1000 + 30,
-					iat: now,
-					data: misc.encrypt(user)
-				})
+				iss: global.config.serverURI,
+				sub: user.uid,
+				aud: clientId,
+				jti: uuid(),
+				exp: now / 1000 + 30,
+				iat: now,
+				data: misc.encrypt(user)
+			})
 
 		let extraParams = R.unless(misc.isObject, () => {}, req.extraParams)
 		req = R.omit(['provider', 'extraParams'], req)
@@ -95,7 +94,7 @@ function process(req, res, next) {
 		//Create an openId authorization request
 		logger.log2('info', 'Crafting an OIDC authorization request')
 
-		let authzRequestData = createAuthzRequest(user, iiconfig)
+		let authzRequestData = createAuthzRequest(user, iiconfig, provider)
 		if (authzRequestData) {
 			let target = url.parse(iiconfig.openidclient.authorizationEndpoint, true)
 			target.search = null
