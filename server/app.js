@@ -1,4 +1,5 @@
 const
+	config = require('config'),
 	server = require('http'),
 	app = require('express')(),
 	session = require('express-session'),
@@ -12,7 +13,8 @@ const
 	confDiscovery = require('./utils/configDiscovery'),
 	routes = require('./routes'),
 	providers = require('./providers'),
-	passportFile = '/etc/gluu/conf/passport-config.json'
+	passportFile = config.get('passportFile')
+
 
 var httpServer, httpPort = -1
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
@@ -92,7 +94,7 @@ function pollConfiguration(configEndpoint) {
 			logger.log2('debug', e.stack)
 			logger.log2('warn', 'An attempt to get configuration data will be tried again soon')
 		})
-	setTimeout(pollConfiguration, 60000, configEndpoint)	 //1 minute timer
+	setTimeout(pollConfiguration, 30000, configEndpoint)	 //1 minute timer
 }
 
 function init() {
