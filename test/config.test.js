@@ -1,4 +1,3 @@
-const mocha = require('mocha')
 const chai = require('chai')
 const defaultcfg = require('../config/default.json')
 const productioncfg = require('../config/production.json')
