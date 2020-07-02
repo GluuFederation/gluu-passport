@@ -81,3 +81,5 @@ describe('misc.arrify', () => {
 			{ profiles : [] }
 		)
 	})
+
+})
