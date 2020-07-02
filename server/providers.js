@@ -127,7 +127,8 @@ function parseProp(value) {
 		if (typeof value == 'string') {
 			value = JSON.parse(value)
 		}
-	} catch (e) {
+	} catch (err) {
+		logger.log2('error', `An error occurred: ${err}`)
 	}
 	return value
 
