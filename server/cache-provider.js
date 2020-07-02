@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 const
 	redis = require('redis'),
 	Memcached = require('memcached'),
