@@ -53,32 +53,41 @@ const getJWT = (payload, expSec) => jwt.sign(payload, secretKey(), { expiresIn: 
 const verifyJWT = token => jwt.verify(token, secretKey())
 
 function arrify(obj) {
-	/*
-		This functions aims at transforming every key value of an object in the following way:
 
-		"" --> []
-		"hi" --> ["hi"]
-		["hi", "there"] --> ["hi", "there"]
-		[{"attr":"hi"}, {"attr":"there"}] --> ['{"attr":"hi"}', '{"attr":"there"}']
-		{"attr":"hi"} --> ['{"attr":"hi"}']
-		[] --> []
-		null --> []
-		undefined --> []
+	Object.keys(obj).forEach( (key) => {
 
-		Object members which are functions are dropped
-	*/
+		if (!obj[key]) {
+			obj[key] = []
+		}
 
-	//Implementing this in imperative style ends up in a very funny stair-like code
-	let isBasicType = R.flip(R.includes)(['boolean', 'number', 'string']),
-		f = R.ifElse(x => isBasicType(typeof x[0]), R.identity, x => R.map(val => JSON.stringify(val), x)),
-		g = R.ifElse(Array.isArray, f, x => [x]),
-		h = R.ifElse(isObject, x => [JSON.stringify(x)], g),
-		k = R.ifElse(R.anyPass([R.isNil, R.isEmpty]), x => [], h)
+		switch (typeof obj[key]) {
 
-	obj = R.filter(v => typeof(v) != 'function', obj)
-	return R.map(k, obj)
+		case 'string': obj[key] = [obj[key]]
+			break
 
+		case 'object':
+			if (Array.isArray(obj[key])) {
+
+				let arr = []
+				obj[key].forEach( (item) => {
+					if (typeof item === 'string') {
+						arr.push(item)
+					} else if (typeof item === 'object') {
+						let str = JSON.stringify(item)
+						arr.push(str)
+					}
+				})
+				obj[key] = arr
+
+			} else {
+				obj[key] = [JSON.stringify(obj[key])]
+			}
+			break
+		}
+	})
+	return obj
 }
+
 
 function encrypt(obj) {
 
