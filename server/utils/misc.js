@@ -29,8 +29,15 @@ const hasData = (list, obj) => pathsHaveData(R.map(x => [x], list), obj)
 
 const privateKey = R.once(() =>
 	fs.readFileSync(global.basicConfig.keyPath, 'utf8')
-		.replace('-----BEGIN RSA PRIVATE KEY-----', '-----BEGIN PRIVATE KEY-----')
-		.replace('-----END RSA PRIVATE KEY-----', '-----END PRIVATE KEY-----'))
+		.replace(
+			'-----BEGIN RSA PRIVATE KEY-----', 
+			'-----BEGIN PRIVATE KEY-----'
+		)
+		.replace(
+			'-----END RSA PRIVATE KEY-----', 
+			'-----END PRIVATE KEY-----'
+		)
+)
 
 const defaultRpOptions = R.once(() => ({
 	algorithm: global.basicConfig.keyAlg,
@@ -48,37 +55,71 @@ const secretKey = R.once(() => {
 
 const getRpJWT = payload => jwt.sign(payload, privateKey(), defaultRpOptions())
 
-const getJWT = (payload, expSec) => jwt.sign(payload, secretKey(), { expiresIn: expSec })
+const getJWT = (payload, expSec) => jwt.sign(
+	payload, secretKey(), { expiresIn: expSec }
+)
 
 const verifyJWT = token => jwt.verify(token, secretKey())
 
 function arrify(obj) {
-	/*
-		This functions aims at transforming every key value of an object in the following way:
+	/* This functions aims at transforming every key value
+	 of an object in the following way:
 
-		"" --> []
-		"hi" --> ["hi"]
-		["hi", "there"] --> ["hi", "there"]
-		[{"attr":"hi"}, {"attr":"there"}] --> ['{"attr":"hi"}', '{"attr":"there"}']
-		{"attr":"hi"} --> ['{"attr":"hi"}']
-		[] --> []
-		null --> []
-		undefined --> []
-
-		Object members which are functions are dropped
+	"" --> []
+	"hi" --> ["hi"]
+	["hi", "there"] --> ["hi", "there"]
+	[{"attr":"hi"}, {"attr":"there"}] --> ['{"attr":"hi"}', '{"attr":"there"}']
+	{"attr":"hi"} --> ['{"attr":"hi"}']
+	[] --> []
+	null --> []
+	undefined --> []
+	Object members which are functions are dropped
 	*/
 
-	//Implementing this in imperative style ends up in a very funny stair-like code
-	let isBasicType = R.flip(R.includes)(['boolean', 'number', 'string']),
-		f = R.ifElse(x => isBasicType(typeof x[0]), R.identity, x => R.map(val => JSON.stringify(val), x)),
-		g = R.ifElse(Array.isArray, f, x => [x]),
-		h = R.ifElse(isObject, x => [JSON.stringify(x)], g),
-		k = R.ifElse(R.anyPass([R.isNil, R.isEmpty]), x => [], h)
+	Object.keys(obj).forEach( (key) => {
 
-	obj = R.filter(v => typeof(v) != 'function', obj)
-	return R.map(k, obj)
+		if (!obj[key]) {
+			obj[key] = []
+		}
 
+		switch (typeof obj[key]) {
+
+		case 'string': obj[key] = [obj[key]]
+			break
+
+		case 'object':
+			if (Array.isArray(obj[key])) {
+
+				let arr = []
+				obj[key].forEach( (item) => {
+					if (typeof item === 'string') {
+						arr.push(item)
+					} else if (typeof item === 'object') {
+						let str = JSON.stringify(item)
+						arr.push(str)
+					}
+				})
+				obj[key] = arr
+
+			} else {
+				obj[key] = [JSON.stringify(obj[key])]
+			}
+			break
+		
+		case 'function': 
+			delete obj[key]
+			break
+		
+		}
+		
+		
+
+		
+	})
+
+	return obj
 }
+
 
 function encrypt(obj) {
 

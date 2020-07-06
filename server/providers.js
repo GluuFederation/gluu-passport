@@ -127,7 +127,10 @@ function parseProp(value) {
 		if (typeof value == 'string') {
 			value = JSON.parse(value)
 		}
-	} catch (e) {
+	} catch (err) {
+		// not an error. For datatypes other than string, 
+		// the original parameter value is returned
+
 	}
 	return value
 

@@ -3,7 +3,6 @@ const
 	winston = require('winston'),
 	dailyRotateFile = require('winston-daily-rotate-file'),
 	Stomp = require('stomp-client'),
-	dateFormat = require('dateformat'),
 	util = require('util'),
 	R = require('ramda'),
 	misc = require('./misc'),
@@ -34,7 +33,7 @@ const
 	})
 
 logger.stream = {
-	write: (message, enc) => log2('info', message.trim())
+	write: (message) => log2('info', message.trim())
 }
 
 var transport, fileTransport, consoleTransport
@@ -79,6 +78,7 @@ function configure(cfg) {
 			}
 
 			transport = new dailyRotateFile(R.assoc('level', level, defaultLogOptions))
+			// eslint-disable-next-line no-unused-vars
 			transport.on('rotate', function(oldFilename, newFilename) {
 				//remove method flushes passport.log file
 				logger.remove(fileTransport)
@@ -103,6 +103,8 @@ function configure(cfg) {
 			}
 			stompClient = new Stomp(MQDetails)
 			stompClient.connect(
+
+				// eslint-disable-next-line no-unused-vars
 				sessionId => logger.info('Connected to STOMP server')
 				//, The error callback is called successively until the connection succeeds...
 				//e => logger.error(`Error connecting to STOMP server: ${e.message}`)
@@ -138,7 +140,7 @@ function log2(level, msg) {
 	msg = R.defaultTo('', msg)
 
 	//Convert arguments to a real array (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/arguments#Description)
-	args = [].slice.call(arguments)
+	var args = [].slice.call(arguments)
 	args[0] = level
 	args[1] = msg
 
