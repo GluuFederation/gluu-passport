@@ -18,7 +18,8 @@ function getTokenEndpoint(umaConfigURL) {
 				logger.log2('info', 'getTokenEndpoint. Found endpoint at %s', endpoint)
 				return endpoint
 			} else {
-				logger.log2('error', 'getTokenEndpoint. No token endpoint was found')
+				let msg = 'getTokenEndpoint. No token endpoint was found'
+				logger.log2('error', msg)
 				throw new Error(msg)
 			}
 		})
@@ -71,18 +72,19 @@ function doRequest(options) {
 	return reqp(options)
 		.then(response => {
 			switch (response.statusCode) {
-			case 401:
+			case 401: {
 				let parsed = new parsers.WWW_Authenticate(response.headers['www-authenticate'])
 				logger.log2('verbose', `getConfiguration. Got www-authenticate in header with ticket ${parsed.parms.ticket}`)
 				return parsed.parms
-				break
-			case 200:
+			}
+			case 200: {
 				logger.log2('info', 'getConfiguration. Passport configs received')
 				logger.log2('silly', `getConfiguration. Passport configs are: ${response.body}`)
 				return JSON.parse(response.body)
-				break
-			default:
+			}
+			default: {
 				throw new Error(`Received unexpected HTTP status code of ${response.statusCode}`)
+			}
 			}
 		})
 }
