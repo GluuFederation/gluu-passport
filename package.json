@@ -48,7 +48,7 @@
     "winston-daily-rotate-file": "^3.6.0",
     "www-authenticate": "^0.6.2"
   },
-  "description": "Find the docs of this project at:",
+  "description": "Find the docs of this project at: https://gluu.org/docs/gluu-server/authn-guide/passport/",
   "main": "server/app.js",
   "directories": {
     "test": "test"
@@ -59,7 +59,7 @@
     "url": "git+https://github.com/GluuFederation/gluu-passport.git"
   },
   "author": "",
-  "license": "ISC",
+  "license": "Apache2",
   "bugs": {
     "url": "https://github.com/GluuFederation/gluu-passport/issues"
   },
