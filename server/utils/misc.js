@@ -29,8 +29,15 @@ const hasData = (list, obj) => pathsHaveData(R.map(x => [x], list), obj)
 
 const privateKey = R.once(() =>
 	fs.readFileSync(global.basicConfig.keyPath, 'utf8')
-		.replace('-----BEGIN RSA PRIVATE KEY-----', '-----BEGIN PRIVATE KEY-----')
-		.replace('-----END RSA PRIVATE KEY-----', '-----END PRIVATE KEY-----'))
+		.replace(
+			'-----BEGIN RSA PRIVATE KEY-----', 
+			'-----BEGIN PRIVATE KEY-----'
+		)
+		.replace(
+			'-----END RSA PRIVATE KEY-----', 
+			'-----END PRIVATE KEY-----'
+		)
+)
 
 const defaultRpOptions = R.once(() => ({
 	algorithm: global.basicConfig.keyAlg,
@@ -48,7 +55,9 @@ const secretKey = R.once(() => {
 
 const getRpJWT = payload => jwt.sign(payload, privateKey(), defaultRpOptions())
 
-const getJWT = (payload, expSec) => jwt.sign(payload, secretKey(), { expiresIn: expSec })
+const getJWT = (payload, expSec) => jwt.sign(
+	payload, secretKey(), { expiresIn: expSec }
+)
 
 const verifyJWT = token => jwt.verify(token, secretKey())
 
@@ -83,8 +92,18 @@ function arrify(obj) {
 				obj[key] = [JSON.stringify(obj[key])]
 			}
 			break
+		
+		case 'function': 
+			delete obj[key]
+			break
+		
 		}
+		
+		
+
+		
 	})
+	
 	return obj
 }
 
