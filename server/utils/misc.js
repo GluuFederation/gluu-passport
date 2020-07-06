@@ -62,6 +62,19 @@ const getJWT = (payload, expSec) => jwt.sign(
 const verifyJWT = token => jwt.verify(token, secretKey())
 
 function arrify(obj) {
+	/* This functions aims at transforming every key value
+	 of an object in the following way:
+
+	"" --> []
+	"hi" --> ["hi"]
+	["hi", "there"] --> ["hi", "there"]
+	[{"attr":"hi"}, {"attr":"there"}] --> ['{"attr":"hi"}', '{"attr":"there"}']
+	{"attr":"hi"} --> ['{"attr":"hi"}']
+	[] --> []
+	null --> []
+	undefined --> []
+	Object members which are functions are dropped
+	*/
 
 	Object.keys(obj).forEach( (key) => {
 
@@ -103,7 +116,7 @@ function arrify(obj) {
 
 		
 	})
-	
+
 	return obj
 }
 
