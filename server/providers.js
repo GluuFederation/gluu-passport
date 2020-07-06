@@ -128,7 +128,9 @@ function parseProp(value) {
 			value = JSON.parse(value)
 		}
 	} catch (err) {
-		logger.log2('error', `An error occurred: ${err}`)
+		// not an error. For datatypes other than string, 
+		// the original parameter value is returned
+
 	}
 	return value
 
