@@ -89,11 +89,10 @@ describe('misc.arrify', () => {
 	it(' { key: function() { return 0; }, key2: "hi" } --> { key2: ["hi"] }' ,
 		() => {
 			assert.deepEqual(
-				misc.arrify(
-					{ key: function() { return 0 }, key2: 'hi' },
-					{ key2: ['hi'] }
-				)
+				misc.arrify({ key: function() { return 0 }, key2: 'hi' }),
+				{ key2: ['hi'] }
 			)
+			
 		})
 	
 	
