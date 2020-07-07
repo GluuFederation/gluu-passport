@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "NODE_ENV=production node server/app.js",
-    "test" : "mocha",
+    "test": "mocha --require test/bootstrap.js test/config.test.js test/*.test.js",
     "dev": "NODE_ENV=development node server/app.js",
     "lint": "eslint server/**/*.js"
   },
@@ -13,7 +13,6 @@
     "@sokratis/passport-linkedin-oauth2": "^2.1.0",
     "bluebird": "^3.5.3",
     "body-parser": "^1.18.3",
-    "chai": "^4.2.0",
     "config": "^3.3.1",
     "cookie-parser": "^1.4.4",
     "dateformat": "^3.0.3",
@@ -23,7 +22,6 @@
     "jsonwebtoken": "^8.4.0",
     "memcached": "^2.2.2",
     "memorystore": "^1.6.0",
-    "mocha": "^8.0.1",
     "morgan": "^1.9.1",
     "openid-client": "^3.14.0",
     "passport": "^0.4.0",
@@ -53,7 +51,12 @@
   "directories": {
     "test": "test"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^8.0.1",
+    "nock": "^13.0.2",
+    "supertest": "^4.0.2"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/GluuFederation/gluu-passport.git"
