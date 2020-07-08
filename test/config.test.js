@@ -4,13 +4,16 @@ const fs = require('fs');
 const nock = require('nock');
 const uuid = require('uuid');
 const jwt = require('jsonwebtoken');
+const request = require('supertest');
+const sinon = require('sinon');
+const misc = require('../server/utils/misc');
 
 /**
  * Testing config
  */
 const passportConfig = {
-	"configurationEndpoint": "https://gluu.local.org/identity/restv1/passport/config",
-	"failureRedirectUrl": "https://gluu.local.org/oxauth/auth/passport/passportlogin.htm",
+	"configurationEndpoint": "https://gluu.test.local.org/identity/restv1/passport/config",
+	"failureRedirectUrl": "https://gluu.test.local.org/oxauth/auth/passport/passportlogin.htm",
 	"logLevel": "info",
 	"consoleLogOnly": false,
 	"clientId": "1502.3fe76d0a-38dd-4f91-830b-e33fd70d778a",
@@ -29,7 +32,7 @@ const ticket = '016f84e8-f9b9-11e0-bd6f-0021cc6004de';
 
 // generate new passport config file
 fs.writeFileSync(passportConfigFile, JSON.stringify(passportConfig));
-process.env.passport_file = passportConfigFile;
+process.env.passport_config_file = passportConfigFile;
 process.env.config_update_timer = 600000;
 
 // passport certs
@@ -77,7 +80,7 @@ after((done) => {
 	done();
 });
 
-describe('defaultcfg', function() {
+describe('defaultcfg', function () {
 	it('default.json should have passportFile not null or undefined', () => {
 		assert.exists(defaultcfg.passportFile, 'passportFile is not null or undefined')
 	});
@@ -87,7 +90,7 @@ describe('defaultcfg', function() {
 	})
 });
 
-describe('productioncfg', function() {
+describe('productioncfg', function () {
 	it('production.json should have passportFile  not null or undefined', () => {
 		assert.exists(productioncfg.passportFile, 'passportFile is not null or undefined')
 	});
@@ -99,24 +102,26 @@ describe('productioncfg', function() {
 /**
  * Todo: Testing purpose temporarily added app test here
  */
+let app = null;
 describe('App', () => {
 
 	after((done) => {
-		// app.close(done);
+		app.close(done);
 		done();
 	});
 
 	it('Health Check', (done) => {
 		expect('test').to.equal('test');
-		done();
-		// request(app)
-		//     .get('/')
-		//     .expect(200)
-		//     .end((err, res) => {
-		//         if (err) throw done(err);
-		//
-		//         done();
-		//     });
+		app = require('../server/app');
+		// Todo need to fix server start issue
+		request(app)
+			.get('/')
+			.expect(200)
+			.end((err, res) => {
+				if (err) throw done(err);
+
+				done();
+			});
 	});
 
 });
@@ -125,9 +130,7 @@ function mockIDP() {
 	// mock configuration endpoint and get ticket
 	console.log('mock configuration endpoint and get ticket');
 	let passportConfigResponseHeader = {
-		'www-authenticate': `UMA realm="example",
-    as_uri=${idpURL},
-    ticket=${ticket}`,
+		'www-authenticate': `UMA realm="example", as_uri=${idpURL}, ticket=${ticket}`,
 	};
 	nock(idpURL)
 		.get(idpPassportConfigPath)
@@ -147,14 +150,13 @@ function mockIDP() {
 	console.log('mock token endpoint')
 	const clientId = passportConfig.clientId;
 	const now = new Date().getTime();
-	const token = getRpJWT({
-		iss: clientId,
-		sub: clientId,
-		aud: tokenEndpoint,
-		jti: uuid(),
-		exp: now / 1000 + 30,
-		iat: now
-	});
+	const token = 'eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCIsImtpZCI6ImZiYzI2N2VmLTA3MDUtNGIzYS04YzgwLWJmNzBlNzVjZjA4Yl9zaWdfcnM1MTIifQ.eyJpc3MiOiIxNTAyLjNmZTc2ZDBhLTM4ZGQtNGY5MS04MzBiLWUzM2ZkNzBkNzc4YSIsInN1YiI6IjE1MDIuM2ZlNzZkMGEtMzhkZC00ZjkxLTgzMGItZTMzZmQ3MGQ3NzhhIiwiYXVkIjoiaHR0cHM6Ly9nbHV1LnRlc3QubG9jYWwub3JnL294YXV0aC9yZXN0djEvdG9rZW4iLCJqdGkiOiIwZGQzNGI3My0zMTA2LTRhZmUtYmFiMS02YTlmYWQ0MGViN2UiLCJleHAiOjE1OTQyMDg5NDAuODUzLCJpYXQiOjE1OTQyMDg5MTA4NTN9.VA--wKcNoq8bNzaTW1QxaexPWwDfQkHg3ti-EbYnrwaMuayEecH_uZlhxC-1TZJfKDhAzaylevoOnS_ihgMXJ_fFAgfEnqPO2TgcjI8MEnyvbiTnJNtWAz7iptbrs4gurO_9wjJLe9Z0b8XmngqwVz0rkNGnmSA49ryAcA4ndF3z_zx5MY2kvu4MQhP7ofJt3f0AST4XipUMYVyB8Ohfe_oXnTs1WVbbZCw_1Rl-f9nBTprGoQMCrmgnbPFKvD-rs-8XVm3vt2dQNsBvfcUOl8Zmz_Mfmu5JMO2uQfXRDkW96W3OXjU7rzsd2sZbU1rUcZy_-dqQ7R-pqIcJoUIZ2A';
+
+	// mock misc.getRpJWT
+	sinon
+	.mock(misc)
+	.expects('getRpJWT')
+	.returns(token);
 
 	const rptTokenRequest = {
 		grant_type: 'urn:ietf:params:oauth:grant-type:uma-ticket',
@@ -176,49 +178,63 @@ function mockIDP() {
 
 	// mock configuration endpoint and get response
 	console.log('mock configuration endpoint and get response');
+	
 	const passportConfigResponse = {
-		conf: {
-			logging: {},
-			serverURI: 'http://localhost',
-			serverWebPort: 8
+		"conf": {
+			"serverURI": "https://gluu.test.local.org",
+			"serverWebPort": 8090,
+			"postProfileEndpoint": "https://gluu.test.local.org/oxauth/postlogin.htm",
+			"spTLSCert": "/etc/certs/passport-sp.crt",
+			"spTLSKey": "/etc/certs/passport-sp.key",
+			"logging": {
+				"level": "info",
+				"consoleLogOnly": false,
+				"activeMQConf": {
+					"enabled": false,
+					"host": "",
+					"username": "",
+					"password": "",
+					"port": 0
+				}
+			}
 		},
-		providers: {
-
-		}
+		"idpInitiated": {
+			"openidclient": {
+				"authorizationEndpoint": "https://gluu.test.local.org/oxauth/restv1/authorize",
+				"clientId": "1503.6a319ccf-c801-4fd8-a11a-a9e0c8e92322",
+				"acrValues": "passport_saml"
+			},
+			"authorizationParams": []
+		},
+		"providers": [{
+			"id": "cedev6",
+			"displayName": "ce-dev6-passport",
+			"type": "openidconnect",
+			"mapping": "openidconnect-default",
+			"passportStrategyId": "passport-openidconnect",
+			"enabled": true,
+			"callbackUrl": "https://gluu.test.local.org/passport/auth/cedev6/callback",
+			"requestForEmail": false,
+			"emailLinkingSafe": false,
+			"options": {
+				"userInfoURL": "https://gluu.test.ce6.local.org/oxauth/restv1/userinfo",
+				"clientID": "b4e0f241-a8c1-4c75-8fc8-4ae7163e9695",
+				"tokenURL": "https://gluu.test.ce6.local.org/oxauth/restv1/token",
+				"authorizationURL": "https://gluu.test.ce6.local.org/oxauth/restv1/authorize",
+				"scope": "[\"openid\", \"email\", \"profile\"]",
+				"clientSecret": "Admin1Admin!",
+				"issuer": "https://gluu.test.ce6.local.org"
+			}
+		}]
 	};
 
 	const reqheaders = {
 		authorization: `Bearer ${rptTokenResponse.access_token}`,
 		pct: rptTokenResponse.pct
 	};
-
 	nock(idpURL, {
 		reqheaders
 	})
 		.get(idpPassportConfigPath)
-		.reply(401, '', passportConfigResponse);
+		.reply(200, passportConfigResponse);
 }
-
-
-const privateKey = R.once(() =>
-	fs.readFileSync(passportConfig.keyPath, 'utf8')
-		.replace(
-			'-----BEGIN RSA PRIVATE KEY-----',
-			'-----BEGIN PRIVATE KEY-----'
-		)
-		.replace(
-			'-----END RSA PRIVATE KEY-----',
-			'-----END PRIVATE KEY-----'
-		)
-);
-
-const defaultRpOptions = R.once(() => ({
-	algorithm: passportConfig.keyAlg,
-	header: {
-		typ: 'JWT',
-		alg: passportConfig.keyAlg,
-		kid: passportConfig.keyId
-	}
-}));
-
-const getRpJWT = payload => jwt.sign(payload, privateKey(), defaultRpOptions());
