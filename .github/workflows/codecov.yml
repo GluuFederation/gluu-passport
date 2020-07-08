@@ -20,7 +20,7 @@ jobs:
   build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-    
+
     strategy:
       matrix:
         node-version: [12.x, 14.x]
@@ -33,12 +33,17 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
+    - name: Mocking files
+      run: |
+        mkdir -p /opt/gluu-server/etc/gluu/conf
+        touch /opt/gluu-server/etc/gluu/conf/salt
+        echo "encodeSalt = xdFq7ESeydarn39v51YAT5bm" > /opt/gluu-server/etc/gluu/conf
     - name: Generate coverage report
       run: |
         npm ci
         npm run build --if-present
         npm run report-2
-        
+
     - name: Upload to codecov
       uses: codecov/codecov-action@v1.0.10
-     
+
