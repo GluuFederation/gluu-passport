@@ -9,6 +9,17 @@ const
 
 function createAuthzRequest(user, iiconfig, provider) {
 
+
+	function replaceAllDotsWithUnderscore(jwt){
+		/* This function is a workaround due some problems
+		as reported in issue:
+		https://github.com/GluuFederation/gluu-passport/issues/95
+		TODO: - Remove after fixed in oxauth
+		*/
+		let state = jwt.split('.').join('_')
+		return state
+	}
+
 	let req = R.find(R.propEq('provider', provider), iiconfig.authorizationParams)
 
 	if (!req) {
@@ -34,7 +45,9 @@ function createAuthzRequest(user, iiconfig, provider) {
 		let extraParams = R.unless(misc.isObject, () => {}, req.extraParams)
 		req = R.omit(['provider', 'extraParams'], req)
 
-		req.state = jwt
+		req.state = replaceAllDotsWithUnderscore(jwt)
+
+		// req.state = req.state.split('.').join('_')
 		req.response_type = R.defaultTo('code', req.response_type)
 
 		req.scope = R.defaultTo('openid', req.scope)
