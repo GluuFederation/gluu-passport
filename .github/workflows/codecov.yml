@@ -39,8 +39,11 @@ jobs:
       run: |
         npm ci
         npm run build --if-present
-        npm run report-2
+        npm test
+        npm run generate-coverage
 
     - name: Upload to codecov
       uses: codecov/codecov-action@v1.0.10
+        with:
+          file: ./coverage.lcov
 

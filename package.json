@@ -7,7 +7,7 @@
     "test": "NODE_ENV=test nyc mocha",
     "dev": "NODE_ENV=development node server/app.js",
     "lint": "eslint server/**/*.js",
-    "report-coverage": "NODE_ENV=test nyc report --reporter=text-lcov > ./coverage/coverage.lcov && codecov",
+    "generate-coverage": "NODE_ENV=test nyc report --reporter=text-lcov > coverage.lcov",
     "report-2": "NODE_ENV=test nyc mocha --report lcovonly -R spec && codecov"
   },
   "dependencies": {
