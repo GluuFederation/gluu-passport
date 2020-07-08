@@ -8,7 +8,7 @@ const
 	logger = require('./utils/logging')
 
 function createAuthzRequest(user, iiconfig, provider) {
-
+	logger.log2('debug', 'idp-initiated.createAuthzRequest: entered function ')
 
 	function replaceAllDotsWithUnderscore(jwt){
 		/* This function is a workaround due some problems
@@ -41,10 +41,7 @@ function createAuthzRequest(user, iiconfig, provider) {
 				iat: now,
 				data: misc.encrypt(user)
 			})
-		logger.log2(
-			'debug',
-			`createAuthzRequest. jwt = ${JSON.stringify(jwt, null, 4)}`
-		)
+		logger.log2('debug', `createAuthzRequest. jwt = ${JSON.stringify(jwt, null, 4)}`)
 		let extraParams = R.unless(misc.isObject, () => {}, req.extraParams)
 		req = R.omit(['provider', 'extraParams'], req)
 

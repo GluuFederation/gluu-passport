@@ -6,10 +6,7 @@ const sinon = require('sinon')
 const assert = chai.assert
 const config = require('config')
 const passportFile = config.get('passportFile')
-const sha1 = require('sha1')
-
-
-
+const helper = require('./helper.js')
 
 /* This is how passportFile looks like
 {
@@ -204,6 +201,7 @@ describe('idp-initiated.createAuthzRequest', () => {
 		idp_initiated.__set__('config', conf)
 		idp_initiated.__set__('basicConfig', basicConfig)
 		idp_initiated.__set__('jwt', jwt)
+		// idp_initiated.__set__('logger', logger)
 	})
 
 	it('createAuthzRequest should exist', () => {
