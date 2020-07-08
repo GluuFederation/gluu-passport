@@ -10,9 +10,10 @@ var rpt
 
 function getTokenEndpoint(umaConfigURL) {
 
-	logger.log2('verbose', 'getTokenEndpoint called')
+	logger.log2('verbose', 'getTokenEndpoint called for ' + umaConfigURL)
 	return reqp({ uri: umaConfigURL, json: true })
 		.then(obj => {
+			logger.log2('debug', `getTokenEndpoint. obj = ${JSON.stringify(obj)}`)
 			let endpoint = obj.token_endpoint
 			if (endpoint) {
 				logger.log2('info', 'getTokenEndpoint. Found endpoint at %s', endpoint)
@@ -51,9 +52,10 @@ function getRPT(ticket, token_endpoint) {
 				ticket: ticket
 			}
 		}
-
+	logger.log2('debug',`getRPT request options = ${JSON.stringify(options,null,4)}`)
 	return reqp(options)
 		.then(rptDetails => {
+			logger.log2('debug', `getRPT. response: ${JSON.stringify(rptDetails,null,4)}`)
 			logger.log2('info', 'getRPT. RPT details were received')
 			logger.log2('debug', `getRPT. Access token is ${rptDetails.access_token}`)
 			return rptDetails
@@ -69,17 +71,21 @@ function doRequest(options) {
 		}
 		options.headers = R.mergeRight(options.headers, headers)
 	}
+	logger.log2('debug', `doRequest. options = ${JSON.stringify(options,null,4)}`)
 	return reqp(options)
 		.then(response => {
+			logger.log2('debug',`doRequest. response is: ${JSON.stringify(response,null,4)} `)
 			switch (response.statusCode) {
 			case 401: {
 				let parsed = new parsers.WWW_Authenticate(response.headers['www-authenticate'])
 				logger.log2('verbose', `getConfiguration. Got www-authenticate in header with ticket ${parsed.parms.ticket}`)
+				logger.log2('debug', `getConfiguration. Reponse Headers ${JSON.stringify(response.headers,null,4)}`)
+				logger.log2('debug', `getConfiguration. parsed.params = ${parsed.params}`)
 				return parsed.parms
 			}
 			case 200: {
 				logger.log2('info', 'getConfiguration. Passport configs received')
-				logger.log2('silly', `getConfiguration. Passport configs are: ${response.body}`)
+				logger.log2('debug', `getConfiguration. Passport configs are: ${response.body}`)
 				return JSON.parse(response.body)
 			}
 			default: {
@@ -117,6 +123,7 @@ function request(options) {
 	let fn = val => {
 		if (misc.hasData(['ticket', 'as_uri'], val)) {
 			return processUnauthorized(val.ticket, val.as_uri, options)
+
 		} else {
 			logger.log2('info', 'Response received')
 			return val
