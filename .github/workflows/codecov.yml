@@ -38,6 +38,37 @@ jobs:
         mkdir -p /opt/gluu-server/etc/gluu/conf
         touch /opt/gluu-server/etc/gluu/conf/salt
         echo "encodeSalt = xdFq7ESeydarn39v51YAT5bm" > /opt/gluu-server/etc/gluu/conf/salt
+        mkdir -P /etc/certs
+        touch /etc/certs/passport-rp.pem
+        echo "-----BEGIN RSA PRIVATE KEY-----" >> /etc/certs/passport-rp.pem
+        echo "MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDmfPz4FJQq95DN" >> /etc/certs/passport-rp.pem
+        echo "Ghyb22gDkmHRzzGeh5V6qOkSvTvUIUvUmvxhpBWaBsEYfbEfq7caXKroQCIv29oc" >> /etc/certs/passport-rp.pem
+        echo "nVLbbKcdzp988uer/+bsYObwFfyko5yeTZHRMBoVKcvSrOkbhTCIjS6OkxzGDivD" >> /etc/certs/passport-rp.pem
+        echo "9C1m/oI0a7X87XntfmLwKfVWu+X/Mk8dGrx2Ph2iYSahrLKMJh8SIysHYJEVq8iS" >> /etc/certs/passport-rp.pem
+        echo "PMRWUVkeqd55GWz+Jbj6dYMjuBrdXEYEa4o4cvA4WCPIXvIAAQtrDf7thHdSEwH6" >> /etc/certs/passport-rp.pem
+        echo "OZjJyw+CdrjK6JyQWr40TPrhjGEJZFKJn9VbVXE5Bl8t1lS0fzl2KEyGXGcaHbdY" >> /etc/certs/passport-rp.pem
+        echo "FvIwSy87AgMBAAECggEAPgXJPuquumc3EHIj267tbPShnQdfx1Sd3U2Btpi0dk9l" >> /etc/certs/passport-rp.pem
+        echo "a/cuzgmNBI8nu/LqzGZ1VcM0/F1xtaY4KbYOG1zAFa3JziJBRFAO8HHdAyMvgpBC" >> /etc/certs/passport-rp.pem
+        echo "b3jZMcz7X9GI9w6vhcfP+Rbgvd4JgqRCk67r3sjC+d84MDEpO8bkUdNAoU/bwtFg" >> /etc/certs/passport-rp.pem
+        echo "o8GgAN9bQrROrZGHlQVn391UdK+HeOpukj3T0/gjuugGeIOWR29BlwfY0ITuhE9d" >> /etc/certs/passport-rp.pem
+        echo "rIU0/ViaiHZ7gWWQBoP5ABGI1TSB3ttgjBIsnWfLQ2soCemBuhMyEcGGCM7IAELj" >> /etc/certs/passport-rp.pem
+        echo "H+r7l8P/CJNJ4W4/2F7QpzEQieV9rs5BSuD78fHbpQKBgQD4cTGP6puv/8AgN26t" >> /etc/certs/passport-rp.pem
+        echo "PyaPsTr+8L/ut6zoZZIVu31REC/B6K9qhmcSC79s53kLu/uGQnx9tPmzklFC8EFO" >> /etc/certs/passport-rp.pem
+        echo "+6vqhecXVl86H/0p9WUyxPkl2IXWdc6P73OQZd7NXNhGXM9nOnchwuBVjNpM0Rpg" >> /etc/certs/passport-rp.pem
+        echo "QBzh10rF2DXW2PxW/l/tQ/pIxQKBgQDtf/lKWr0g+1JkhJYLaym+3x1l/GWfqv+A" >> /etc/certs/passport-rp.pem
+        echo "BE5UQlLXhWPJmKprwNVKKaXaTqgRju7mIB3QBh4oLCnRtnzxoM1qov52yfvCCtoN" >> /etc/certs/passport-rp.pem
+        echo "l3CY3E6ArCnAePLj0ocYImmQkI8EpS4aTuONuB+JxPnCYdeNq83429+oGNnyK0Fi" >> /etc/certs/passport-rp.pem
+        echo "E3AnYNcX/wKBgQDaOaNNRMhoOf+qzMYcy2G1yfmGQjZ1G0V4BO/iwwN6lvs8GoUq" >> /etc/certs/passport-rp.pem
+        echo "zs/uW/9TS6dZlU+ESRZM3RCQmS9j2uGi3RHPOLsaFrYiukKH/pNbmwU2JxC4plZA" >> /etc/certs/passport-rp.pem
+        echo "vBYIelLQlIMsmw1bIVHPh/vBaa2+19WRQf+cqJ13V0lDZOmSCHJ+WL2Z+QKBgDeP" >> /etc/certs/passport-rp.pem
+        echo "zN5cRArHQQtLCV86ftWslNAbMBsegg+M8lY7/e11w1aSZKw4vK1Q+QANjrws2C72" >> /etc/certs/passport-rp.pem
+        echo "LINSKxPy4QWyz6AnombkIuvfbQqER2cOmsToJWVs4YepxAkQY5J92nx7lTnc+uAk" >> /etc/certs/passport-rp.pem
+        echo "vI+XF6m/bz7ObQMzwkgKCFTnG3XQMMelDIPp3+g5AoGBAJovuN/aFNAby4s7durj" >> /etc/certs/passport-rp.pem
+        echo "QUPKOTjkNMrUomxEczUheRK06WVh9NfHDaQHVXa+wugDCeyw7Vmmf0/85KZJeBiC" >> /etc/certs/passport-rp.pem
+        echo "JOOQ2WZVO2/7WKDu5HZ6G/xyEr+C+uHAXma12kK3q5Ul2YKOOdfBpG3MHcekBgyB" >> /etc/certs/passport-rp.pem
+        echo "b8cGQWiP+SB+pDP/ZLDhUCsW" >> /etc/certs/passport-rp.pem
+        echo "-----END RSA PRIVATE KEY-----" >> /etc/certs/passport-rp.pem
+
     - name: Generate coverage report
       run: |
         npm ci
