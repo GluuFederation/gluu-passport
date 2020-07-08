@@ -8,6 +8,7 @@ const
 	logger = require('./utils/logging')
 
 function createAuthzRequest(user, iiconfig, provider) {
+	
 	logger.log2('debug', 'idp-initiated.createAuthzRequest: entered function ')
 
 	function replaceAllDotsWithUnderscore(jwt){
