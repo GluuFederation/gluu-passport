@@ -38,7 +38,6 @@ jobs:
         mkdir -p /opt/gluu-server/etc/gluu/conf
         touch /opt/gluu-server/etc/gluu/conf/salt
         echo "encodeSalt = xdFq7ESeydarn39v51YAT5bm" > /opt/gluu-server/etc/gluu/conf/salt
-        mkdir -p /etc/certs
         touch /etc/certs/passport-rp.pem
         echo "-----BEGIN RSA PRIVATE KEY-----" >> /etc/certs/passport-rp.pem
         echo "MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDmfPz4FJQq95DN" >> /etc/certs/passport-rp.pem
