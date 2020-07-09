@@ -5,20 +5,23 @@ const
 	providersModule = require('./providers'),
 	webutil = require('./utils/web-utils'),
 	misc = require('./utils/misc'),
-	logger = require('./utils/logging')
+	logger = require('./utils/logging'),
+	base64url = require('base64url')
+
 
 function createAuthzRequest(user, iiconfig, provider) {
 
 	logger.log2('debug', 'idp-initiated.createAuthzRequest: entered function ')
 
-	function replaceAllDotsWithUnderscore(jwt){
+	function encodeBase64Url(jwt){
 		/* This function is a workaround due some problems
 		as reported in issue:
 		https://github.com/GluuFederation/gluu-passport/issues/95
 		TODO: - Remove after fixed in oxauth
 		*/
-		let state = jwt.split('.').join('_')
-		return state
+		let b64_encoded = base64url(jwt)
+		
+		return b64_encoded
 	}
 
 	let req = R.find(R.propEq(
@@ -55,9 +58,8 @@ function createAuthzRequest(user, iiconfig, provider) {
 		let extraParams = R.unless(misc.isObject, () => {}, req.extraParams)
 		req = R.omit(['provider', 'extraParams'], req)
 
-		req.state = replaceAllDotsWithUnderscore(jwt)
+		req.state = encodeBase64Url(jwt)
 
-		// req.state = req.state.split('.').join('_')
 		req.response_type = R.defaultTo('code', req.response_type)
 
 		req.scope = R.defaultTo('openid', req.scope)

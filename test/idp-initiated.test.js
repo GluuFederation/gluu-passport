@@ -7,6 +7,8 @@ const assert = chai.assert
 const config = require('config')
 // const passportFile = config.get('passportFile')
 const helper = require('./helper.js')
+const base64url = require('base64url')
+const jwt = require('jsonwebtoken')
 
 /* This is how passportFile looks like
 {
@@ -32,7 +34,8 @@ const helper = require('./helper.js')
 
 // consts to mock
 
-const jwt = 'eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCIsImtpZCI6IjM2NjU4ZTAzLTM0ZWEt'+
+const mocked_jwt_string = 
+'eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCIsImtpZCI6IjM2NjU4ZTAzLTM0ZWEt'+
 'NDc0NS1hZDQzLTk1OTkxNmM5NmRlZl9zaWdfcnM1MTIifQ.eyJpc3MiOiJodHRwczovL2NocmlzL'+
 'mdsdXV0aHJlZS5vcmciLCJzdWIiOlsidGVzdGVyMyJdLCJhdWQiOiIxNTAzLmYxOTE3ZjZmLWIxN'+
 'TUtNDJlMC05YmQxLTk5ZDU2ZjVjM2I1MCIsImp0aSI6IjMxYTFmNGUwLTE5YzUtNDMwMi1hYzE4L'+
@@ -124,6 +127,25 @@ describe('idp-initiated.createAuthzRequest', () => {
 			createAuthzRequest(
 				valid_user, valid_iiconfig, valid_provider
 			).state, '.')
+	})
+
+	it('workaround: decoded req.state should have all jwt keys', () => {
+	
+
+		let b64url_state = createAuthzRequest(
+			valid_user,valid_iiconfig,valid_provider).state
+		
+		let jwt_string = base64url.decode(b64url_state)
+		
+		let decoded_jwt = jwt.decode(jwt_string)
+		
+		assert.hasAllKeys(
+			decoded_jwt,
+			['iss','sub','aud','jti','exp','iat','data'],
+			'decoded req.state has all keys:'+
+			'iss, sub, aud, jti , exp, iat, data'
+		)
+
 	})
 
 	it('workaround: req.state should have underscores', () => {
