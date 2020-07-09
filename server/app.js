@@ -70,6 +70,7 @@ function recreateHttpServer(serverURI, port) {
 		httpServer.listen(port, () => {
 			logger.log2('info', `Server listening on ${serverURI}:${port}`)
 			console.log(`Server listening on ${serverURI}:${port}`)
+			module.exports = httpServer;
 		})
 	}
 
@@ -117,3 +118,4 @@ function init() {
 }
 
 init()
+module.exports = server;
