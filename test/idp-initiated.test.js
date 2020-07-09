@@ -34,7 +34,7 @@ const jwt = require('jsonwebtoken')
 
 // consts to mock
 
-const mocked_jwt_string = 
+const mocked_jwt_string =
 'eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCIsImtpZCI6IjM2NjU4ZTAzLTM0ZWEt'+
 'NDc0NS1hZDQzLTk1OTkxNmM5NmRlZl9zaWdfcnM1MTIifQ.eyJpc3MiOiJodHRwczovL2NocmlzL'+
 'mdsdXV0aHJlZS5vcmciLCJzdWIiOlsidGVzdGVyMyJdLCJhdWQiOiIxNTAzLmYxOTE3ZjZmLWIxN'+
@@ -73,7 +73,7 @@ describe('idp-initiated.createAuthzRequest', () => {
 	}
 
 	const valid_extraParams = {}
-	
+
 	const valid_iiconfig = {
 		authorizationParams: [{
 			provider : 'saml-yidpinitiated',
@@ -130,15 +130,15 @@ describe('idp-initiated.createAuthzRequest', () => {
 	})
 
 	it('workaround: decoded req.state should have all jwt keys', () => {
-	
+
 
 		let b64url_state = createAuthzRequest(
 			valid_user,valid_iiconfig,valid_provider).state
-		
+
 		let jwt_string = base64url.decode(b64url_state)
-		
+
 		let decoded_jwt = jwt.decode(jwt_string)
-		
+
 		assert.hasAllKeys(
 			decoded_jwt,
 			['iss','sub','aud','jti','exp','iat','data'],
@@ -148,8 +148,8 @@ describe('idp-initiated.createAuthzRequest', () => {
 
 	})
 
-	it('workaround: req.state should have underscores', () => {
-		assert.include(
+	it('workaround: req.state should not have underscores', () => {
+		assert.notInclude(
 			createAuthzRequest(
 				valid_user, valid_iiconfig, valid_provider
 			).state, '_')
