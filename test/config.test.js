@@ -103,20 +103,18 @@ describe('productioncfg', function () {
  * Todo: Testing purpose temporarily added app test here
  */
 describe('App', () => {
-	let app = null;
-
 	after((done) => {
 		app.close(done);
 	});
 
 	before((done) => {
-		app = require('../server/app');
+		global.app = require('../server/app');
 		setTimeout(() => {
 			app = require('../server/app');
 			// Call Endpoint
 			request(app)
-				.get('/')
-				.expect(404)
+				.get('/passport/health-check')
+				.expect(200)
 				.end((err, res) => {
 					if (err) return done(err);
 
@@ -128,12 +126,27 @@ describe('App', () => {
 	it('Health Check', (done) => {
 		expect('test').to.equal('test');
 		request(app)
-			.get('/')
-			.expect(404)
-			.end((err, res) => {
+			.get('/passport/token')
+			.expect(200)
+			.end((err, tokenResponse) => {
 				if (err) return done(err);
 
-				done();
+				request(app)
+					.get('/passport/auth/cedev6/' + tokenResponse.token_)
+					.expect(302)
+					.end((err, authRedirectResponse) => {
+						if (err) return done(err);
+						console.log(authRedirectResponse)
+						const code = "1234567890"
+						request(app)
+							.get('/passport/auth/cedev6/callback?code=' + code + '&state=1234567890')
+							.expect(302)
+							.end((err, passportAuthResponse) => {
+								if (err) return done(err);
+
+								done();
+							});
+					});
 			});
 	});
 

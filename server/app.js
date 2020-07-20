@@ -91,7 +91,6 @@ function reconfigure(cfg) {
 function pollConfiguration(configEndpoint) {
 	misc.pipePromise(confDiscovery.retrieve, reconfigure)(configEndpoint)
 		.catch(e => {
-			console.log('----poll configuration error ---', e);
 			logger.log2('error', e.toString())
 			logger.log2('debug', e.stack)
 			logger.log2('warn', 'An attempt to get configuration data will be tried again soon')
