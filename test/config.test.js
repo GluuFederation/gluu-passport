@@ -9,8 +9,8 @@ const data = require('./config-data');
  * Testing config
  */
 const passportConfig = data.passportConfig;
-const defaultcfg = require('../config/default.json');
-const productioncfg = require('../config/production.json');
+const defaultcfg = require('../config/default.js');
+const productioncfg = require('../config/production.js');
 const passportConfigFile = '/tmp/passport_config.json';
 const passportRPPEMFile = passportConfig.keyPath;
 const passportConfigURL = new URL(passportConfig.configurationEndpoint);
@@ -35,9 +35,13 @@ before((done) => {
 	// init and get/set all config
 	global.app = require('../server/app');
 
-	setTimeout(() => {
+	const serverStart = setInterval(() => {
 		// need again re-initialize, now server started
 		global.app = require('../server/app');
+
+		if(!app.address) {
+			return
+		}
 		// start the server and ready to request
 		request(app)
 			.get('/passport/health-check') // Calling Endpoint /passport/health-check
@@ -45,6 +49,7 @@ before((done) => {
 			.end((err, res) => {
 				if (err) return done(err);
 
+				clearInterval(serverStart);
 				done();
 			});
 	}, 500);
@@ -101,12 +106,27 @@ function mockIDP() {
 	// mock token endpoint
 	const clientId = passportConfig.clientId;
 	const now = new Date().getTime();
-	const token = 'eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCIsImtpZCI6ImZiYzI2N2VmLTA3MDUtNGIzYS04YzgwLWJmNzBlNzVjZjA4Yl9zaWdfcnM1MTIifQ.eyJpc3MiOiIxNTAyLjNmZTc2ZDBhLTM4ZGQtNGY5MS04MzBiLWUzM2ZkNzBkNzc4YSIsInN1YiI6IjE1MDIuM2ZlNzZkMGEtMzhkZC00ZjkxLTgzMGItZTMzZmQ3MGQ3NzhhIiwiYXVkIjoiaHR0cHM6Ly9nbHV1LnRlc3QubG9jYWwub3JnL294YXV0aC9yZXN0djEvdG9rZW4iLCJqdGkiOiIwZGQzNGI3My0zMTA2LTRhZmUtYmFiMS02YTlmYWQ0MGViN2UiLCJleHAiOjE1OTQyMDg5NDAuODUzLCJpYXQiOjE1OTQyMDg5MTA4NTN9.VA--wKcNoq8bNzaTW1QxaexPWwDfQkHg3ti-EbYnrwaMuayEecH_uZlhxC-1TZJfKDhAzaylevoOnS_ihgMXJ_fFAgfEnqPO2TgcjI8MEnyvbiTnJNtWAz7iptbrs4gurO_9wjJLe9Z0b8XmngqwVz0rkNGnmSA49ryAcA4ndF3z_zx5MY2kvu4MQhP7ofJt3f0AST4XipUMYVyB8Ohfe_oXnTs1WVbbZCw_1Rl-f9nBTprGoQMCrmgnbPFKvD-rs-8XVm3vt2dQNsBvfcUOl8Zmz_Mfmu5JMO2uQfXRDkW96W3OXjU7rzsd2sZbU1rUcZy_-dqQ7R-pqIcJoUIZ2A';
+	const token = 'eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCIsImtpZCI6IjM2NjU4ZTAzLTM0ZWEt'+
+	'NDc0NS1hZDQzLTk1OTkxNmM5NmRlZl9zaWdfcnM1MTIifQ.eyJpc3MiOiJodHRwczovL2NocmlzL'+
+	'mdsdXV0aHJlZS5vcmciLCJzdWIiOlsidGVzdGVyMyJdLCJhdWQiOiIxNTAzLmYxOTE3ZjZmLWIxN'+
+	'TUtNDJlMC05YmQxLTk5ZDU2ZjVjM2I1MCIsImp0aSI6IjMxYTFmNGUwLTE5YzUtNDMwMi1hYzE4L'+
+	'WY1OTk2YjcxYzVlNyIsImV4cCI6MTU5NDE4MDc2NC45OSwiaWF0IjoxNTk0MTgwNzM0OTkwLCJkY'+
+	'XRhIjoiQmVHMG1BU2lWUys2K3RUSDhUWFZNZ0lpOW9zTXFXTG1WVi9sMC9GSTdEWDBBQzRXQ3hlK'+
+	'1hhQWpiNnNPZWVBQksyUEIyUGVhZ0FSM3lQcExBSE52YjYvOUVpK1JjY3RlZ3haYUhEYlpRdEsyd'+
+	'GFzN3JPZlFFUmNkRDNKSFFXaWlneFphSERiWlF0Snpycml6WXV0TXNyUG9vVklpMG9ZajlTYWM3S'+
+	'k16a0NqWVNQM2dSU3phMXJaQUt5Mmw4VEVRejRxYVQxWjFzSHQ3TEpzem9OZTcvcmNLZ0pVM0wwb'+
+	'W1qbCtYNDkwRmJEVT0ifQ.G7O9uIP00vtsSsmjs8IPf9Tl-6Q9YE-gh-t5_-K2HKoO7akSLUJegv'+
+	'u4qYjaC9Din1fkRKJZpndGUiiJfcpACum4llw1GIC_UqPkDZhO2i5azwqy_nBRLHOxdyd_DchP2O'+
+	'jVYUMMwzZIzh2nUNQYk7NOqMKV05nd-YausfG6cFECqEhu_J0glUsm41cs066shv9UfU2fwNyPXS'+
+	'lOSVupYW6Ey6KjP03t5E44m0Ab09N0pHqIJlFBxYi4xb64RXzDhfjfV2SsWZl8XHAuY5mdrdCFxT'+
+	'6m6fZuEMAS6k9izCuq99-sPLrRBXshAjbpdoNzIBg60TOMgxyI8gsI9b38HA';
 
 	// mock misc.getRpJWT
 	sinon
 		.mock(misc)
 		.expects('getRpJWT')
+		.atLeast(3)
+		.atMost(5)
 		.returns(token);
 
 	const rptTokenRequest = {
