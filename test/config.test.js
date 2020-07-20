@@ -57,22 +57,26 @@ after((done) => {
 	app.close(done);
 });
 
-describe('defaultcfg', function () {
-	it('default.json should have passportFile not null or undefined', () => {
-		assert.exists(defaultcfg.passportFile, 'passportFile is not null or undefined')
-	});
-
-	it('default.json should have saltFile not null or undefined', () => {
-		assert.exists(defaultcfg.saltFile, 'saltFile is not null or undefined')
+describe('defaultcfg', function() {
+	it('default.js should have passportFile not null or undefined', () => {
+		assert.exists(
+			defaultcfg.passportFile, 'passportFile is not null or undefined')
 	})
-});
 
-describe('productioncfg', function () {
-	it('production.json should have passportFile  not null or undefined', () => {
-		assert.exists(productioncfg.passportFile, 'passportFile is not null or undefined')
-	});
-	it('default.json should have saltFile not null or undefined', () => {
-		assert.exists(productioncfg.saltFile, 'saltFile is not null or undefined')
+	it('default.js should have saltFile not null or undefined', () => {
+		assert.exists(
+			defaultcfg.saltFile, 'saltFile is not null or undefined')
+	})
+})
+
+describe('productioncfg', function() {
+	it('production.js should have passportFile  not null or undefined', () => {
+		assert.exists(
+			productioncfg.passportFile, 'passportFile is not null or undefined')
+	})
+	it('default.js should have saltFile not null or undefined', () => {
+		assert.exists(
+			productioncfg.saltFile, 'saltFile is not null or undefined')
 	})
 });
 
