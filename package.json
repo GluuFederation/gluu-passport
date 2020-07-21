@@ -64,7 +64,7 @@
     "test": "test"
   },
   "devDependencies": {
-    "codecov": "^3.7.0",
+    "codecov": "^3.7.1",
     "nock": "^13.0.2",
     "nyc": "^15.1.0",
     "rewire": "^5.0.0",
