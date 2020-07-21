@@ -4,11 +4,13 @@ const nock = require('nock');
 const request = require('supertest');
 const sinon = require('sinon');
 const misc = require('../server/utils/misc');
-const data = require('./config-data');
+const data = require('../config/test');
 /**
  * Testing config
  */
 const passportConfig = data.passportConfig;
+const passportConfigResponse = data.passportConfigResponse;
+
 const defaultcfg = require('../config/default.js');
 const productioncfg = require('../config/production.js');
 const passportConfigFile = '/tmp/passport_config.json';
@@ -24,8 +26,10 @@ process.env.passport_config_file = passportConfigFile;
 process.env.config_update_timer = 600000;
 
 // passport certs
-const pems = data.passportPEM;
-fs.writeFileSync(passportRPPEMFile, pems);
+const {passportRPPEM, passportSPCert, passportSPKey} = data;
+fs.writeFileSync(passportRPPEMFile, passportRPPEM);
+fs.writeFileSync(passportConfigResponse.conf.spTLSCert, passportSPCert);
+fs.writeFileSync(passportConfigResponse.conf.spTLSKey, passportSPKey);
 
 /**
  * root level hooks
@@ -58,6 +62,8 @@ before((done) => {
 after((done) => {
 	fs.unlinkSync(passportConfigFile);
 	fs.unlinkSync(passportRPPEMFile);
+	fs.unlinkSync(passportConfigResponse.conf.spTLSCert);
+	fs.unlinkSync(passportConfigResponse.conf.spTLSKey);
 	// Todo: need to find why test case not stoping process, press ctrl + c to stop for now
 	app.close(done);
 });
@@ -106,20 +112,7 @@ function mockIDP() {
 	// mock token endpoint
 	const clientId = passportConfig.clientId;
 	const now = new Date().getTime();
-	const token = 'eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCIsImtpZCI6IjM2NjU4ZTAzLTM0ZWEt'+
-	'NDc0NS1hZDQzLTk1OTkxNmM5NmRlZl9zaWdfcnM1MTIifQ.eyJpc3MiOiJodHRwczovL2NocmlzL'+
-	'mdsdXV0aHJlZS5vcmciLCJzdWIiOlsidGVzdGVyMyJdLCJhdWQiOiIxNTAzLmYxOTE3ZjZmLWIxN'+
-	'TUtNDJlMC05YmQxLTk5ZDU2ZjVjM2I1MCIsImp0aSI6IjMxYTFmNGUwLTE5YzUtNDMwMi1hYzE4L'+
-	'WY1OTk2YjcxYzVlNyIsImV4cCI6MTU5NDE4MDc2NC45OSwiaWF0IjoxNTk0MTgwNzM0OTkwLCJkY'+
-	'XRhIjoiQmVHMG1BU2lWUys2K3RUSDhUWFZNZ0lpOW9zTXFXTG1WVi9sMC9GSTdEWDBBQzRXQ3hlK'+
-	'1hhQWpiNnNPZWVBQksyUEIyUGVhZ0FSM3lQcExBSE52YjYvOUVpK1JjY3RlZ3haYUhEYlpRdEsyd'+
-	'GFzN3JPZlFFUmNkRDNKSFFXaWlneFphSERiWlF0Snpycml6WXV0TXNyUG9vVklpMG9ZajlTYWM3S'+
-	'k16a0NqWVNQM2dSU3phMXJaQUt5Mmw4VEVRejRxYVQxWjFzSHQ3TEpzem9OZTcvcmNLZ0pVM0wwb'+
-	'W1qbCtYNDkwRmJEVT0ifQ.G7O9uIP00vtsSsmjs8IPf9Tl-6Q9YE-gh-t5_-K2HKoO7akSLUJegv'+
-	'u4qYjaC9Din1fkRKJZpndGUiiJfcpACum4llw1GIC_UqPkDZhO2i5azwqy_nBRLHOxdyd_DchP2O'+
-	'jVYUMMwzZIzh2nUNQYk7NOqMKV05nd-YausfG6cFECqEhu_J0glUsm41cs066shv9UfU2fwNyPXS'+
-	'lOSVupYW6Ey6KjP03t5E44m0Ab09N0pHqIJlFBxYi4xb64RXzDhfjfV2SsWZl8XHAuY5mdrdCFxT'+
-	'6m6fZuEMAS6k9izCuq99-sPLrRBXshAjbpdoNzIBg60TOMgxyI8gsI9b38HA';
+	const token = 'eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCIsImtpZCI6IjM2NjU4ZTAzLTM0ZWEtNDc0NS1hZDQzLTk1OTkxNmM5NmRlZl9zaWdfcnM1MTIifQ.eyJpc3MiOiJodHRwczovL2NocmlzLmdsdXV0aHJlZS5vcmciLCJzdWIiOlsidGVzdGVyMyJdLCJhdWQiOiIxNTAzLmYxOTE3ZjZmLWIxNTUtNDJlMC05YmQxLTk5ZDU2ZjVjM2I1MCIsImp0aSI6IjMxYTFmNGUwLTE5YzUtNDMwMi1hYzE4LWY1OTk2YjcxYzVlNyIsImV4cCI6MTU5NDE4MDc2NC45OSwiaWF0IjoxNTk0MTgwNzM0OTkwLCJkYXRhIjoiQmVHMG1BU2lWUys2K3RUSDhUWFZNZ0lpOW9zTXFXTG1WVi9sMC9GSTdEWDBBQzRXQ3hlK1hhQWpiNnNPZWVBQksyUEIyUGVhZ0FSM3lQcExBSE52YjYvOUVpK1JjY3RlZ3haYUhEYlpRdEsydGFzN3JPZlFFUmNkRDNKSFFXaWlneFphSERiWlF0Snpycml6WXV0TXNyUG9vVklpMG9ZajlTYWM3Sk16a0NqWVNQM2dSU3phMXJaQUt5Mmw4VEVRejRxYVQxWjFzSHQ3TEpzem9OZTcvcmNLZ0pVM0wwbW1qbCtYNDkwRmJEVT0ifQ.G7O9uIP00vtsSsmjs8IPf9Tl-6Q9YE-gh-t5_-K2HKoO7akSLUJegvu4qYjaC9Din1fkRKJZpndGUiiJfcpACum4llw1GIC_UqPkDZhO2i5azwqy_nBRLHOxdyd_DchP2OjVYUMMwzZIzh2nUNQYk7NOqMKV05nd-YausfG6cFECqEhu_J0glUsm41cs066shv9UfU2fwNyPXSlOSVupYW6Ey6KjP03t5E44m0Ab09N0pHqIJlFBxYi4xb64RXzDhfjfV2SsWZl8XHAuY5mdrdCFxT6m6fZuEMAS6k9izCuq99-sPLrRBXshAjbpdoNzIBg60TOMgxyI8gsI9b38HA';
 
 	// mock misc.getRpJWT
 	sinon
@@ -148,8 +141,6 @@ function mockIDP() {
 		.reply(200, rptTokenResponse)
 
 	// mock configuration endpoint and get response
-	const passportConfigResponse = data.passportConfigResponse;
-
 	const reqheaders = {
 		authorization: `Bearer ${rptTokenResponse.access_token}`,
 		pct: rptTokenResponse.pct
