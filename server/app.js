@@ -13,7 +13,7 @@ const
 	confDiscovery = require('./utils/configDiscovery'),
 	routes = require('./routes'),
 	providers = require('./providers'),
-	passportFile = process.env.passport_config_file || config.get('passportFile')
+	passportFile = config.get('passportFile')
 
 
 var httpServer, httpPort = -1
@@ -95,7 +95,7 @@ function pollConfiguration(configEndpoint) {
 			logger.log2('debug', e.stack)
 			logger.log2('warn', 'An attempt to get configuration data will be tried again soon')
 		})
-	setTimeout(pollConfiguration, process.env.config_update_timer || 60000, configEndpoint)	 //1 minute timer
+	setTimeout(pollConfiguration, config.get('timerInterval'), configEndpoint)	 //1 minute timer
 }
 
 function init() {

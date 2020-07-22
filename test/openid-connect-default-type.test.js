@@ -1,7 +1,7 @@
 const request = require('supertest');
 
 describe('Openidconnect-default type passport flow', () => {
-	it('Authorization request to external IDP', (done) => {
+	it('Authorization request to external OP', (done) => {
 		request(app)
 			.get('/passport/token')
 			.expect(200)
