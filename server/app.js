@@ -70,6 +70,7 @@ function recreateHttpServer(serverURI, port) {
 		httpServer.listen(port, () => {
 			logger.log2('info', `Server listening on ${serverURI}:${port}`)
 			console.log(`Server listening on ${serverURI}:${port}`)
+			module.exports = httpServer;
 		})
 	}
 
@@ -94,7 +95,7 @@ function pollConfiguration(configEndpoint) {
 			logger.log2('debug', e.stack)
 			logger.log2('warn', 'An attempt to get configuration data will be tried again soon')
 		})
-	setTimeout(pollConfiguration, 60000, configEndpoint)	 //1 minute timer
+	setTimeout(pollConfiguration, config.get('timerInterval'), configEndpoint)	 //1 minute timer
 }
 
 function init() {

@@ -11,6 +11,10 @@ const
 	logger = require('./utils/logging'),
 	path = require('path')
 
+router.get('/health-check', function(req, res) {
+	return res.send({message: 'Cool!!!'});
+})
+
 router.post('/auth/saml/:provider/callback',
 	validateProvider,
 	authenticateRequestCallback,

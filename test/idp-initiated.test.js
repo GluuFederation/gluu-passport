@@ -52,7 +52,7 @@ const mocked_jwt_string =
 
 const basicConfig = config.get('passportFile')
 
-const mocked_conf = helper.getMockedConfiguration()['conf']
+const mocked_conf = helper.passportConfigResponse;
 
 // const scope = helper.nockMockedConfigurationRequest()
 
