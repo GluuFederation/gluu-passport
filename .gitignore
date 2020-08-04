@@ -41,3 +41,5 @@ jspm_packages
 
 #ide
 .vscode
+.idea
+server/idp-metadata
