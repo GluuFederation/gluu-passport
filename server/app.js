@@ -27,12 +27,20 @@ const metricsMiddleware = promBundle({
 	includePath: true,
 	normalizePath: [
 		['^/customer/.*', '/customer/#name'],
-		['^/passport/auth/(?=saml).*/(.*)/callback', '/passport/auth/saml/#provider/callback'],
-		['^/passport/auth/(?=.*)(?!.*saml).*/callback', '/passport/auth/#provider/callback'],
-		['^/passport/auth/meta/idp/(.*)', '/passport/auth/meta/idp/#metadata'],
-		['^/passport/auth/(?=.*)(?!.*meta|saml/|/callback).*/(?=.*)(?!.*callback).*',
-			'/passport/auth/#provider/#token'],
-		['^.*/order-list', '/#name/order-list']
+
+		['^/passport/auth/(?=saml).*/(.*)/callback',
+			'/passport/auth/saml/#provider/callback'],
+
+		['^/passport/auth/(?=.*)(?!.*saml).*/callback',
+			'/passport/auth/#provider/callback'],
+
+		['^/passport/auth/meta/idp/(.*)',
+			'/passport/auth/meta/idp/#metadata'],
+		[
+			'^/passport/auth/(?=.*)(?!.*meta|saml/|/callback).*/'+
+				'(?=.*)(?!.*callback).*',
+			'/passport/auth/#provider/#token'
+		],
 	]
 })
 
