@@ -14,35 +14,10 @@ const
 	routes = require('./routes'),
 	providers = require('./providers'),
 	passportFile = config.get('passportFile')
-
-const promBundle = require('express-prom-bundle')
-// const metricsMiddleware = promBundle({includeMethod: true});
+const metricsMiddleware = require('../server/utils/metrics')
 
 var httpServer, httpPort = -1
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
-
-const metricsMiddleware = promBundle({
-	includeMethod: true,
-	buckets: [0.03, 0.3, 1, 1.5, 3, 5, 10],
-	includePath: true,
-	normalizePath: [
-		['^/customer/.*', '/customer/#name'],
-
-		['^/passport/auth/(?=saml).*/(.*)/callback',
-			'/passport/auth/saml/#provider/callback'],
-
-		['^/passport/auth/(?=.*)(?!.*saml).*/callback',
-			'/passport/auth/#provider/callback'],
-
-		['^/passport/auth/meta/idp/(.*)',
-			'/passport/auth/meta/idp/#metadata'],
-		[
-			'^/passport/auth/(?=.*)(?!.*meta|saml/|/callback).*/'+
-				'(?=.*)(?!.*callback).*',
-			'/passport/auth/#provider/#token'
-		],
-	]
-})
 
 app.use(metricsMiddleware)
 app.use(morgan('short', { stream: logger.logger.stream }))
