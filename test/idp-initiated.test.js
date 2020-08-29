@@ -2,10 +2,8 @@ const chai = require('chai')
 const rewire = require('rewire')
 const nock = require('nock')
 const idp_initiated = rewire('../server/idp-initiated.js')
-// const sinon = require('sinon')
 const assert = chai.assert
 const config = require('config')
-// const passportFile = config.get('passportFile')
 const helper = require('./helper.js')
 const base64url = require('base64url')
 const jwt = require('jsonwebtoken')
@@ -32,32 +30,10 @@ const jwt = require('jsonwebtoken')
 }
 */
 
-// consts to mock
-
-const mocked_jwt_string =
-'eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCIsImtpZCI6IjM2NjU4ZTAzLTM0ZWEt'+
-'NDc0NS1hZDQzLTk1OTkxNmM5NmRlZl9zaWdfcnM1MTIifQ.eyJpc3MiOiJodHRwczovL2NocmlzL'+
-'mdsdXV0aHJlZS5vcmciLCJzdWIiOlsidGVzdGVyMyJdLCJhdWQiOiIxNTAzLmYxOTE3ZjZmLWIxN'+
-'TUtNDJlMC05YmQxLTk5ZDU2ZjVjM2I1MCIsImp0aSI6IjMxYTFmNGUwLTE5YzUtNDMwMi1hYzE4L'+
-'WY1OTk2YjcxYzVlNyIsImV4cCI6MTU5NDE4MDc2NC45OSwiaWF0IjoxNTk0MTgwNzM0OTkwLCJkY'+
-'XRhIjoiQmVHMG1BU2lWUys2K3RUSDhUWFZNZ0lpOW9zTXFXTG1WVi9sMC9GSTdEWDBBQzRXQ3hlK'+
-'1hhQWpiNnNPZWVBQksyUEIyUGVhZ0FSM3lQcExBSE52YjYvOUVpK1JjY3RlZ3haYUhEYlpRdEsyd'+
-'GFzN3JPZlFFUmNkRDNKSFFXaWlneFphSERiWlF0Snpycml6WXV0TXNyUG9vVklpMG9ZajlTYWM3S'+
-'k16a0NqWVNQM2dSU3phMXJaQUt5Mmw4VEVRejRxYVQxWjFzSHQ3TEpzem9OZTcvcmNLZ0pVM0wwb'+
-'W1qbCtYNDkwRmJEVT0ifQ.G7O9uIP00vtsSsmjs8IPf9Tl-6Q9YE-gh-t5_-K2HKoO7akSLUJegv'+
-'u4qYjaC9Din1fkRKJZpndGUiiJfcpACum4llw1GIC_UqPkDZhO2i5azwqy_nBRLHOxdyd_DchP2O'+
-'jVYUMMwzZIzh2nUNQYk7NOqMKV05nd-YausfG6cFECqEhu_J0glUsm41cs066shv9UfU2fwNyPXS'+
-'lOSVupYW6Ey6KjP03t5E44m0Ab09N0pHqIJlFBxYi4xb64RXzDhfjfV2SsWZl8XHAuY5mdrdCFxT'+
-'6m6fZuEMAS6k9izCuq99-sPLrRBXshAjbpdoNzIBg60TOMgxyI8gsI9b38HA'
 
 const basicConfig = config.get('passportFile')
 
-const mocked_conf = helper.passportConfigResponse;
-
-// const scope = helper.nockMockedConfigurationRequest()
-
-
-
+const mocked_conf = helper.passportConfigResponse['conf']
 
 describe('idp-initiated.createAuthzRequest', () => {
 
