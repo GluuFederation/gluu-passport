@@ -1,10 +1,9 @@
-const
-	config = require('config'),
-	R = require('ramda'),
-	sha1 = require('sha1'),
-	jwt = require('jsonwebtoken'),
-	crypto = require('crypto'),
-	fs = require('fs')
+const config = require('config')
+const R = require('ramda')
+const sha1 = require('sha1') 
+const jwt = require('jsonwebtoken') 
+const crypto = require('crypto') 
+const fs = require('fs')
 
 const isObject = x => !R.isNil(x) && !Array.isArray(x) && typeof x == 'object'
 
