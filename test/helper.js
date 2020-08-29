@@ -22,8 +22,8 @@ const passportConfigResponse = {
 		serverURI: 'https://chris.gluuthree.org',
 		serverWebPort: 8090,
 		postProfileEndpoint: 'https://chris.gluuthree.org/oxauth/postlogin.htm',
-		spTLSCert: '/tmp/passport-sp.crt',
-		spTLSKey: '/tmp/passport-sp.key',
+		spTLSCert: './test/testdata/passport-sp.crt',
+		spTLSKey: './test/testdata/passport-sp.key',
 		logging: {
 			level: 'debug',
 			consoleLogOnly: false,
