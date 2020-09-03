@@ -9,8 +9,13 @@ const isObject = x => !R.isNil(x) && !Array.isArray(x) && typeof x == 'object'
 
 const pipePromise_ = R.reduce( (p,fn) => Promise.resolve(p).then(fn) )
 
+
 /**
+ * Chains a sequence of calls and avoid callback hell
  * @sig (a -> Promise b, b -> Promise c, ...) -> (a -> Promise z)
+ * @type {(function(): *)|(function(*): *)|(function(*, *): *)|(function(*, *, *): *)
+ * |(function(*, *, *, *): *)|(function(*, *, *, *, *): *)|*}
+ *
  */
 const pipePromise = R.pipe(R.unapply(R.flatten), R.flip(pipePromise_))
 
@@ -52,6 +57,11 @@ const secretKey = R.once(() => {
 	return /=\s*(\S+)/.exec(salt)[1]
 })
 
+/**
+ * Calls jwt.sign to generate RpJWT w/ privateKey and defaultOptions
+ * @param payload : Object containing payload
+ * @returns jwt.sign : Signed RP Jwt (expected)
+ */
 const getRpJWT = payload => jwt.sign(payload, privateKey(), defaultRpOptions())
 
 const getJWT = (payload, expSec) => jwt.sign(

@@ -3,6 +3,11 @@ const
 	logger = require('./logging'),
 	uma = require('./uma')
 
+/**
+ * Validates and parses data fetched from config endpoint
+ * @param data : Object containing configuration data fetched from endpoint
+ * @returns {*}: Object containing validated data
+ */
 function validate(data) {
 
 	//Perform a shallow validation on configuration data gathered
@@ -17,6 +22,11 @@ function validate(data) {
 
 }
 
+/**
+ * Retrieves the full configuration from passport configuration endpoint
+ * @param cfgEndpoint : configuration endpoint got from basic config file
+ * @returns {*}
+ */
 function retrieve(cfgEndpoint){
 
 	let options = {
