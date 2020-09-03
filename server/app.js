@@ -1,20 +1,21 @@
-const
-	config = require('config'),
-	server = require('http'),
-	app = require('express')(),
-	session = require('express-session'),
-	MemoryStore = require('memorystore')(session),
-	bodyParser = require('body-parser'),
-	cookieParser = require('cookie-parser'),
-	passport = require('passport'),
-	morgan = require('morgan'),
-	logger = require('./utils/logging'),
-	misc = require('./utils/misc'),
-	confDiscovery = require('./utils/configDiscovery'),
-	routes = require('./routes'),
-	providers = require('./providers'),
-	passportFile = config.get('passportFile')
+
+const config = require('config')
+const express = require('express')
+const session = require('express-session')
+const MemoryStore = require('memorystore')(session)
+const bodyParser = require('body-parser')
+const cookieParser = require('cookie-parser')
+const passport = require('passport')
+const morgan = require('morgan')
+const logger = require('./utils/logging')
+const misc = require('./utils/misc')
+const confDiscovery = require('./utils/configDiscovery')
+const routes = require('./routes')
+const providers = require('./providers')
+const passportFile = config.get('passportFile')
 const metricsMiddleware = require('../server/utils/metrics')
+
+const app = express()
 
 var httpServer, httpPort = -1
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
@@ -41,12 +42,15 @@ app.use(passport.initialize())
 app.use(passport.session())
 app.use('/passport', routes)
 
-//Default error handler
+// Default error handler
 // eslint-disable-next-line no-unused-vars
-app.use((err, req, res, next) => {
+app.use((err, req, {redirect}, next) => {
+// app.use((err, req, res, next) => {
 	logger.log2('error', `Unknown Error: ${err}`)
 	logger.log2('error', err.stack)
-	res.redirect(`${global.basicConfig.failureRedirectUrl}?failure=An error occurred`)
+	redirect(
+		`${global.basicConfig.failureRedirectUrl}?failure=An error occurred`
+	)
 })
 
 passport.serializeUser((user, done) => {
@@ -57,24 +61,36 @@ passport.deserializeUser((user, done) => {
 	done(null, user)
 })
 
-// TESTS
-// module.exports = app
 
+/**
+ * Creates express server for the first time and recreates if port changed
+ * @param serverURI - server host and uri
+ * @param port - port to create server
+ */
 function recreateHttpServer(serverURI, port) {
+	logger.log2('debug',
+		`entered recreateHttpServer(serverURI=${serverURI},port=${port}`)
+	logger.log2('debug', `httpPort = ${httpPort}`)
 
 	//Closes and creates a new server if port has changed
+	//after configuration file fetched, it will also change to 8090
 	if (httpPort != port) {
 		httpPort = port
 
 		if (httpServer) {
-			httpServer.close(() => logger.log2('info', 'Server stopped accepting connections'))
+			httpServer.close(() => logger.log2(
+				'info', 'Server stopped accepting connections')
+			)
 		}
-		httpServer = server.createServer(app)
-		httpServer.listen(port, () => {
+
+		httpServer = app.listen(port, () => {
 			logger.log2('info', `Server listening on ${serverURI}:${port}`)
 			console.log(`Server listening on ${serverURI}:${port}`)
-			module.exports = httpServer;
+			app.emit('appStarted') // event emitter for tests
+
+			// module.exports = server
 		})
+
 	}
 
 }
@@ -96,9 +112,14 @@ function pollConfiguration(configEndpoint) {
 		.catch(e => {
 			logger.log2('error', e.toString())
 			logger.log2('debug', e.stack)
-			logger.log2('warn', 'An attempt to get configuration data will be tried again soon')
+			logger.log2(
+				'warn', 'An attempt to get configuration data ' +
+				'will be tried again soon')
 		})
-	setTimeout(pollConfiguration, config.get('timerInterval'), configEndpoint)	 //1 minute timer
+	setTimeout(
+		pollConfiguration, config.get('timerInterval'), configEndpoint
+	)
+	//1 minute timer
 }
 
 function init() {
@@ -106,9 +127,20 @@ function init() {
 	//Read the minimal params to start
 	let basicConfig = require(passportFile)
 	//Start logging with basic params
-	logger.configure({ level: basicConfig.logLevel, consoleLogOnly: basicConfig.consoleLogOnly })
+	logger.configure(
+		{
+			level: 'DEBUG', //basicConfig.logLevel,
+			consoleLogOnly: basicConfig.consoleLogOnly
+		})
 
-	let props = ['clientId', 'keyPath', 'keyId', 'keyAlg', 'configurationEndpoint', 'failureRedirectUrl']
+	let props = [
+		'clientId',
+		'keyPath',
+		'keyId',
+		'keyAlg',
+		'configurationEndpoint',
+		'failureRedirectUrl'
+	]
 	if (misc.hasData(props, basicConfig)) {
 		global.basicConfig = basicConfig
 		//Try to gather the configuration
@@ -119,4 +151,6 @@ function init() {
 
 }
 
+
+module.exports = app
 init()
