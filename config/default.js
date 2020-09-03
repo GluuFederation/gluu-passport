@@ -16,6 +16,7 @@ const passportConfigFileData = {
  * If file doesn't exists, creates it and return path
  * @returns {string} passport-config.json file path
  */
+
 function passportConfigFilePath() {
 	let passportFilePath = '/opt/gluu-server/etc/gluu/'+
 		'conf/passport-config.json'
@@ -37,5 +38,5 @@ function passportConfigFilePath() {
 module.exports = {
 	passportFile : passportConfigFilePath(),
 	saltFile : '/opt/gluu-server/etc/gluu/conf/salt',
-	timerInterval: 600000,
+	timerInterval: 60000,
 }
