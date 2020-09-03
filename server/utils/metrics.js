@@ -1,6 +1,9 @@
 // openmetrics middleware
 
 const promBundle = require('express-prom-bundle')
+const promClient = require('prom-client')
+
+promClient.register.clear()
 
 const metricsMiddleware = promBundle({
 	includeMethod: true,
