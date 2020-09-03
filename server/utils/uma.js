@@ -1,5 +1,5 @@
 const
-	rp = require('request-promise'),
+	reqp = require('request-promise'),
 	parsers = require('www-authenticate').parsers,
 	R = require('ramda'),
 	uuid = require('uuid'),
@@ -11,7 +11,7 @@ var rpt
 /**
  * @todo: Add proxy option for dev/tests
  */
-// const reqp = rp.defaults({
+// const reqp = reqp.defaults({
 // 	proxy: 'http://127.0.0.1:9234'
 // })
 
