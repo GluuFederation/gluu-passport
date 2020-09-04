@@ -2,6 +2,19 @@ const URL = require('url').URL;
 const nock = require('nock');
 const sinon = require('sinon');
 const misc = require('../server/utils/misc');
+const InitMock = require('./testdata/init-mock')
+
+var app
+
+const mockedAppInit = function() {
+	let initMock = new InitMock()
+	initMock.passportConfigEndpoint()
+	initMock.umaConfigurationEndpoint()
+	initMock.umaTokenEndpoint()
+	// app = require('../server/app')
+
+
+}
 
 // data of passportFile
 const passportConfig = {
@@ -301,4 +314,6 @@ module.exports = {
 	idpURL,
 	idpPassportConfigPath,
 	mockIDP,
+	mockedAppInit,
+	app
 }
