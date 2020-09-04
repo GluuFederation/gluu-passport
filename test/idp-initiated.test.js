@@ -9,7 +9,7 @@ const base64url = require('base64url')
 const jwt = require('jsonwebtoken')
 
 /* This is how passportFile looks like
-{
+{1
 	"configurationEndpoint":
 	"https://chris.gluuthree.org/identity/restv1/passport/config",
 
@@ -73,15 +73,15 @@ describe('idp-initiated.createAuthzRequest', () => {
 	var createAuthzRequest = idp_initiated.__get__('createAuthzRequest')
 
 	beforeEach(() => {
-		idp_initiated.__set__('config', mocked_conf)
-		idp_initiated.__set__('basicConfig', basicConfig)
-		idp_initiated.__set__('jwt', jwt)
-		nock.disableNetConnect()
+		// idp_initiated.__set__('config', mocked_conf)
+		// idp_initiated.__set__('basicConfig', basicConfig)
+		// idp_initiated.__set__('jwt', jwt)
+		// nock.disableNetConnect()
 		// idp_initiated.__set__('logger', logger)
 	})
 
 	afterEach(() => {
-		nock.enableNetConnect()
+		// nock.enableNetConnect()
 	})
 	it('createAuthzRequest should exist', () => {
 		assert.exists(
