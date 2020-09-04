@@ -72,6 +72,11 @@ describe('idp-initiated.createAuthzRequest', () => {
 	// "importing" not exported function
 	var createAuthzRequest = idp_initiated.__get__('createAuthzRequest')
 
+	/**
+	 * @todo: Activate this (uses `rewire`) to do unit instead of integration
+	 * Mocks basic configuration, jwt...
+	 * disableNetConnect so app don't try to get it from "external" sources.
+	 */
 	beforeEach(() => {
 		// idp_initiated.__set__('config', mocked_conf)
 		// idp_initiated.__set__('basicConfig', basicConfig)
