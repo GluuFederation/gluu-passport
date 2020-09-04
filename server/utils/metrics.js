@@ -6,6 +6,7 @@ const promClient = require('prom-client')
 promClient.register.clear()
 
 const metricsMiddleware = promBundle({
+	metricsPath: '/passport/metrics',
 	includeMethod: true,
 	buckets: [0.03, 0.3, 1, 1.5, 3, 5, 10],
 	includePath: true,
