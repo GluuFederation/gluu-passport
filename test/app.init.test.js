@@ -155,7 +155,6 @@ describe('app.init() - Initialization', () => {
 
 		it('response body should contain pct key', () => {
 			expect(response.body).to.have.property('pct')
-			console.log(contexto)
 			contexto.pct = response.body.pct
 
 		})
@@ -202,7 +201,6 @@ describe('app.init() - Initialization', () => {
 		})
 
 		it('response.conf should have expected keys', () => {
-			console.log(response)
 			expect(response.body.conf).to.have.all.keys(
 				'logging',
 				'postProfileEndpoint',
@@ -223,6 +221,7 @@ describe('app.init() - Initialization', () => {
 
 		it('expect spTLSKey file to exist', () => {
 			expect(file(response.body.conf.spTLSKey)).to.exist
+
 		})
 
 	})
