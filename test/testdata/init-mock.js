@@ -23,8 +23,7 @@ class InitMock {
 			+ '97F8.BA28.3B17.C447.C3FA.153D'
 	}
 
-	get gluuHostName() {}
- 	get gluuUrl() {
+	get gluuUrl() {
 		return this._gluuUrl
 	}
 
@@ -61,7 +60,10 @@ class InitMock {
 			'connection': 'close'
 		}
 
-		nock(this._gluuUrl)
+		nock(this._gluuUrl, {
+			reqheaders: {'host': this._gluuHostName}
+		})
+
 			.get(this._configurationEndpointPath, '')
 			.reply(
 				401, '', passportConfigUnauthorizedResponseHeader
@@ -219,6 +221,7 @@ class InitMock {
 		 * mocking /config endpoint with authorized params
 		 */
 		nock(this._gluuUrl)
+			.persist()
 			.get(this._configurationEndpointPath, '',{
 				reqheaders: passportConfigAuthorizedRequestHeaders
 			})
@@ -304,7 +307,8 @@ class InitMock {
 		 * Mocking uma-configuration endpoint response
 		 */
 		nock(this._gluuUrl)
-			.get(umaCfgEndpointPath, '')
+			.persist()
+			.get(umaCfgEndpointPath)
 			.reply(200, umaCfgEndpointResponse)
 
 	}
@@ -319,7 +323,8 @@ class InitMock {
 			'host': this._gluuHostName,
 			'content-type' : 'application/x-www-form-urlencoded',
 			'accept' : 'application/json',
-			'Connection': 'close'
+			'content-length': 1043
+			//'Connection': 'close'
 		}
 
 		const umaTokenRequestBody = {
@@ -359,13 +364,14 @@ class InitMock {
 			'access_token': this._accessToken,
 			'token_type': 'Bearer',
 			'pct': this._pct,
-			'upgraded': false
+			'upgraded': false,
 		}
 
 		// mocking endpoint response if conditions match
 		nock(this._gluuUrl,{
-			reqheaders: umaTokenRequestHeader
+			//reqheaders: umaTokenRequestHeader
 		})
+			.persist()
 			.post('/oxauth/restv1/token', umaTokenRequestBody)
 			.reply(200, umaTokenResponseBody, umaTokenResponseHeader)
 	}
