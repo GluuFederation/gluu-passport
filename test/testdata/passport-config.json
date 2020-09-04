@@ -1,5 +1,3 @@
-// {"configurationEndpoint":"https://chris.gluuthree.org/identity/restv1/passport/config","failureRedirectUrl":"https://chris.gluuthree.org/oxauth/auth/passport/passportlogin.htm","logLevel":"debug","consoleLogOnly":false,"clientId":"1502.3fe76d0a-38dd-4f91-830b-e33fd70d778a","keyPath":"/tmp/passport-rp.pem","keyId":"fbc267ef-0705-4b3a-8c80-bf70e75cf08b_sig_rs512","keyAlg":"RS512"}
-
 {
   "configurationEndpoint":
   "https://chris.gluuthree.org/identity/restv1/passport/config",
