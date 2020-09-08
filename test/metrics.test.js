@@ -9,7 +9,7 @@ const config = require('config')
 
 const basicConfig = config.get('passportConfig')
 
-const should = chai.should()
+const should = chai.Should()
 chai.use(chaiHttp)
 
 
@@ -77,7 +77,7 @@ describe('metrics.js unit', () => {
  * Integration test using localhost (not mocked)
  */
 describe('/passport/metrics - metrics endpoint (integration)', ()  => {
-	const gluuBasePath = 'http://127.0.0.1'
+	const gluuBasePath = 'http://127.0.0.1:8090'
 
 	// server should be up and running, integration test
 	it('Health check - GET /passport/health-check', (done) => {
@@ -98,5 +98,5 @@ describe('/passport/metrics - metrics endpoint (integration)', ()  => {
 				res.should.have.status(200)
 				done()
 			})
-	}
+	})
 })
