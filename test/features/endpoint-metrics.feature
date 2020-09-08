@@ -1,4 +1,4 @@
-Feature: Metrics OpenMetrics
+Feature: OpenMetrics for endpoints
 
   As a Site Reliability Engineer
   Want to easily pickup on endpoint fails

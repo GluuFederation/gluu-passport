@@ -1,6 +1,10 @@
 const saltFile = './test/testdata/salt'
 const timerInterval = 5000
 
+/**
+ * basicConfig
+ * @type {{keyAlg: string, failureRedirectUrl: string, consoleLogOnly: boolean, clientId: string, logLevel: string, keyPath: string, configurationEndpoint: string, keyId: string}}
+ */
 const passportConfig = {
 	configurationEndpoint:
         'https://chris.gluuthree.org/identity/restv1/passport/config',
@@ -16,7 +20,6 @@ const passportConfig = {
 
 const root = process.cwd()
 const passportFile = `${root}/test/testdata/passport-config.json`
-// const passportFile = '/test/testdata/passport-config.json'
 
 module.exports = {
 	saltFile,
