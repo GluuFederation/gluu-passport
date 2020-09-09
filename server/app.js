@@ -45,7 +45,6 @@ app.use('/passport', routes)
 // Default error handler
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, {redirect}, next) => {
-// app.use((err, req, res, next) => {
 	logger.log2('error', `Unknown Error: ${err}`)
 	logger.log2('error', err.stack)
 	redirect(
