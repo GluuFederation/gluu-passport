@@ -127,7 +127,7 @@ function init() {
 	//Start logging with basic params
 	logger.configure(
 		{
-			level: 'DEBUG', //basicConfig.logLevel,
+			basicConfig.logLevel,
 			consoleLogOnly: basicConfig.consoleLogOnly
 		})
 
