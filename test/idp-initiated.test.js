@@ -33,7 +33,7 @@ const jwt = require('jsonwebtoken')
 
 const basicConfig = config.get('passportFile')
 
-const mocked_conf = helper.passportConfigResponse['conf']
+const mocked_conf = config.get('passportConfigAuthorizedResponse')['conf']
 
 describe('idp-initiated.createAuthzRequest', () => {
 

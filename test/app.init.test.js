@@ -80,7 +80,6 @@ describe('app.init() - Initialization', () => {
 		})
 
 		it('response body should have token_endpoint key', () => {
-			//console.log(JSON.stringify(response.body, null, 4))
 			expect(response.body).to.have.property('token_endpoint')
 		})
 
@@ -128,10 +127,8 @@ describe('app.init() - Initialization', () => {
 			.send(umaTokenRequestBody)
 			.end(function(err, res) {
 				response = res
-				// expect(res.status).to.equal(200)
-				// expect(res.body).to.be.deep.equal(umaTokenResponseBody)
-				// expect(res.header).to.be.deep.equal(umaTokenResponseHeader)
-			})
+				expect(res.status).to.equal(200)
+				})
 
 		it('response status code expected to be 200', () => {
 			expect(response.status).to.be.equal(200)
@@ -184,10 +181,6 @@ describe('app.init() - Initialization', () => {
 			.set(passportConfigAuthorizedRequestHeaders)
 			.end(function(err, res) {
 				response = res
-				// expect(res.status).to.be.equal(200)
-				// expect(res.body).to.be.deep.equal(
-				// 	passportConfigAuthorizedResponse
-				// )
 			})
 
 		it( 'response status code expected to be 200', () => {

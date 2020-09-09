@@ -1,22 +1,26 @@
-const { Given, When, Then, AfterAll, BeforeAll } = require('cucumber')
+const { Given, When, Then, BeforeAll } = require('cucumber')
 const got = require('got')
 const server = require('../../../server/app')
 const chai = require('chai')
 const assert = chai.assert
+const InitMock = require('../../testdata/init-mock')
+
 
 BeforeAll( {timeout: 600 * 1000}, (done) => {
-	// perform some shared setup
+	// mock init external endpoints
+	const initMock = new InitMock()
+	initMock.passportConfigEndpoint()
+	initMock.umaTokenEndpoint()
+	initMock.umaConfigurationEndpoint()
+
+	// waits for the server to start (app.listen)
 	server.on('appStarted', () => {
-		console.log('FINALLY STARTED! FINALLYU!!!')
+		console.log('app started...')
 		done()
 	})
 })
 
-
-
-
 Given('passport server is up and running', async () => {
-	// Write code here that turns the phrase above into concrete actions
 	const response = await got('http://127.0.0.1:8090/passport/health-check')
 	assert.equal(response.statusCode, 200,
 		'response.statusCode is NOT 200')
@@ -25,12 +29,10 @@ Given('passport server is up and running', async () => {
 
 When('my aggregator access metrics endpoint', async () => {
 	const response = await got('http://127.0.0.1:8090/passport/metrics')
-	// Write code here that turns the phrase above into concrete actions
 	assert.isNotNull(response)
 })
 
 Then('should return me the metrics', async () => {
-	// Write code here that turns the phrase above into concrete actions
 	const response = await got('http://127.0.0.1:8090/passport/metrics')
 	assert.propertyVal(response.headers, 'content-type','text/plain')
 })
@@ -41,16 +43,13 @@ Given(
 	async function (endpoint, numberOfTimes) {
 		let counter = 0
 		while(counter < numberOfTimes) {
-			// const fullUrl = `http://127.0.0.1:8090${endpoint}`
-			// assert('http://127.0.0.1:8090/passport/token' === fullUrl, fullUrl)
-			try {
+				try {
 				const response = await got(`http://127.0.0.1:8090${endpoint}`,{throwHttpErrors: false})
+
 			} catch(err) {
-				console.log("ERROR:")
-				console.log(err)
+				// empty block for errors status code (i.e. 404)
 			}
-			// console.log(response.statusCode)
-			//assert.exists(response.statusCode)
+
 			counter++
 		}
 	})
@@ -59,7 +58,7 @@ Given(
 Then(
 	'{string} count should be {int}',
 	async function (endpointAlias, numberOfTimes) {
-		const response = await got('http://127.0.0.1/passport/metrics')
+		const response = await got('http://127.0.0.1:8090/passport/metrics')
 		const body = response.body
 		const pattern = new RegExp(
 			`http_request_duration_seconds_count{status_code="\\d+",method="GET",path="${endpointAlias}.*`
@@ -67,7 +66,6 @@ Then(
 		const startIndex = body.search(pattern)
 		const lineEndIndex = body.substring(startIndex).search('\n')
 		const textLine = body.substr(startIndex, lineEndIndex)
-		console.log(textLine)
 		const lastSpaceIndex = textLine.lastIndexOf(' ')
 
 		// after space is count number
