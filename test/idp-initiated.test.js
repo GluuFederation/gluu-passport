@@ -9,7 +9,7 @@ const base64url = require('base64url')
 const jwt = require('jsonwebtoken')
 
 /* This is how passportFile looks like
-{1
+{
 	"configurationEndpoint":
 	"https://chris.gluuthree.org/identity/restv1/passport/config",
 

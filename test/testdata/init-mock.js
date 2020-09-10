@@ -2,7 +2,6 @@
 const config = require('config')
 const nock = require('nock')
 
-
 /**
  * Mocks for app.init() flow.
  */
@@ -243,8 +242,3 @@ class InitMock {
 }
 
 module.exports = InitMock
-
-
-
-
-
