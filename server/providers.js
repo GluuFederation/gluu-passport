@@ -228,6 +228,10 @@ function fillMissingData(ps) {
 
 }
 
+/**
+ * Setup providers and sets global `providers`
+ * @param ps : Object containing providers (fetched from config endpoint)
+ */
 function setup(ps) {
 
 	ps = R.defaultTo([], ps)
