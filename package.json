@@ -71,6 +71,7 @@
     "codecov": "^3.7.1",
     "cucumber": "^6.0.5",
     "got": "^11.6.0",
+    "husky": "^4.3.0",
     "mocha": "^8.1.1",
     "nock": "^13.0.2",
     "nyc": "^15.1.0",
@@ -100,5 +101,10 @@
       "it",
       "expect"
     ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint"
+    }
   }
 }
