@@ -1,25 +1,22 @@
-const
-	misc = require('./misc'),
-	logger = require('./logging'),
-	uma = require('./uma')
+const misc = require('./misc')
+const logger = require('./logging')
+const uma = require('./uma')
 
 /**
  * Validates and parses data fetched from config endpoint
  * @param data : Object containing configuration data fetched from endpoint
  * @returns {*}: Object containing validated data
  */
-function validate(data) {
+function validate (data) {
+  // Perform a shallow validation on configuration data gathered
+  const paths = [['conf', 'logging', 'level'], ['conf', 'serverWebPort']]
 
-	//Perform a shallow validation on configuration data gathered
-	let paths = [['conf', 'logging', 'level'], ['conf', 'serverWebPort']]
-
-	if (misc.pathsHaveData(paths, data) && Array.isArray(data.providers)) {
-		logger.log2('info', 'Configuration data has been parsed')
-		return data
-	} else {
-		throw new Error('Received data not in the expected format')
-	}
-
+  if (misc.pathsHaveData(paths, data) && Array.isArray(data.providers)) {
+    logger.log2('info', 'Configuration data has been parsed')
+    return data
+  } else {
+    throw new Error('Received data not in the expected format')
+  }
 }
 
 /**
@@ -27,21 +24,19 @@ function validate(data) {
  * @param cfgEndpoint : configuration endpoint got from basic config file
  * @returns {*}
  */
-function retrieve(cfgEndpoint){
-
-	let options = {
-		simple: false,
-		resolveWithFullResponse: true,
-		uri: cfgEndpoint
-	}
-	let	chain = misc.pipePromise(
-		uma.request,
-		validate
-	)
-	return chain(options)
-
+function retrieve (cfgEndpoint) {
+  const options = {
+    simple: false,
+    resolveWithFullResponse: true,
+    uri: cfgEndpoint
+  }
+  const chain = misc.pipePromise(
+    uma.request,
+    validate
+  )
+  return chain(options)
 }
 
 module.exports = {
-	retrieve: retrieve
+  retrieve: retrieve
 }
