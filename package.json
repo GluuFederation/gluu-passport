@@ -13,7 +13,7 @@
     "start": "NODE_ENV=production node server/app.js",
     "test": "NODE_ENV=test cucumber-js --exit test/features && NODE_ENV=test nyc mocha --exit --no-warnings test/*.test.js",
     "dev": "NODE_ENV=development node server/app.js",
-    "lint": "eslint server/**/*.js",
+    "lint": "standardx",
     "generate-coverage": "NODE_ENV=test nyc report --reporter=text-lcov > coverage.lcov",
     "report-2": "NODE_ENV=test nyc mocha --report lcovonly -R spec && codecov"
   },
@@ -26,7 +26,6 @@
     "config": "^3.3.1",
     "cookie-parser": "^1.4.4",
     "dateformat": "^3.0.3",
-    "eslint": "^7.3.1",
     "express": "^4.16.4",
     "express-list-endpoints": "^5.0.0",
     "express-prom-bundle": "^6.1.0",
@@ -71,12 +70,15 @@
     "chai-http": "^4.3.0",
     "codecov": "^3.7.1",
     "cucumber": "^6.0.5",
+    "eslint-plugin-chai-friendly": "^0.6.0",
     "got": "^11.6.0",
+    "husky": "^4.3.0",
     "mocha": "^8.1.1",
     "nock": "^13.0.2",
     "nyc": "^15.1.0",
     "rewire": "^5.0.0",
     "sinon": "^9.0.2",
+    "standardx": "^5.0.0",
     "supertest": "^4.0.2"
   },
   "repository": {
@@ -88,5 +90,10 @@
   "bugs": {
     "url": "https://github.com/GluuFederation/gluu-passport/issues"
   },
-  "homepage": "https://github.com/GluuFederation/gluu-passport#readme"
+  "homepage": "https://github.com/GluuFederation/gluu-passport#readme",
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint"
+    }
+  }
 }

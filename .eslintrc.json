@@ -1,35 +1,10 @@
 {
-    "env": {
-        "node": true,
-        "commonjs": true,
-        "mocha" : true,
-        "es6" : true
-
-    },
-    "extends": "eslint:recommended",
-    "parserOptions": {
-        "ecmaVersion": 11
-    },
+    "env": { "mocha": true },
+    "plugins": [
+        "chai-friendly"
+    ],
     "rules": {
-        "indent": [
-            "error",
-            "tab"
-        ],
-        "linebreak-style": [
-            "error",
-            "unix"
-        ],
-        "quotes": [
-            "error",
-            "single"
-        ],
-        "semi": [
-            "error",
-            "never"
-        ],
-        "max-len": [
-            "warn",
-            { "code" : 80 }
-        ]
+        "no-unused-expressions": 0,
+        "chai-friendly/no-unused-expressions": 2
     }
 }
