@@ -199,12 +199,10 @@ describe('app.init() - Initialization', () => {
     })
 
     it('expect spTLSCert file to exist', () => {
-      // eslint-disable-next-line no-unused-expressions
       expect(file(response.body.conf.spTLSCert)).to.exist
     })
 
     it('expect spTLSKey file to exist', () => {
-      // eslint-disable-next-line no-unused-expressions
       expect(file(response.body.conf.spTLSKey)).to.exist
     })
   })

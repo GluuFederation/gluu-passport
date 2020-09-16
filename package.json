@@ -13,7 +13,7 @@
     "start": "NODE_ENV=production node server/app.js",
     "test": "NODE_ENV=test cucumber-js --exit test/features && NODE_ENV=test nyc mocha --exit --no-warnings test/*.test.js",
     "dev": "NODE_ENV=development node server/app.js",
-    "lint": "standard",
+    "lint": "standardx",
     "generate-coverage": "NODE_ENV=test nyc report --reporter=text-lcov > coverage.lcov",
     "report-2": "NODE_ENV=test nyc mocha --report lcovonly -R spec && codecov"
   },
@@ -70,6 +70,7 @@
     "chai-http": "^4.3.0",
     "codecov": "^3.7.1",
     "cucumber": "^6.0.5",
+    "eslint-plugin-chai-friendly": "^0.6.0",
     "got": "^11.6.0",
     "husky": "^4.3.0",
     "mocha": "^8.1.1",
@@ -77,7 +78,7 @@
     "nyc": "^15.1.0",
     "rewire": "^5.0.0",
     "sinon": "^9.0.2",
-    "standard": "^14.3.4",
+    "standardx": "^5.0.0",
     "supertest": "^4.0.2"
   },
   "repository": {
@@ -90,18 +91,6 @@
     "url": "https://github.com/GluuFederation/gluu-passport/issues"
   },
   "homepage": "https://github.com/GluuFederation/gluu-passport#readme",
-  "standard": {
-    "globals": [
-      "describe",
-      "context",
-      "before",
-      "beforeEach",
-      "after",
-      "afterEach",
-      "it",
-      "expect"
-    ]
-  },
   "husky": {
     "hooks": {
       "pre-commit": "npm run lint"
