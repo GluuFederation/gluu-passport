@@ -1,5 +1,5 @@
 module.exports = {
-	passportFile : '/etc/gluu/conf/passport-config.json',
-	saltFile : '/etc/gluu/conf/salt',
-	timerInterval: 60000,
+  passportFile: '/etc/gluu/conf/passport-config.json',
+  saltFile: '/etc/gluu/conf/salt',
+  timerInterval: 60000
 }
