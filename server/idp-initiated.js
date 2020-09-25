@@ -1,11 +1,12 @@
 const R = require('ramda')
 const uuid = require('uuid')
-const url = require('url').URL
+// const url = require('url')
 const providersModule = require('./providers')
 const webutil = require('./utils/web-utils')
 const misc = require('./utils/misc')
 const logger = require('./utils/logging')
 const base64url = require('base64url')
+const querystring = require('querystring')
 
 function createAuthzRequest (user, iiconfig, provider) {
   logger.log2('debug', 'idp-initiated.createAuthzRequest: entered function ')
@@ -121,13 +122,12 @@ function process (req, res, next) {
 
     const authzRequestData = createAuthzRequest(user, iiconfig, provider)
     if (authzRequestData) {
-      const target = url.parse(
-        iiconfig.openidclient.authorizationEndpoint, true)
-      target.search = null
-      target.query = authzRequestData
+      const target = new URL(iiconfig.openidclient.authorizationEndpoint)
+
+      target.search = querystring.stringify(authzRequestData)
 
       // DO the redirection
-      res.redirect(url.format(target))
+      res.redirect(target)
     } else {
       const msg = 'Not enough data to build an authorization request.' +
         'At least a redirect URI is needed'
