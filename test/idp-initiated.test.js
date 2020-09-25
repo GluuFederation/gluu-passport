@@ -121,3 +121,16 @@ describe('idp-initiated.createAuthzRequest', () => {
       ).state, '_')
   })
 })
+
+describe('idp-initiated.url', () => {
+  // "importing" not exported function
+  var url = idpInitiated.__get__('url')
+
+  it('url type should NOT be a function (deprecated)', () => {
+    assert.notTypeOf(url, 'function', 'url is a function (deprecrated!)')
+  })
+
+  it('url type should be an object', () => {
+    assert.typeOf(url, 'object', 'url is not an object!')
+  })
+})
