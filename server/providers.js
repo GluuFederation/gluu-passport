@@ -9,7 +9,7 @@ const cacheProvider = require('./cache-provider')
 
 var prevConfigHash = 0
 
-// These are the (node) strategies loaded so far: [{id: "...", strategy: ...}, ... ]
+// These are the (node) strategies loaded so far: [{id: "...", Strategy: ...}, ... ]
 var passportStrategies = []
 
 function applyMapping (profile, provider) {
@@ -70,7 +70,7 @@ function setupStrategy (prv) {
 
   // if module is not found, load it
   if (Strategy) {
-    Strategy = Strategy.strategy
+    Strategy = Strategy.Strategy
   } else {
     logger.log2('info', `Loading node module ${moduleId}`)
     Strategy = require(moduleId)
