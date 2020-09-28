@@ -1,11 +1,18 @@
 # commented due not in use FOR NOW
-# name: Merge master to other branches
-# on:
-#   push:
-#     branches:
-#       - 'master'
-# jobs:
-#     sync-branch:
+name: Merge master to other branches
+on:
+  push:
+    branches:
+      - 'master'
+jobs:
+  sync-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Skipping
+        run: |
+          echo "Skipping as we have no version branch to merge right now"
+     
+# UNCOMMENT AND CHANGE NEW BRANCH NAME WHEN NEEDED
 #         runs-on: ubuntu-latest
 #         steps:
 #             - uses: actions/checkout@master
