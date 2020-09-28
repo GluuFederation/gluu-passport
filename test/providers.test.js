@@ -7,18 +7,17 @@ const assert = chai.assert
 
 describe('providers setupStrategy', () => {
   const passportStrategies = providers.__get__('passportStrategies')
+  const setupStrategy = providers.__get__('setupStrategy')
+  const testProvider = {
+    ...testConfig.passportConfigAuthorizedResponse.providers[0],
+    verifyCallbackArity: 0
+  }
 
   it('passport strategies array should be empty first time', () => {
     assert.deepEqual(passportStrategies, [])
   })
 
   it('new strategy should be added in passport strategies', () => {
-    const setupStrategy = providers.__get__('setupStrategy')
-    const testProvider = {
-      ...testConfig.passportConfigAuthorizedResponse.providers[0],
-      verifyCallbackArity: 0
-    }
-
     setupStrategy(testProvider)
 
     assert.lengthOf(passportStrategies, 1)
@@ -29,12 +28,6 @@ describe('providers setupStrategy', () => {
   })
 
   it('existing loaded strategy should be found and load again', () => {
-    const setupStrategy = providers.__get__('setupStrategy')
-    const testProvider = {
-      ...testConfig.passportConfigAuthorizedResponse.providers[0],
-      verifyCallbackArity: 0
-    }
-
     setupStrategy(testProvider)
 
     assert.lengthOf(passportStrategies, 1)
