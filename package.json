@@ -69,7 +69,9 @@
     "chai-files": "^1.4.0",
     "chai-http": "^4.3.0",
     "codecov": "^3.7.1",
+    "commitizen": "^4.2.2",
     "cucumber": "^6.0.5",
+    "cz-conventional-changelog": "^3.3.0",
     "eslint-plugin-chai-friendly": "^0.6.0",
     "got": "^11.6.0",
     "husky": "^4.3.0",
@@ -78,6 +80,7 @@
     "nyc": "^15.1.0",
     "rewire": "^5.0.0",
     "sinon": "^9.0.2",
+    "standard-version": "^9.0.0",
     "standardx": "^5.0.0",
     "supertest": "^4.0.2"
   },
@@ -93,7 +96,13 @@
   "homepage": "https://github.com/GluuFederation/gluu-passport#readme",
   "husky": {
     "hooks": {
-      "pre-commit": "npm run lint"
+      "pre-commit": "npm run lint",
+      "prepare-commit-msg": "exec < /dev/tty && git cz --hook || true"
+    }
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
     }
   }
 }
