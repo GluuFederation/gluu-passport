@@ -15,7 +15,7 @@ var passportStrategies = []
 function applyMapping (profile, provider) {
   let mappedProfile
   try {
-    const mapping = R.find(R.propEq('id', provider), global.providers).mapping
+    const mapping = global.providers.find(providerObj => providerObj.id === provider).mapping
     const additionalParams = profile.extras
 
     delete profile.extras
