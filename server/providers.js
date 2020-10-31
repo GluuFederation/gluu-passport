@@ -15,7 +15,7 @@ var passportStrategies = []
 function applyMapping (profile, provider) {
   let mappedProfile
   try {
-    const mapping = R.find(R.propEq('id', provider), global.providers).mapping
+    const mapping = global.providers.find(providerObj => providerObj.id === provider).mapping
     const additionalParams = profile.extras
 
     delete profile.extras
@@ -66,7 +66,7 @@ function setupStrategy (prv) {
 
   const id = prv.id
   const moduleId = prv.passportStrategyId
-  let Strategy = R.find(R.propEq('id', id), passportStrategies)
+  let Strategy = passportStrategies.find(strategyObj => strategyObj.id === id)
 
   // if module is not found, load it
   if (Strategy) {
