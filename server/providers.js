@@ -66,7 +66,7 @@ function setupStrategy (prv) {
 
   const id = prv.id
   const moduleId = prv.passportStrategyId
-  let Strategy = R.find(R.propEq('id', id), passportStrategies)
+  let Strategy = passportStrategies.find(strategyObj => strategyObj.id === id)
 
   // if module is not found, load it
   if (Strategy) {
