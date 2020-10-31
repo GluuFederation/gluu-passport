@@ -2,7 +2,6 @@ const router = require('express').Router()
 const passport = require('passport')
 const uuid = require('uuid')
 const fs = require('fs')
-const R = require('ramda')
 const idpInitiated = require('./idp-initiated')
 const providersModule = require('./providers')
 const webutil = require('./utils/web-utils')
@@ -92,7 +91,7 @@ router.get('/auth/meta/idp/:idp',
 
 function validateProvider (req, res, next) {
   const provider = req.params.provider // provider is non empty here
-  const providerConfData = R.find(R.propEq('id', provider), global.providers)
+  const providerConfData = global.providers.find(cfg => cfg.id === provider)
 
   if (providerConfData) {
     // Attach some info for later use
