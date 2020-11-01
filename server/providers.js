@@ -77,7 +77,12 @@ function setupStrategy (provider) {
   } else {
     logger.log2('info', `Loading node module ${module}`)
     Strategy = require(module)
-    Strategy = (provider.type === 'oauth' && Strategy.OAuth2Strategy) ? Strategy.OAuth2Strategy : Strategy.Strategy
+
+    if (provider.type === 'oauth' && Strategy.OAuth2Strategy) {
+      Strategy = Strategy.OAuth2Strategy
+    } else {
+      Strategy = Strategy.Strategy
+    }
 
     logger.log2('verbose', 'Adding to list of known strategies')
     passportStrategies.push({ id, Strategy })
@@ -221,12 +226,26 @@ function fillMissingData (providers) {
     */
 
     // Fills verifyCallbackArity (number expected)
-    const prop = 'verifyCallbackArity'
-    const value = extraPassportParams.get(strategyId, prop)
-    const toadd = options.passReqToCallback ? 1 : 0
+    const value = extraPassportParams.get(strategyId, 'verifyCallbackArity')
+    let toadd
+    if (options.passReqToCallback) {
+      toadd = 1
+    } else {
+      toadd = 0
+    }
 
     // In most passport strategies the verify callback has arity 4 except for saml
-    provider[prop] = (typeof value === 'number') ? value : (toadd + (isSaml ? 2 : 4))
+    if (typeof value === 'number') {
+      provider.verifyCallbackArity = value
+    } else {
+      let arity
+      if (isSaml) {
+        arity = 2
+      } else {
+        arity = 4
+      }
+      provider.verifyCallbackArity = toadd + arity
+    }
   }
 }
 
