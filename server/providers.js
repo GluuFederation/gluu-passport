@@ -67,16 +67,16 @@ function setupStrategy (provider) {
   logger.log2('debug', `Provider data is\n${JSON.stringify(provider, null, 4)}`)
 
   const id = provider.id
-  const module = provider.passportStrategyId
+  const strategyModule = provider.passportStrategyId
 
   let Strategy = passportStrategies.find(strategy => strategy.id === id)
 
-  // if module is not found, load it
+  // if strategyModule is not found, load it
   if (Strategy) {
     Strategy = Strategy.Strategy
   } else {
-    logger.log2('info', `Loading node module ${module}`)
-    Strategy = require(module)
+    logger.log2('info', `Loading node strategy module ${strategyModule}`)
+    Strategy = require(strategyModule)
 
     if (provider.type === 'oauth' && Strategy.OAuth2Strategy) {
       Strategy = Strategy.OAuth2Strategy
@@ -89,7 +89,7 @@ function setupStrategy (provider) {
   }
 
   const providerOptions = provider.options
-  const isSaml = module === 'passport-saml'
+  const isSaml = strategyModule === 'passport-saml'
   const verify = getVerifyFunction(provider)
 
   // Create strategy
@@ -173,6 +173,7 @@ function fixDataTypes (providers) {
     provider.passportAuthnParams = value
   }
 }
+
 function mergeProperty (strategyId, obj, property) {
   const extraParams = extraPassportParams.get(strategyId, property)
   return R.mergeLeft(obj[property], extraParams)
@@ -208,7 +209,7 @@ function fillMissingData (providers) {
     if (strategyId.indexOf('passport-apple') >= 0 && options.key) {
       // Smells like apple...
       try {
-        // TODO: we have to make the UI fields multiline so they can paste the contents and avoid this
+        // @TODO: we have to make the UI fields multiline so they can paste the contents and avoid this
         options.key = require('fs').readFileSync(options.key, 'utf8')
       } catch (e) {
         logger.log2('warn', `There was a problem reading file ${options.key}. Ensure the file exists and is readable`)
