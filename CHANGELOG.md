@@ -4,7 +4,6 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [4.3.6](https://github.com/GluuFederation/gluu-passport/compare/v4.3.5...v4.3.6) (2020-10-31)
 
-
 ### Bug Fixes
 
 * **routes.js:** add extended option to urlencode function call ([74ae36c](https://github.com/GluuFederation/gluu-passport/commit/74ae36ca692423130bab5adccc7222c7fd8dc2b1)), closes [#126](https://github.com/GluuFederation/gluu-passport/issues/126)
