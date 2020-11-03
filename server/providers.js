@@ -1,9 +1,9 @@
 const passport = require('passport')
 const R = require('ramda')
-const meta = require('./sp-meta')
+const spMetadata = require('./sp-meta')
 const misc = require('./utils/misc')
 const logger = require('./utils/logging')
-const pparams = require('./extra-passport-params')
+const extraPassportParams = require('./extra-passport-params')
 const cacheProvider = require('./cache-provider')
 // oiclienth = require('./utils/openid-client-helper')
 
@@ -15,7 +15,9 @@ var passportStrategies = []
 function applyMapping (profile, provider) {
   let mappedProfile
   try {
-    const mapping = global.providers.find(providerObj => providerObj.id === provider).mapping
+    const mapping = global.providers.find(
+      providerObj => providerObj.id === provider).mapping
+
     const additionalParams = profile.extras
 
     delete profile.extras
@@ -30,17 +32,17 @@ function applyMapping (profile, provider) {
   return mappedProfile
 }
 
-function getVerifyFunction (prv) {
-  const arity = prv.verifyCallbackArity
+function getVerifyFunction (provider) {
+  const arity = provider.verifyCallbackArity
 
   const uncurried = (...args) => {
     // profile and callback are the last 2 params in all passport verify functions,
     // except for passport-openidconnect which does not follow this convention
     let profile, extras
 
-    if (prv.passportStrategyId === 'passport-openidconnect') {
+    if (provider.passportStrategyId === 'passport-openidconnect') {
       // Check passport-openidconnect/lib/strategy.js
-      const index = prv.options.passReqToCallback ? 1 : 0
+      const index = provider.options.passReqToCallback ? 1 : 0
 
       profile = args[2 + index]
       extras = args.slice(0, 2 + index)
@@ -50,7 +52,7 @@ function getVerifyFunction (prv) {
       extras = args.slice(0, arity - 2)
     }
     const cb = args[arity - 1]
-    profile.providerKey = prv.id
+    profile.providerKey = provider.id
     profile.extras = extras
 
     return cb(null, profile)
@@ -60,55 +62,66 @@ function getVerifyFunction (prv) {
   return R.curryN(arity, uncurried)
 }
 
-function setupStrategy (prv) {
-  logger.log2('info', `Setting up strategy for provider ${prv.displayName}`)
-  logger.log2('debug', `Provider data is\n${JSON.stringify(prv, null, 4)}`)
+function setupStrategy (provider) {
+  logger.log2('info', `Setting up strategy for provider ${provider.displayName}`)
+  logger.log2('debug', `Provider data is\n${JSON.stringify(provider, null, 4)}`)
 
-  const id = prv.id
-  const moduleId = prv.passportStrategyId
-  let Strategy = passportStrategies.find(strategyObj => strategyObj.id === id)
+  const id = provider.id
+  const strategyModule = provider.passportStrategyId
 
-  // if module is not found, load it
+  let Strategy = passportStrategies.find(strategy => strategy.id === id)
+
+  // if strategyModule is not found, load it
   if (Strategy) {
     Strategy = Strategy.Strategy
   } else {
-    logger.log2('info', `Loading node module ${moduleId}`)
-    Strategy = require(moduleId)
-    Strategy = (prv.type === 'oauth' && Strategy.OAuth2Strategy) ? Strategy.OAuth2Strategy : Strategy.Strategy
+    logger.log2('info', `Loading node strategy module ${strategyModule}`)
+    Strategy = require(strategyModule)
+
+    if (provider.type === 'oauth' && Strategy.OAuth2Strategy) {
+      Strategy = Strategy.OAuth2Strategy
+    } else {
+      Strategy = Strategy.Strategy
+    }
 
     logger.log2('verbose', 'Adding to list of known strategies')
     passportStrategies.push({ id, Strategy })
   }
 
-  const options = prv.options
-  const isSaml = moduleId === 'passport-saml'
-  const verify = getVerifyFunction(prv)
+  const providerOptions = provider.options
+  const isSaml = strategyModule === 'passport-saml'
+  const verify = getVerifyFunction(provider)
 
   // Create strategy
   if (isSaml) {
     // Turn off inResponseTo validation if the IDP is configured for IDP-initiated:
     // "an IDP would never do both IDP initiated and SP initiated..."
-    if (R.find(R.propEq('provider', id), global.iiconfig.authorizationParams)) {
-      options.validateInResponseTo = false
+    if (global.iiconfig.authorizationParams.find(
+      authorizationParam => authorizationParam.provider === id)) {
+      providerOptions.validateInResponseTo = false
     }
 
     // Instantiate custom cache provider if required
-    if (options.validateInResponseTo) {
+    if (providerOptions.validateInResponseTo) {
       const f = R.anyPass([R.isNil, R.isEmpty])
-      const exp = options.requestIdExpirationPeriodMs / 1000
+      const exp = providerOptions.requestIdExpirationPeriodMs / 1000
 
-      if (!f(options.redisCacheOptions)) {
-        options.cacheProvider = cacheProvider.get('redis', options.redisCacheOptions, exp)
-      } else if (!f(options.memcachedCacheOptions)) {
-        options.cacheProvider = cacheProvider.get('memcached', options.memcachedCacheOptions, exp)
+      if (!f(providerOptions.redisCacheOptions)) {
+        providerOptions.cacheProvider = cacheProvider.get(
+          'redis', providerOptions.redisCacheOptions, exp
+        )
+      } else if (!f(providerOptions.memcachedCacheOptions)) {
+        providerOptions.cacheProvider = cacheProvider.get(
+          'memcached', providerOptions.memcachedCacheOptions, exp
+        )
       }
     }
 
-    const samlStrategy = new Strategy(options, verify)
+    const samlStrategy = new Strategy(providerOptions, verify)
     passport.use(id, samlStrategy)
-    meta.generate(prv, samlStrategy)
+    spMetadata.generate(provider, samlStrategy)
   } else {
-    passport.use(id, new Strategy(options, verify))
+    passport.use(id, new Strategy(providerOptions, verify))
   }
 }
 
@@ -125,59 +138,66 @@ function parseProp (value) {
   return value
 }
 
-function fixDataTypes (ps) {
-  for (const p of ps) {
+/**
+* @TODO refactor ramda to native
+*/
+function fixDataTypes (providers) {
+  for (const provider of providers) {
     // The subproperties of provider's options potentially come from the server as strings, they should
     // be converted to other types if possible
-    let prop = 'options'; let value = p[prop]
+    let value = provider.options
 
     if (misc.isObject(value)) {
       R.forEach((key) => {
         value[key] = parseProp(value[key])
       }, R.keys(value))
     } else {
-      logger.log2('warn', `Object expected for property ${prop}, found ${JSON.stringify(value)}`)
+      logger.log2(
+        'warn', `Object expected for property options, found ${JSON.stringify(value)}`
+      )
       value = {}
     }
-    p[prop] = value
+    provider.options = value
 
     // Tries to convert passportAuthnParams to a dictionary, otherwise {} is left
-    prop = 'passportAuthnParams'
-    value = parseProp(p[prop])
+    value = parseProp(provider.passportAuthnParams)
     if (!misc.isObject(value)) {
       // log message only if passportAuthnParams is not absent
       if (!R.isNil(value)) {
-        logger.log2('warn', `Parsable object expected for property ${prop}, found ${JSON.stringify(value)}`)
+        logger.log2(
+          'warn', `Parsable object expected for property passportAuthnParams, found ${JSON.stringify(value)}`
+        )
       }
       value = {}
     }
-    p[prop] = value
+    provider.passportAuthnParams = value
   }
 }
 
-function mergeProperty (strategyId, obj, prop) {
-  const extraParams = pparams.get(strategyId, prop)
-  return R.mergeLeft(obj[prop], extraParams)
+function mergeProperty (strategyId, obj, property) {
+  const extraParams = extraPassportParams.get(strategyId, property)
+  return R.mergeLeft(obj[property], extraParams)
 }
 
-function fillMissingData (ps) {
+function fillMissingData (providers) {
   const paramsToFill = ['passportAuthnParams', 'options']
 
   // eslint-disable-next-line no-return-assign
-  R.forEach(p => R.forEach(prop => p[prop] = mergeProperty(p.passportStrategyId, p, prop), paramsToFill), ps)
+  R.forEach(provider => R.forEach(prop => provider[prop] = mergeProperty(
+    provider.passportStrategyId, provider, prop), paramsToFill), providers)
 
-  for (const p of ps) {
-    const options = p.options
-    const strategyId = p.passportStrategyId
+  for (const provider of providers) {
+    const options = provider.options
+    const strategyId = provider.passportStrategyId
     const isSaml = strategyId === 'passport-saml'
     const callbackUrl = R.defaultTo(options.callbackUrl, options.callbackURL)
     const prefix = global.config.serverURI + '/passport/auth'
 
     if (isSaml) {
       // Different casing in saml
-      options.callbackUrl = R.defaultTo(`${prefix}/saml/${p.id}/callback`, callbackUrl)
+      options.callbackUrl = R.defaultTo(`${prefix}/saml/${provider.id}/callback`, callbackUrl)
     } else {
-      options.callbackURL = R.defaultTo(`${prefix}/${p.id}/callback`, callbackUrl)
+      options.callbackURL = R.defaultTo(`${prefix}/${provider.id}/callback`, callbackUrl)
       // Some passport strategies expect consumer* instead of client*
       options.consumerKey = options.clientID
       options.consumerSecret = options.clientSecret
@@ -189,7 +209,7 @@ function fillMissingData (ps) {
     if (strategyId.indexOf('passport-apple') >= 0 && options.key) {
       // Smells like apple...
       try {
-        // TODO: we have to make the UI fields multiline so they can paste the contents and avoid this
+        // @TODO: we have to make the UI fields multiline so they can paste the contents and avoid this
         options.key = require('fs').readFileSync(options.key, 'utf8')
       } catch (e) {
         logger.log2('warn', `There was a problem reading file ${options.key}. Ensure the file exists and is readable`)
@@ -207,31 +227,45 @@ function fillMissingData (ps) {
     */
 
     // Fills verifyCallbackArity (number expected)
-    const prop = 'verifyCallbackArity'
-    const value = pparams.get(strategyId, prop)
-    const toadd = options.passReqToCallback ? 1 : 0
+    const value = extraPassportParams.get(strategyId, 'verifyCallbackArity')
+    let toadd
+    if (options.passReqToCallback) {
+      toadd = 1
+    } else {
+      toadd = 0
+    }
 
     // In most passport strategies the verify callback has arity 4 except for saml
-    p[prop] = (typeof value === 'number') ? value : (toadd + (isSaml ? 2 : 4))
+    if (typeof value === 'number') {
+      provider.verifyCallbackArity = value
+    } else {
+      let arity
+      if (isSaml) {
+        arity = 2
+      } else {
+        arity = 4
+      }
+      provider.verifyCallbackArity = toadd + arity
+    }
   }
 }
 
 /**
  * Setup providers and sets global `providers`
- * @param ps : Object containing providers (fetched from config endpoint)
+ * @param providers : Object containing providers (fetched from config endpoint)
+ * @TODO refactor function name to setupProviders
  */
-function setup (ps) {
-  ps = R.defaultTo([], ps)
-  const h = misc.hash(ps)
-  if (h !== prevConfigHash) {
+function setup (providers) {
+  providers = R.defaultTo([], providers)
+  const hashConfig = misc.hash(providers)
+  if (hashConfig !== prevConfigHash) {
     // Only makes recomputations if config data changed
     logger.log2('info', 'Reconfiguring providers')
 
-    prevConfigHash = h
+    prevConfigHash = hashConfig
     // Unuse all strategies before reconfiguring
     R.forEach(s => passport.unuse(s), R.map(R.prop('id'), passportStrategies))
 
-    const providers = R.clone(ps)
     // "Fix" incoming data
     fixDataTypes(providers)
     fillMissingData(providers)
