@@ -20,7 +20,7 @@ class InitMock {
       '_7673.FFB2.0429.E289.BE8F.91B6.5255.82BF'
     this._pct = 'd0a71780-877f-4edb-b002-592f61d9df72_F978.5DC2.' +
       '97F8.BA28.3B17.C447.C3FA.153D'
-    this._oxauthErrorHandlerPath = '/oxauth/auth/passport/passportlogin.htm$'
+    this._oxauthErrorHandlerPath = '/oxauth/auth/passport/passportlogin.htm'
   }
 
   get gluuUrl () {
@@ -36,7 +36,7 @@ class InitMock {
     nock(this._gluuUrl, {
       reqheaders: { host: this._gluuHostName }
     })
-      .get(uri => uri.includes('/oxauth/auth/passport/passportlogin.htm'))
+      .get(uri => uri.includes(`${this._oxauthErrorHandlerPath}?failure=`))
       .reply(404, 'dummy response')
       .persist()
   }
