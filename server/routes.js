@@ -98,7 +98,8 @@ function validateProvider (req, res, next) {
     req.passportAuthenticateParams = providerConfData.passportAuthnParams
     next()
   } else {
-    webutil.handleError(req, res, `${provider} is not recognized as external identity provider`)
+    webutil.handleError(
+      req, res, 'The selected provider is not recognized as external identity provider')
   }
 }
 
