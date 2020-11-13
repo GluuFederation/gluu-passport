@@ -1,5 +1,9 @@
 # Inbound identity using Passport
 
+
+[![codecov](https://codecov.io/gh/GluuFederation/gluu-passport/branch/master/graph/badge.svg)](https://codecov.io/gh/GluuFederation/gluu-passport)
+
+
 Find the docs of this project at:
 
 - [Inbound SAML using Passport](https://gluu.org/docs/ce/authn-guide/passport/)
