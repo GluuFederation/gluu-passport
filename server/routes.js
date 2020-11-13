@@ -76,7 +76,7 @@ router.get('/auth/meta/idp/:idp',
           if (!fs.existsSync(safeFileFullPath)) {
             var EnoentError = `Requested metadata for ${metaFileName} not found`
             logger.log2('error', EnoentError)
-            res.status(404).send(EnoentError)
+            res.status(404).send('Requested metadata not found')
           } else {
             res.status(500).send(`An error occurred: ${err}`)
             logger.log2('error', err)
@@ -98,7 +98,8 @@ function validateProvider (req, res, next) {
     req.passportAuthenticateParams = providerConfData.passportAuthnParams
     next()
   } else {
-    webutil.handleError(req, res, `${provider} is not recognized as external identity provider`)
+    webutil.handleError(
+      req, res, 'The selected provider is not recognized as external identity provider')
   }
 }
 
