@@ -10,8 +10,8 @@ var httpServer
 var httpPort = -1
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
-const appFactory = new AppFactory()
-const app = appFactory.createApp()
+const appFactoryInstance = new AppFactory()
+const app = appFactoryInstance.createApp()
 
 /**
  * Creates express server for the first time and recreates if port changed

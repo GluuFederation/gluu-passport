@@ -55,7 +55,4 @@ class AppFactory {
   }
 }
 
-module.exports = {
-  AppFactory: AppFactory,
-  app: app
-}
+module.exports = AppFactory
