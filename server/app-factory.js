@@ -11,7 +11,7 @@ const routes = require('./routes')
 const metricsMiddleware = require('../server/utils/metrics')
 const csurf = require('csurf')
 
-class App {
+class AppFactory {
   createApp () {
     app.use(metricsMiddleware)
     app.use(morgan('short', { stream: logger.logger.stream }))
@@ -55,4 +55,7 @@ class App {
   }
 }
 
-module.exports = App
+module.exports = {
+  AppFactory: AppFactory,
+  app: app
+}
