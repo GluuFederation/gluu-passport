@@ -28,7 +28,7 @@ class AppFactory {
       store: new MemoryStore({
         checkPeriod: 86400000 // prune expired entries every 24h
       }),
-      secret: randomSecret,
+      secret: randomSecret(),
       resave: false,
       saveUninitialized: false
     }))
