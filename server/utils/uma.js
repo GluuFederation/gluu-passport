@@ -1,7 +1,7 @@
 const reqp = require('request-promise')
 const parsers = require('www-authenticate').parsers
 const R = require('ramda')
-const uuid = require('uuid')
+const { v4: uuidv4 } = require('uuid')
 const misc = require('./misc')
 const logger = require('./logging')
 
@@ -51,7 +51,7 @@ function getRPT (ticket, tokenEndpoint) {
     iss: clientId,
     sub: clientId,
     aud: tokenEndpoint,
-    jti: uuid(),
+    jti: uuidv4(),
     exp: now / 1000 + 30,
     iat: now
   })
