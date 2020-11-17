@@ -127,7 +127,7 @@ function encrypt (obj) {
   // Encryption compatible with Gluu EncryptionService
   const pt = JSON.stringify(obj)
   const encrypt = crypto.createCipheriv('des-ede3-ecb', secretKey(), '')
-  var encrypted = encrypt.update(pt, 'utf8', 'base64')
+  let encrypted = encrypt.update(pt, 'utf8', 'base64')
   encrypted += encrypt.final('base64')
   return encrypted
 }
