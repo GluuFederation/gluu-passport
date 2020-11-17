@@ -5,6 +5,11 @@ const jwt = require('jsonwebtoken')
 const crypto = require('crypto')
 const fs = require('fs')
 
+const randomSecret = () => {
+  const buf = crypto.randomBytes(256)
+  return buf.toString('hex')
+}
+
 const isObject = x => !R.isNil(x) && !Array.isArray(x) && typeof x === 'object'
 
 const pipePromise_ = R.reduce((p, fn) => Promise.resolve(p).then(fn))
@@ -138,5 +143,6 @@ module.exports = {
   getRpJWT: getRpJWT,
   getJWT: getJWT,
   verifyJWT: verifyJWT,
-  encrypt: encrypt
+  encrypt: encrypt,
+  randomSecret: randomSecret
 }

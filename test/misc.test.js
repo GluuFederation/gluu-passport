@@ -1,7 +1,29 @@
 const chai = require('chai')
 const misc = require('../server/utils/misc')
+const rewire = require('rewire')
+const rewiredMisc = rewire('../server/utils/misc.js')
+const sinon = require('sinon')
 
 const assert = chai.assert
+describe('misc.randomSecret', () => {
+  it('should exist', () => {
+    assert.exists(misc.randomSecret)
+  })
+
+  it('should be function', () => {
+    assert.isFunction(misc.randomSecret)
+  })
+
+  it('should call crypto once', () => {
+    const crypto = rewiredMisc.__get__('crypto')
+    const randomBytesSpy = sinon.spy(crypto, 'randomBytes')
+    const randomSecret = rewiredMisc.__get__('randomSecret')
+
+    randomSecret()
+
+    sinon.assert.calledOnce(randomBytesSpy)
+  })
+})
 
 describe('misc.arrify', () => {
   /* This functions aims at transforming every key value
