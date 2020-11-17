@@ -104,12 +104,6 @@
     "url": "https://github.com/GluuFederation/gluu-passport/issues"
   },
   "homepage": "https://github.com/GluuFederation/gluu-passport#readme",
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run lint",
-      "prepare-commit-msg": "exec < /dev/tty && git cz --hook || true"
-    }
-  },
   "config": {
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
