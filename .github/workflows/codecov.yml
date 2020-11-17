@@ -1,6 +1,6 @@
-# This is a basic workflow to help you get started with Actions
+# After coverage report gets generated a vulnerability scan runs and submits a sarif report directly to Security section in GitHub.
 
-name: Codecov
+name: Test, Codecov and VulnerabilityScan
 
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
@@ -35,12 +35,23 @@ jobs:
         node-version: ${{ matrix.node-version }}
         
 
-    - name: Generate coverage report
+    - name: Build,Test and Generate coverage report
       run: |
         npm ci
         npm run build --if-present
         npm test
         npm run generate-coverage
+
+    # Runs vulnerability scan.
+    - uses: anchore/scan-action@v2
+      id: scan
+      with:
+        path: "."
+        acs-report-enable: true
+    - name: upload Anchore scan SARIF report
+      uses: github/codeql-action/upload-sarif@v1
+      with:
+        sarif_file: results.sarif
 
     - name: Upload to codecov
       uses: codecov/codecov-action@v1.0.10
