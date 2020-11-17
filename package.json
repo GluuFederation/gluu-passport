@@ -38,7 +38,6 @@
     "memcached": "^2.2.2",
     "memorystore": "^1.6.4",
     "morgan": "^1.9.1",
-    "npm-check": "^5.9.2",
     "openid-client": "^3.14.0",
     "passport": "^0.4.0",
     "passport-dropbox-oauth2": "^1.1.0",
