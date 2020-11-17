@@ -29,7 +29,6 @@
     "config": "^3.3.2",
     "cookie-parser": "^1.4.4",
     "csurf": "^1.11.0",
-    "dateformat": "^3.0.3",
     "eslint-plugin-import": "^2.22.1",
     "express": "^4.16.4",
     "express-list-endpoints": "^5.0.0",
