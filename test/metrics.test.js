@@ -23,7 +23,7 @@ before(function (done) {
 })
 
 describe('metrics.js unit', () => {
-  var promBundle = metrics.__get__('promBundle')
+  const promBundle = metrics.__get__('promBundle')
   it('promBundle exists', () => {
     assert.exists(
       promBundle,
