@@ -10,6 +10,7 @@ const logger = require('./utils/logging')
 const routes = require('./routes')
 const metricsMiddleware = require('../server/utils/metrics')
 const csurf = require('csurf')
+const { randomSecret } = require('./utils/misc')
 
 class AppFactory {
   createApp () {
@@ -27,7 +28,7 @@ class AppFactory {
       store: new MemoryStore({
         checkPeriod: 86400000 // prune expired entries every 24h
       }),
-      secret: 'wtf',
+      secret: randomSecret,
       resave: false,
       saveUninitialized: false
     }))
