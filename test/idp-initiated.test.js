@@ -60,7 +60,7 @@ describe('idp-initiated.createAuthzRequest', () => {
   }
 
   // "importing" not exported function
-  var createAuthzRequest = idpInitiated.__get__('createAuthzRequest')
+  const createAuthzRequest = idpInitiated.__get__('createAuthzRequest')
 
   /**
    * @todo: Activate this (uses `rewire`) to do unit instead of integration
