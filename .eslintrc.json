@@ -1,6 +1,4 @@
-{   "ecmaFeatures" : {
-    "modules" : true
-  },
+{   
     "env": {
         "commonjs": true,
         "node": true,
