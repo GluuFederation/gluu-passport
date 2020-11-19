@@ -6,6 +6,52 @@ const rewiredMisc = rewire('../server/utils/misc.js')
 const sinon = require('sinon')
 
 const assert = chai.assert
+
+describe('misc.getDefaultValueIfUnexistant', () => {
+  it('shoud exist', () => {
+    assert.exists(misc.assignDefaultValueIfUnexistant)
+  })
+  it('should be a function', () => {
+    assert.isFunction(misc.assignDefaultValueIfUnexistant)
+  })
+
+  it('should throw error if object if defaultValue is unexistant', () => {
+    const object = {}
+    let unexistant
+    assert.throws(() => {
+      misc.assignDefaultValueIfUnexistant(unexistant, object)
+    },
+    'defaultValue cannot be undefined, NaN or null')
+  })
+
+  it('should not throw error if defaultValue exists', () => {
+    const object = {}
+    const existant = 'existantValue'
+    assert.doesNotThrow(() => {
+      misc.assignDefaultValueIfUnexistant(existant, object)
+    },
+    'defaultValue cannot be undefined, NaN or null')
+  })
+
+  it('should return defaultValue if object is unexistant', () => {
+    let unexistantObject
+    const defaultValue = 'myDefaultValue'
+    assert.strictEqual(
+      misc.assignDefaultValueIfUnexistant(defaultValue, unexistantObject),
+      defaultValue
+    )
+  })
+
+  it('should return object if object exists', () => {
+    const existantObject = { exists: true }
+    const defaultValue = 'anyNonEmptyValue'
+    assert.strictEqual(
+      misc.assignDefaultValueIfUnexistant(defaultValue, existantObject),
+      existantObject
+    )
+  })
+})
+
 describe('misc.randomSecret', () => {
   it('should exist', () => {
     assert.exists(misc.randomSecret)

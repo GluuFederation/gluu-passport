@@ -8,8 +8,9 @@ const misc = require('./misc')
 const format = winston.format
 const path = require('path')
 
-const dir = R.defaultTo(
-  path.join(__dirname, 'logs'), process.env.NODE_LOGGING_DIR)
+const dir = misc.assignDefaultValueIfUnexistant(
+  path.join(__dirname, 'logs'), process.env.NODE_LOGGING_DIR
+)
 
 const defaultLogOptions = {
   filename: dir + '/passport-%DATE%.log',
@@ -55,7 +56,8 @@ function configure (cfg) {
   // Only makes recomputations if config data changed
   if (h !== prevConfigHash) {
     prevConfigHash = h
-    const level = R.defaultTo('info', cfg.level)
+
+    const level = misc.assignDefaultValueIfUnexistant('info', cfg.level)
 
     // Remove console log + rotary file transports
     R.forEach(l => logger.remove(l), R.filter(R.complement(R.isNil), [transport, consoleTransport]))
@@ -132,7 +134,7 @@ function log2 (level, msg) {
   level = level.toLowerCase()
   level = R.includes(level, levels) ? level : 'info'
 
-  msg = R.defaultTo('', msg)
+  msg = misc.assignDefaultValueIfUnexistant('', msg)
 
   // Convert arguments to a real array (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/arguments#Description)
   const args = [].slice.call(arguments)
