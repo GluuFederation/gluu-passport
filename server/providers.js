@@ -7,10 +7,10 @@ const extraPassportParams = require('./extra-passport-params')
 const cacheProvider = require('./cache-provider')
 // oiclienth = require('./utils/openid-client-helper')
 
-var prevConfigHash = 0
+let prevConfigHash = 0
 
 // These are the (node) strategies loaded so far: [{id: "...", Strategy: ...}, ... ]
-var passportStrategies = []
+const passportStrategies = []
 
 function applyMapping (profile, provider) {
   let mappedProfile

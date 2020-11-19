@@ -10,23 +10,26 @@ const sinon = require('sinon')
  * @param {*} spyFn sinon.Spy function
  * @param {*} argFn callback / function param
  */
-function getCallWithArgs (spyFn, argFn) {
+function assertCalledWithFunctionAsArg (spyFn, argFn) {
   const calls = spyFn.getCalls()
   const argFnString = argFn.toString()
-  let foundCall
+  let foundMatch = false
   for (const call in calls) {
     const arg = spyFn.getCall(call).args[0]
     if (arg.toString() === argFnString) {
-      foundCall = spyFn.getCall(call)
+      // foundCall = spyFn.getCall(call)
+      foundMatch = true
     }
   }
-  return foundCall
+  assert(foundMatch === true,
+    'Spy function/method was not called with expected function')
 }
 
 describe('csurf middleware', () => {
   const rewiredCsurf = appFactoryRewire.__get__('csurf')
 
   it('should exist', () => {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     assert.exists(rewiredCsurf)
   })
 
@@ -47,10 +50,7 @@ describe('csurf middleware', () => {
 
     appInstance.createApp()
 
-    const call = getCallWithArgs(appUseSpy, csurf({ cookie: true }))
-    const arg = call.args[0]
-    assert(arg.toString === csurf({ cookie: true }).toString)
-
+    assertCalledWithFunctionAsArg(appUseSpy, csurf({ cookies: true }))
     sinon.restore()
   })
 })

@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-non-literal-fs-filename */
 const chai = require('chai')
 const assert = chai.assert
 const chaiHttp = require('chai-http')
@@ -23,7 +24,7 @@ before(function (done) {
 })
 
 describe('metrics.js unit', () => {
-  var promBundle = metrics.__get__('promBundle')
+  const promBundle = metrics.__get__('promBundle')
   it('promBundle exists', () => {
     assert.exists(
       promBundle,
