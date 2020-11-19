@@ -134,7 +134,9 @@ function log2 (level, msg) {
   level = level.toLowerCase()
   level = R.includes(level, levels) ? level : 'info'
 
-  msg = misc.assignDefaultValueIfUnexistant('', msg)
+  if (!msg && msg !== '') {
+    msg = ''
+  }
 
   // Convert arguments to a real array (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/arguments#Description)
   const args = [].slice.call(arguments)
