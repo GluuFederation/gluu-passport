@@ -63,9 +63,8 @@ router.get('/auth/meta/idp/:idp',
   function (req, res) {
     // normalizes
     const idp = path.basename(req.params.idp)
-    const fileDir = `${__dirname}/idp-metadata/`
     const metaFileName = `${idp}.xml`
-    const safeFileFullPath = path.join(fileDir, metaFileName)
+    const safeFileFullPath = path.join(__dirname, 'idp-metadata', metaFileName)
 
     logger.log2('verbose', `Metadata request for IDP ${idp}`)
 
@@ -74,7 +73,7 @@ router.get('/auth/meta/idp/:idp',
       (err, data) => {
         if (err) {
           if (!fs.existsSync(safeFileFullPath)) {
-            var EnoentError = `Requested metadata for ${metaFileName} not found`
+            const EnoentError = `Requested metadata for ${metaFileName} not found`
             logger.log2('error', EnoentError)
             res.status(404).send('Requested metadata not found')
           } else {

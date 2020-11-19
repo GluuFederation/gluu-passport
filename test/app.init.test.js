@@ -11,7 +11,7 @@ chai.use(chaiFiles)
 chai.use(chaiHttp)
 const file = chaiFiles.file
 
-var contexto = {}
+const contexto = {}
 
 // @todo: implement context variables to use in stage testing
 
