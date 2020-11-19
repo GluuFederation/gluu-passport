@@ -29,6 +29,7 @@ describe('csurf middleware', () => {
   const rewiredCsurf = appFactoryRewire.__get__('csurf')
 
   it('should exist', () => {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     assert.exists(rewiredCsurf)
   })
 
