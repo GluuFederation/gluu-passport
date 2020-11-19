@@ -6,8 +6,8 @@ const providers = require('./providers')
 const passportFile = config.get('passportFile')
 const AppFactory = require('./app-factory')
 
-var httpServer
-var httpPort = -1
+let httpServer
+let httpPort = -1
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
 const appFactoryInstance = new AppFactory()
