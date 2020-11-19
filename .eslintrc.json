@@ -1,4 +1,4 @@
-{  
+{
     "env": {
         "commonjs": true,
         "node": true,
