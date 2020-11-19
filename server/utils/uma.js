@@ -5,7 +5,7 @@ const uuid = require('uuid')
 const misc = require('./misc')
 const logger = require('./logging')
 
-var rpt
+let rpt
 
 /**
  * @todo: Add proxy option for dev/tests

@@ -6,9 +6,11 @@ const util = require('util')
 const R = require('ramda')
 const misc = require('./misc')
 const format = winston.format
+const path = require('path')
 
-const
-  dir = R.defaultTo(`${__dirname}/logs`, process.env.NODE_LOGGING_DIR)
+const dir = R.defaultTo(
+  path.join(__dirname, 'logs'), process.env.NODE_LOGGING_DIR)
+
 const defaultLogOptions = {
   filename: dir + '/passport-%DATE%.log',
   handleExceptions: true,
@@ -35,9 +37,9 @@ logger.stream = {
   write: (message) => log2('info', message.trim())
 }
 
-var transport, fileTransport, consoleTransport
-var MQDetails, stompClient
-var prevConfigHash = 0
+let transport, fileTransport, consoleTransport
+let MQDetails, stompClient
+let prevConfigHash = 0
 
 if (!fs.existsSync(dir)) {
   fs.mkdirSync(dir)
@@ -133,7 +135,7 @@ function log2 (level, msg) {
   msg = R.defaultTo('', msg)
 
   // Convert arguments to a real array (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/arguments#Description)
-  var args = [].slice.call(arguments)
+  const args = [].slice.call(arguments)
   args[0] = level
   args[1] = msg
 
