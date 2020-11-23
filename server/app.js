@@ -38,6 +38,7 @@ function recreateHttpServer (serverURI, port) {
       console.log(`Server listening on ${serverURI}:${port}`)
       app.emit('appStarted') // event emitter for tests
     })
+    module.exports = httpServer
   }
 }
 

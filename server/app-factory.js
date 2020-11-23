@@ -11,6 +11,7 @@ const routes = require('./routes')
 const metricsMiddleware = require('../server/utils/metrics')
 const csurf = require('csurf')
 const { randomSecret } = require('./utils/misc')
+const { rateLimiter } = require('./utils/rate-limiter')
 
 class AppFactory {
   createApp () {
@@ -20,6 +21,7 @@ class AppFactory {
     app.use(bodyParser.urlencoded({ extended: false }))
     app.use(cookieParser())
     app.use(csurf({ cookie: true }))
+    app.use(rateLimiter)
 
     app.use(session({
       cookie: {
