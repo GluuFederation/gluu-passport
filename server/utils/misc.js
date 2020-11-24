@@ -10,21 +10,6 @@ const randomSecret = () => {
   return buf.toString('hex')
 }
 
-/**
- * Assigns defaultValue to object if object value is undefined, null or NaN
- * @param {*} defaultValue
- * @param {*} object
- */
-const assignDefaultValueIfUnexistant = (defaultValue, object) => {
-  if (!defaultValue) {
-    throw new Error('defaultValue cannot be undefined, NaN or null')
-  }
-  if (!object) {
-    object = defaultValue
-  }
-  return object
-}
-
 const isObject = x => !R.isNil(x) && !Array.isArray(x) && typeof x === 'object'
 
 const pipePromise_ = R.reduce((p, fn) => Promise.resolve(p).then(fn))
@@ -159,6 +144,5 @@ module.exports = {
   getJWT: getJWT,
   verifyJWT: verifyJWT,
   encrypt: encrypt,
-  randomSecret: randomSecret,
-  assignDefaultValueIfUnexistant: assignDefaultValueIfUnexistant
+  randomSecret: randomSecret
 }

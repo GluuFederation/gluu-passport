@@ -8,9 +8,7 @@ const misc = require('./misc')
 const format = winston.format
 const path = require('path')
 
-const dir = misc.assignDefaultValueIfUnexistant(
-  path.join(__dirname, 'logs'), process.env.NODE_LOGGING_DIR
-)
+const dir = process.env.NODE_LOGGING_DIR || path.join(__dirname, 'logs')
 
 const defaultLogOptions = {
   filename: dir + '/passport-%DATE%.log',
@@ -57,7 +55,7 @@ function configure (cfg) {
   if (h !== prevConfigHash) {
     prevConfigHash = h
 
-    const level = misc.assignDefaultValueIfUnexistant('info', cfg.level)
+    const level = cfg.level || 'info'
 
     // Remove console log + rotary file transports
     R.forEach(l => logger.remove(l), R.filter(R.complement(R.isNil), [transport, consoleTransport]))
@@ -103,7 +101,6 @@ function configure (cfg) {
       }
       stompClient = new Stomp(MQDetails)
       stompClient.connect(
-
         // eslint-disable-next-line no-unused-vars
         sessionId => logger.info('Connected to STOMP server')
         //, The error callback is called successively until the connection succeeds...
@@ -134,9 +131,7 @@ function log2 (level, msg) {
   level = level.toLowerCase()
   level = R.includes(level, levels) ? level : 'info'
 
-  if (!msg && msg !== '') {
-    msg = ''
-  }
+  msg = msg || ''
 
   // Convert arguments to a real array (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/arguments#Description)
   const args = [].slice.call(arguments)
