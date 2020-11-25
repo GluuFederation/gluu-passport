@@ -1,6 +1,5 @@
 const R = require('ramda')
-const uuid = require('uuid')
-// const url = require('url')
+const { v4: uuidv4 } = require('uuid')
 const providersModule = require('./providers')
 const webutil = require('./utils/web-utils')
 const misc = require('./utils/misc')
@@ -43,7 +42,7 @@ function createAuthzRequest (user, iiconfig, provider) {
       iss: global.config.serverURI,
       sub: user.uid,
       aud: clientId,
-      jti: uuid(),
+      jti: uuidv4(),
       exp: now / 1000 + 30,
       iat: now,
       data: misc.encrypt(user)
@@ -73,7 +72,7 @@ function createAuthzRequest (user, iiconfig, provider) {
     )
 
     if (nonceNeeded(req)) {
-      req.nonce = uuid()
+      req.nonce = uuidv4()
     }
 
     logger.log2('debug', `Request is\n${JSON.stringify(req, null, 4)}`)
