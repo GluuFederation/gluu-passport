@@ -217,14 +217,6 @@ function fillMissingData (providers) {
         options.key = ''
       }
     }
-    /*
-    //Disabled temporarily: strategy failing to validate id_tokens, see issue #78
-    else if (strategyId == 'openid-client') {
-      options.redirect_uri = options.callbackURL
-      options = oiclienth.makeOptions(options)
-      p.options = options
-    }
-    */
 
     // Fills verifyCallbackArity (number expected)
     const value = extraPassportParams.get(strategyId, 'verifyCallbackArity')
