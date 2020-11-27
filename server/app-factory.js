@@ -9,7 +9,7 @@ const morgan = require('morgan')
 const logger = require('./utils/logging')
 const routes = require('./routes')
 const metricsMiddleware = require('../server/utils/metrics')
-const csurf = require('csurf')
+// const csurf = require('csurf')
 const { randomSecret } = require('./utils/misc')
 
 class AppFactory {
@@ -19,7 +19,7 @@ class AppFactory {
     app.use(bodyParser.json())
     app.use(bodyParser.urlencoded({ extended: false }))
     app.use(cookieParser())
-    app.use(csurf({ cookie: true }))
+    // app.use(csurf({ cookie: true }))
 
     app.use(session({
       cookie: {
