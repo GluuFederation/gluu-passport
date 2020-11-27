@@ -5,7 +5,6 @@ const misc = require('./utils/misc')
 const logger = require('./utils/logging')
 const extraPassportParams = require('./extra-passport-params')
 const cacheProvider = require('./cache-provider')
-// oiclienth = require('./utils/openid-client-helper')
 
 let prevConfigHash = 0
 
