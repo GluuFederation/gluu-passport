@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-non-literal-fs-filename */
 const chai = require('chai')
 const assert = chai.assert
 const rewire = require('rewire')
@@ -29,7 +30,6 @@ describe('csurf middleware', () => {
   const rewiredCsurf = appFactoryRewire.__get__('csurf')
 
   it('should exist', () => {
-    // eslint-disable-next-line security/detect-non-literal-fs-filename
     assert.exists(rewiredCsurf)
   })
 
@@ -51,6 +51,58 @@ describe('csurf middleware', () => {
     appInstance.createApp()
 
     assertCalledWithFunctionAsArg(appUseSpy, csurf({ cookies: true }))
+    sinon.restore()
+  })
+})
+
+describe('connect-flash middleware', () => {
+  const rewiredFlash = appFactoryRewire.__get__('flash')
+
+  it('should exist', () => {
+    assert.exists(rewiredFlash)
+  })
+
+  it('should be a function', () => {
+    assert.isFunction(rewiredFlash)
+  })
+
+  it('should be equal connect-flash module', () => {
+    assert.strictEqual(rewiredFlash, require('connect-flash'))
+  })
+
+  it('should be called once as app.use arg', () => {
+    const flash = require('connect-flash')
+    const app = appFactoryRewire.__get__('app')
+    const AppFactory = appFactoryRewire.__get__('AppFactory')
+    const appUseSpy = sinon.spy(app, 'use')
+    const appInstance = new AppFactory()
+
+    appInstance.createApp()
+
+    assertCalledWithFunctionAsArg(appUseSpy, flash())
+    sinon.restore()
+  })
+})
+
+describe('error-handler middleware', () => {
+  const rewiredGlobalErrorHandler = appFactoryRewire.__get__('globalErrorHandler')
+
+  it('should exist', () => {
+    assert.exists(rewiredGlobalErrorHandler)
+  })
+
+  it('should be a function', () => {
+    assert.isFunction(rewiredGlobalErrorHandler)
+  })
+
+  it('should be called once as app.use arg', () => {
+    const app = appFactoryRewire.__get__('app')
+    const AppFactory = appFactoryRewire.__get__('AppFactory')
+    const appUseSpy = sinon.spy(app, 'use')
+    const appInstance = new AppFactory()
+
+    appInstance.createApp()
+    assertCalledWithFunctionAsArg(appUseSpy, rewiredGlobalErrorHandler)
     sinon.restore()
   })
 })
