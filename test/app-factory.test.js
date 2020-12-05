@@ -26,33 +26,3 @@ function assertCalledWithFunctionAsArg (spyFn, argFn) {
   assert(foundMatch === true,
     'Spy function/method was not called with expected function')
 }
-
-// describe('csurf middleware', () => {
-//   const rewiredCsurf = appFactoryRewire.__get__('csurf')
-
-//   it('should exist', () => {
-//     // eslint-disable-next-line security/detect-non-literal-fs-filename
-//     assert.exists(rewiredCsurf)
-//   })
-
-//   it('should be a function', () => {
-//     assert.isFunction(rewiredCsurf)
-//   })
-
-//   it('should be equal csurf module', () => {
-//     assert.strictEqual(rewiredCsurf, require('csurf'))
-//   })
-
-//   it('should be called once as app.use arg', () => {
-//     const csurf = require('csurf')
-//     const app = appFactoryRewire.__get__('app')
-//     const AppFactory = appFactoryRewire.__get__('AppFactory')
-//     const appUseSpy = sinon.spy(app, 'use')
-//     const appInstance = new AppFactory()
-
-//     appInstance.createApp()
-
-//     assertCalledWithFunctionAsArg(appUseSpy, csurf({ cookies: true }))
-//     sinon.restore()
-//   })
-// })
