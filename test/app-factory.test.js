@@ -1,8 +1,5 @@
 const chai = require('chai')
 const assert = chai.assert
-// const rewire = require('rewire')
-// const appFactoryRewire = rewire('../server/app-factory.js')
-// const sinon = require('sinon')
 
 /**
  * Helper: Returns the argument call number with matching args
