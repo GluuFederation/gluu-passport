@@ -1,15 +1,30 @@
 const redis = require('redis')
 const Memcached = require('memcached')
 const Promise = require('bluebird')
-const R = require('ramda')
 const logger = require('./utils/logging')
 const OPERATION_NO_CONN = 'Attempt to operate on cache provider but connection has not been established'
 
 const promisify = (context, methodName) => Promise.promisify(context[methodName], { context: context })
 
+const retryStrategy = (options) => {
+  if (options.error && options.error.code === 'ECONNREFUSED') {
+    return new Error('The redis server refused the connection')
+  }
+  if (options.total_retry_time > 1000 * 60 * 60) {
+    // 1 min, End reconnecting after a specific timeout and flush all commands
+    return new Error('Redis connection retry time exhausted')
+  }
+  if (options.attempt > 10) {
+    // End reconnecting with built in error
+    return undefined
+  }
+  // reconnect after milliseconds
+  return Math.min(options.attempt * 100, 3000)
+}
+
 function getRedisProvider (options, exp) {
   logger.log2('info', 'Configuring redis cache provider for inResponseTo validation')
-  options = R.mergeLeft(options, { max_attempts: 3 })
+  options.retry_strategy = retryStrategy
 
   let ready = false
   const client = redis.createClient(options)
