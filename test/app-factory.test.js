@@ -11,6 +11,8 @@ const sinon = require('sinon')
  * @param {*} spyFn sinon.Spy function
  * @param {*} argFn callback / function param
  */
+
+// eslint-disable-next-line no-unused-vars
 function assertCalledWithFunctionAsArg (spyFn, argFn) {
   const calls = spyFn.getCalls()
   const argFnString = argFn.toString()
@@ -25,35 +27,6 @@ function assertCalledWithFunctionAsArg (spyFn, argFn) {
   assert(foundMatch === true,
     'Spy function/method was not called with expected function')
 }
-
-describe('csurf middleware', () => {
-  const rewiredCsurf = appFactoryRewire.__get__('csurf')
-
-  it('should exist', () => {
-    assert.exists(rewiredCsurf)
-  })
-
-  it('should be a function', () => {
-    assert.isFunction(rewiredCsurf)
-  })
-
-  it('should be equal csurf module', () => {
-    assert.strictEqual(rewiredCsurf, require('csurf'))
-  })
-
-  it('should be called once as app.use arg', () => {
-    const csurf = require('csurf')
-    const app = appFactoryRewire.__get__('app')
-    const AppFactory = appFactoryRewire.__get__('AppFactory')
-    const appUseSpy = sinon.spy(app, 'use')
-    const appInstance = new AppFactory()
-
-    appInstance.createApp()
-
-    assertCalledWithFunctionAsArg(appUseSpy, csurf({ cookies: true }))
-    sinon.restore()
-  })
-})
 
 describe('connect-flash middleware', () => {
   const rewiredFlash = appFactoryRewire.__get__('flash')
