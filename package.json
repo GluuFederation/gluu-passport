@@ -73,7 +73,7 @@
     "commitizen": "^4.2.2",
     "cucumber": "^6.0.5",
     "cz-conventional-changelog": "^3.3.0",
-    "eslint": "^7.14.0",
+    "eslint": "^7.15.0",
     "eslint-config-scanjs": "^1.0.0-beta4",
     "eslint-config-standard": "^16.0.2",
     "eslint-plugin-chai-friendly": "^0.6.0",
