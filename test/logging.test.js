@@ -4,6 +4,7 @@ const assert = chai.assert
 const rewire = require('rewire')
 const rewiredLogging = rewire('../server/utils/logging.js')
 const path = require('path')
+const sinon = require('sinon')
 
 describe('logging.js file', () => {
   describe('dir', () => {
@@ -40,12 +41,12 @@ describe('logging.js file', () => {
       assert.deepEqual(defaultLogOptions, expected)
     })
   })
-  describe('flogOpts', () => {
+  describe('fileLogOptions', () => {
     const defaultLogOptions = rewiredLogging.__get__('defaultLogOptions')
-    const flogOpts = rewiredLogging.__get__('flogOpts')
+    const fileLogOptions = rewiredLogging.__get__('fileLogOptions')
 
     it('should exist', () => {
-      assert.exists(flogOpts)
+      assert.exists(fileLogOptions)
     })
 
     it('should have propper keys / values', () => {
@@ -56,7 +57,24 @@ describe('logging.js file', () => {
         maxFiles: 5,
         options: { flags: 'w' }
       }
-      assert.deepEqual(flogOpts, expected)
+      assert.deepEqual(fileLogOptions, expected)
+    })
+  })
+  describe('logger', () => {
+    const rewiredLogger = rewiredLogging.__get__('logger')
+    it('should exist', () => {
+      assert.exists(rewiredLogger)
+    })
+    it('should be an object', () => {
+      // console.log(rewiredLogger)
+      assert.isObject(rewiredLogger, 'logger is not an object')
+    })
+    it('should call winston.createLogger once', () => {
+      const rewiredWinston = rewiredLogging.__get__('winston')
+      const createLoggerSpy = sinon.spy(rewiredWinston, 'createLogger')
+      require('../server/utils/logging')
+      sinon.assert.calledOnce(createLoggerSpy)
+      sinon.restore()
     })
   })
 })
