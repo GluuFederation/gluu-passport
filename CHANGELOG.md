@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.3.8](https://github.com/GluuFederation/gluu-passport/compare/v4.3.7...v4.3.8) (2020-12-10)
+
+
+### Bug Fixes
+
+* **app-factory.js:** fix location undefine and req.flash function problem ([6d10f9b](https://github.com/GluuFederation/gluu-passport/commit/6d10f9ba8be788ef4265c550b82996bfd0872000)), closes [#170](https://github.com/GluuFederation/gluu-passport/issues/170) [#173](https://github.com/GluuFederation/gluu-passport/issues/173)
+* **app-factory.js:** remove undeeded csurf middleware ([2b2152f](https://github.com/GluuFederation/gluu-passport/commit/2b2152f6483121dbb46b4dbda022e05de4aeb4e7)), closes [#169](https://github.com/GluuFederation/gluu-passport/issues/169)
+
 ### [4.3.7](https://github.com/GluuFederation/gluu-passport/compare/v4.3.6...v4.3.7) (2020-11-25)
 
 
