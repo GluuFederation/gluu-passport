@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const passport = require('passport')
-const uuid = require('uuid')
+const { v4: uuidv4 } = require('uuid')
 const fs = require('fs')
 const idpInitiated = require('./idp-initiated')
 const providersModule = require('./providers')
@@ -49,7 +49,7 @@ router.get('/token',
   // eslint-disable-next-line no-unused-vars
   function (req, res, next) {
     logger.log2('verbose', 'Issuing token')
-    const t = misc.getJWT({ jwt: uuid() }, 120) // 2 min expiration
+    const t = misc.getJWT({ jwt: uuidv4() }, 120) // 2 min expiration
     res.status(200).send({ token_: t })
   }
 )
@@ -169,7 +169,7 @@ function callbackResponse (req, res) {
     iss: postUrl,
     sub: sub,
     aud: global.basicConfig.clientId,
-    jti: uuid(),
+    jti: uuidv4(),
     exp: now / 1000 + 30,
     iat: now,
     data: misc.encrypt(user)

@@ -12,6 +12,8 @@ const { rateLimiter } = require('../server/utils/rate-limiter')
  * @param {*} spyFn sinon.Spy function
  * @param {*} argFn callback / function param
  */
+
+// eslint-disable-next-line no-unused-vars
 function assertCalledWithFunctionAsArg (spyFn, argFn) {
   const calls = spyFn.getCalls()
   const argFnString = argFn.toString()
@@ -27,23 +29,23 @@ function assertCalledWithFunctionAsArg (spyFn, argFn) {
     'Spy function/method was not called with expected function')
 }
 
-describe('csurf middleware', () => {
-  const rewiredCsurf = appFactoryRewire.__get__('csurf')
+describe('connect-flash middleware', () => {
+  const rewiredFlash = appFactoryRewire.__get__('flash')
 
   it('should exist', () => {
-    assert.exists(rewiredCsurf)
+    assert.exists(rewiredFlash)
   })
 
   it('should be a function', () => {
-    assert.isFunction(rewiredCsurf)
+    assert.isFunction(rewiredFlash)
   })
 
-  it('should be equal csurf module', () => {
-    assert.strictEqual(rewiredCsurf, require('csurf'))
+  it('should be equal connect-flash module', () => {
+    assert.strictEqual(rewiredFlash, require('connect-flash'))
   })
 
   it('should be called once as app.use arg', () => {
-    const csurf = require('csurf')
+    const flash = require('connect-flash')
     const app = appFactoryRewire.__get__('app')
     const AppFactory = appFactoryRewire.__get__('AppFactory')
     const appUseSpy = sinon.spy(app, 'use')
@@ -51,7 +53,30 @@ describe('csurf middleware', () => {
 
     appInstance.createApp()
 
-    assertCalledWithFunctionAsArg(appUseSpy, csurf({ cookies: true }))
+    assertCalledWithFunctionAsArg(appUseSpy, flash())
+    sinon.restore()
+  })
+})
+
+describe('error-handler middleware', () => {
+  const rewiredGlobalErrorHandler = appFactoryRewire.__get__('globalErrorHandler')
+
+  it('should exist', () => {
+    assert.exists(rewiredGlobalErrorHandler)
+  })
+
+  it('should be a function', () => {
+    assert.isFunction(rewiredGlobalErrorHandler)
+  })
+
+  it('should be called once as app.use arg', () => {
+    const app = appFactoryRewire.__get__('app')
+    const AppFactory = appFactoryRewire.__get__('AppFactory')
+    const appUseSpy = sinon.spy(app, 'use')
+    const appInstance = new AppFactory()
+
+    appInstance.createApp()
+    assertCalledWithFunctionAsArg(appUseSpy, rewiredGlobalErrorHandler)
     sinon.restore()
   })
 })

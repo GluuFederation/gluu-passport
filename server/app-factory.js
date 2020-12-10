@@ -9,8 +9,9 @@ const morgan = require('morgan')
 const logger = require('./utils/logging')
 const routes = require('./routes')
 const metricsMiddleware = require('../server/utils/metrics')
-const csurf = require('csurf')
 const { randomSecret } = require('./utils/misc')
+const { globalErrorHandler } = require('./utils/error-handler')
+const flash = require('connect-flash')
 const { rateLimiter } = require('./utils/rate-limiter')
 
 class AppFactory {
@@ -20,7 +21,7 @@ class AppFactory {
     app.use(bodyParser.json())
     app.use(bodyParser.urlencoded({ extended: false }))
     app.use(cookieParser())
-    app.use(csurf({ cookie: true }))
+    app.use(flash())
     app.use(rateLimiter)
 
     app.use(session({
@@ -38,16 +39,8 @@ class AppFactory {
     app.use(passport.initialize())
     app.use(passport.session())
     app.use('/passport', routes)
+    app.use(globalErrorHandler)
 
-    // Default error handler
-    // eslint-disable-next-line no-unused-vars
-    app.use((err, req, { redirect }, next) => {
-      logger.log2('error', `Unknown Error: ${err}`)
-      logger.log2('error', err.stack)
-      redirect(
-    `${global.basicConfig.failureRedirectUrl}?failure=An error occurred`
-      )
-    })
     passport.serializeUser((user, done) => {
       done(null, user)
     })

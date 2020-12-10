@@ -6,6 +6,7 @@ const rewiredMisc = rewire('../server/utils/misc.js')
 const sinon = require('sinon')
 
 const assert = chai.assert
+
 describe('misc.randomSecret', () => {
   it('should exist', () => {
     assert.exists(misc.randomSecret)
