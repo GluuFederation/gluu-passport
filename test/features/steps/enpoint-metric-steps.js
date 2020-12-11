@@ -1,22 +1,12 @@
 const { Given, When, Then, BeforeAll } = require('cucumber')
 const got = require('got')
-const server = require('../../../server/app')
 const chai = require('chai')
 const assert = chai.assert
-const InitMock = require('../../testdata/init-mock')
+const helper = require('../../helper')
 
 BeforeAll({ timeout: 600 * 1000 }, (done) => {
-  // mock init external endpoints
-  const initMock = new InitMock()
-  initMock.passportConfigEndpoint()
-  initMock.umaTokenEndpoint()
-  initMock.umaConfigurationEndpoint()
-
-  // waits for the server to start (app.listen)
-  server.on('appStarted', () => {
-    console.log('app started...')
-    done()
-  })
+  helper.setupServer()
+    .then(() => done())
 })
 
 Given('passport server is up and running', async () => {

@@ -29,6 +29,19 @@ function assertCalledWithFunctionAsArg (spyFn, argFn) {
     'Spy function/method was not called with expected function')
 }
 
+/**
+ * spy on app.use
+ */
+function spyOnAppUse () {
+  const app = appFactoryRewire.__get__('app')
+  const AppFactory = appFactoryRewire.__get__('AppFactory')
+  const appUseSpy = sinon.spy(app, 'use')
+  const appInstance = new AppFactory()
+
+  appInstance.createApp()
+  return appUseSpy
+}
+
 describe('connect-flash middleware', () => {
   const rewiredFlash = appFactoryRewire.__get__('flash')
 
@@ -70,12 +83,7 @@ describe('error-handler middleware', () => {
   })
 
   it('should be called once as app.use arg', () => {
-    const app = appFactoryRewire.__get__('app')
-    const AppFactory = appFactoryRewire.__get__('AppFactory')
-    const appUseSpy = sinon.spy(app, 'use')
-    const appInstance = new AppFactory()
-
-    appInstance.createApp()
+    const appUseSpy = spyOnAppUse()
     assertCalledWithFunctionAsArg(appUseSpy, rewiredGlobalErrorHandler)
     sinon.restore()
   })
@@ -97,13 +105,7 @@ describe('rateLimiter middleware', () => {
   })
 
   it('should be called once as app.use arg', () => {
-    const app = appFactoryRewire.__get__('app')
-    const AppFactory = appFactoryRewire.__get__('AppFactory')
-    const appUseSpy = sinon.spy(app, 'use')
-    const appInstance = new AppFactory()
-
-    appInstance.createApp()
-
+    const appUseSpy = spyOnAppUse()
     assertCalledWithFunctionAsArg(appUseSpy, rewiredRateLimiter)
     sinon.restore()
   })
