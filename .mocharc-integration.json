@@ -1,0 +1,6 @@
+{
+    "diff": true,
+    "timeout": 20000,
+    "require": "test/start-server-hook" ,
+    "file": "test/app.init.spec.js"
+}
