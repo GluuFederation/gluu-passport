@@ -1,4 +1,4 @@
-export const mochaHooks = {
+exports.mochaHooks = {
   before (done) {
     /**
      * Wait for server to start (event appStarted) to start tests
