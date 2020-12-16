@@ -1,35 +1,38 @@
-const { Given, When, Then, Before } = require('cucumber')
+const { Given, When, Then } = require('cucumber')
 const got = require('got')
 const chai = require('chai')
-const assert = chai.assert
-const helper = require('../../helper')
+const config = require('config')
 
-Before({ timeout: 600 * 1000 }, (done) => {
-  helper.setupServer()
-    .then(() => done())
+const assert = chai.assert
+const { rateLimiter } = require('../../../server/utils/rate-limiter')
+const port = config.get('passportConfigAuthorizedResponse').conf.serverWebPort
+
+Given('rate limit is {int} in {int}', { timeout: 600 * 1000 }, async (rateLimitMax, rateLimitWindowMs) => {
+  const app = require('../../../server/app')
+  app.close()
+
+  const appStart = new Promise((resolve, reject) => {
+    app.listen(port, () => {
+      rateLimiter.resetKey('::ffff:127.0.0.1')
+      console.log('New Server started...')
+      resolve()
+    })
+  })
+
+  await appStart
 })
 
-Given('endpoint requested {int} times by the same client', { timeout: 600 * 1000 }, async (max) => {
-  for (let i = 0; i < max; i++) {
-    const response = await got('http://127.0.0.1:8090/passport/health-check', { retry: 0 })
-    assert.equal(response.statusCode, 200,
-      'response.statusCode is NOT 200')
+When('{string} is requested {int} times in less then {int} by the same client', async (endpoint, requestsCount, rateLimitMax) => {
+  for (let i = 1; i <= requestsCount; i++) {
+    this.lastResponse = await got(`http://127.0.0.1:${port}/passport${endpoint}`, { retry: 0, throwHttpErrors: false })
   }
 })
 
-When('endpoint is requested one more times', async () => {
-  const response = await got('http://127.0.0.1:8090/passport/health-check', { retry: 0, throwHttpErrors: false })
-  assert.equal(response.statusCode, 429,
-    'response.statusCode is NOT 429')
+Then('last request response should have status code {int}', async (responseStatusCode) => {
+  assert.equal(this.lastResponse.statusCode, responseStatusCode,
+    `response.statusCode is NOT ${responseStatusCode}`)
 })
 
-Then('response status code should be {int}', async (httpStatusCode) => {
-  const response = await got('http://127.0.0.1:8090/passport/health-check', { retry: 0, throwHttpErrors: false })
-  assert.equal(response.statusCode, httpStatusCode,
-    'response.statusCode is NOT 429')
-})
-
-Then('response body shoulb be {string}', async (message) => {
-  const response = await got('http://127.0.0.1:8090/passport/health-check', { retry: 0, throwHttpErrors: false })
-  assert.equal(response.body, message)
+Then('response body should be "{string}"', async (responseBody) => {
+  assert.equal(this.lastResponse.body, responseBody)
 })

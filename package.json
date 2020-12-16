@@ -14,7 +14,7 @@
   },
   "scripts": {
     "start": "NODE_ENV=production node server/app.js",
-    "test": "NODE_ENV=test cucumber-js --exit test/features --tags 'not @RateLimiting' && NODE_ENV=test cucumber-js --exit test/features/rate-limiting.feature && NODE_ENV=test nyc mocha --exit --no-warnings test/*.test.js",
+    "test": "NODE_ENV=test cucumber-js --exit test/features && NODE_ENV=test nyc mocha --exit --no-warnings test/*.test.js",
     "dev": "NODE_ENV=development node server/app.js",
     "lint": "eslint 'server/**/*.js' 'test/**/*.js' 'config/**/*.js'",
     "generate-coverage": "NODE_ENV=test nyc report --reporter=text-lcov > coverage.lcov",
