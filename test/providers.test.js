@@ -3,11 +3,20 @@ const rewire = require('rewire')
 const providers = rewire('../server/providers.js')
 const config = require('config')
 const PassportSAMLStrategy = require('passport-saml').Strategy
+const helper = require('./helper')
 
 const assert = chai.assert
 
 describe('providers.js', () => {
   describe('setupStrategy', () => {
+    before(() => {
+      process.env.ALLOW_CONFIG_MUTATIONS = 'true'
+      helper.configureLogger()
+      const passportFullConfig = config.get('passportConfigAuthorizedResponse')
+      const iiconfigStub = passportFullConfig.idpInitiated
+      providers.__set__('iiconfig', iiconfigStub)
+    })
+
     const passportStrategies = providers.__get__('passportStrategies')
     const setupStrategy = providers.__get__('setupStrategy')
     const testProvider = {
