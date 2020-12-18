@@ -57,9 +57,13 @@ describe('providers.js', () => {
     })
 
     it('Passport SAML Provider with redis setup should initialize the passport-saml strategy', () => {
-      const testProvider = config.passportConfigAuthorizedResponse.providers.find(provider => provider.id === 'saml-redis-test')
+      const testProvider = config.passportConfigAuthorizedResponse.providers.find(
+        provider => provider.id === 'saml-redis-test'
+      )
       try {
-        const oPassportSAMLStrategy = new PassportSAMLStrategy(testProvider.options, (profile, done) => { })
+        const oPassportSAMLStrategy = new PassportSAMLStrategy(
+          testProvider.options, (profile, done) => { }
+        )
         // eslint-disable-next-line security/detect-non-literal-fs-filename
         assert.exists(oPassportSAMLStrategy, 'Failed to initialize passport saml strategy')
       } catch (error) {
