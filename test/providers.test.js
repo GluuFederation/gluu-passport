@@ -1,7 +1,7 @@
 const chai = require('chai')
 const rewire = require('rewire')
 const providers = rewire('../server/providers.js')
-const testConfig = require('../config/test')
+const config = require('config')
 const PassportSAMLStrategy = require('passport-saml').Strategy
 
 const assert = chai.assert
@@ -11,7 +11,7 @@ describe('providers.js', () => {
     const passportStrategies = providers.__get__('passportStrategies')
     const setupStrategy = providers.__get__('setupStrategy')
     const testProvider = {
-      ...testConfig.passportConfigAuthorizedResponse.providers[0],
+      ...config.passportConfigAuthorizedResponse.providers[0],
       verifyCallbackArity: 0
     }
 
@@ -29,6 +29,14 @@ describe('providers.js', () => {
       )
     })
 
+    it('added strategy should be a function', () => {
+      setupStrategy(testProvider)
+      assert.isFunction(
+        passportStrategies[0].Strategy,
+        'Strategy is not a function!'
+      )
+    })
+
     it('existing loaded strategy should be found and load again', () => {
       setupStrategy(testProvider)
 
@@ -40,7 +48,7 @@ describe('providers.js', () => {
     })
 
     it('Passport SAML Provider with redis setup should initialize the passport-saml strategy', () => {
-      const testProvider = testConfig.passportConfigAuthorizedResponse.providers.find(provider => provider.id === 'saml-redis-test')
+      const testProvider = config.passportConfigAuthorizedResponse.providers.find(provider => provider.id === 'saml-redis-test')
       try {
         const oPassportSAMLStrategy = new PassportSAMLStrategy(testProvider.options, (profile, done) => { })
         // eslint-disable-next-line security/detect-non-literal-fs-filename
