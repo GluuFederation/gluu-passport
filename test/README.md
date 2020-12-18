@@ -1,6 +1,10 @@
 # Test Folder
 Remember, we do TDD.
 
+## Practices
+- **Unit tests** : files should be named *.test.js
+- **Integration tests**: files should be named *.spec.js
+
 ## Things you should know
 
 - **config/test.js**: File used to setup testing env and some mocks, using [node-config](https://www.npmjs.com/package/config) module (please read it).
