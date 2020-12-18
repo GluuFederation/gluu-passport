@@ -6,15 +6,14 @@ const webUtils = require('../server/utils/web-utils')
 const InitMock = require('./testdata/init-mock')
 const initMock = new InitMock()
 
-afterEach(() => {
-  // Restore the default sandbox here
-  sinon.restore()
-})
-
 describe('routes.js', () => {
   describe('security - normalization', () => {
     before(() => {
       initMock.errorHandlerEndpoint()
+    })
+    afterEach(() => {
+      // Restore the default sandbox here
+      sinon.restore()
     })
 
     it('metadata request error should not have metaFileName', async () => {
