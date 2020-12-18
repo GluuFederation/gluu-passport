@@ -11,28 +11,30 @@ afterEach(() => {
   sinon.restore()
 })
 
-describe('Error message should not have inputs', () => {
-  before(() => {
-    initMock.errorHandlerEndpoint()
-  })
-  // initMock.errorHandlerEndpoint()
-  it('metadata request error should not have metaFileName', async () => {
-    const unexistantIdp = 'idonotexist'
-    const response = await got(
-        `http://127.0.0.1:8090/passport/auth/meta/idp/${unexistantIdp}`,
+describe('routes.js', () => {
+  describe('security - normalization', () => {
+    before(() => {
+      initMock.errorHandlerEndpoint()
+    })
+
+    it('metadata request error should not have metaFileName', async () => {
+      const unexistantIdp = 'idonotexist'
+      const response = await got(
+          `http://127.0.0.1:8090/passport/auth/meta/idp/${unexistantIdp}`,
+          { throwHttpErrors: false }
+      )
+      assert.notInclude(response.body, unexistantIdp)
+    })
+    it('providers get routes should not throw error with provider name', async () => {
+      const webUtilsSpy = sinon.spy(webUtils, 'handleError')
+      const provider = 'idontexist'
+      const token = 'whateveRt0k3n'
+      await got(
+        `http://127.0.0.1:8090/passport/auth/${provider}/${token}`,
         { throwHttpErrors: false }
-    )
-    assert.notInclude(response.body, unexistantIdp)
-  })
-  it('providers get routes should not throw error with provider name', async () => {
-    const webUtilsSpy = sinon.spy(webUtils, 'handleError')
-    const provider = 'idontexist'
-    const token = 'whateveRt0k3n'
-    await got(
-      `http://127.0.0.1:8090/passport/auth/${provider}/${token}`,
-      { throwHttpErrors: false }
-    )
-    sinon.assert.calledOnce(webUtilsSpy)
-    assert.notInclude(webUtilsSpy.getCall(0).lastArg, provider)
+      )
+      sinon.assert.calledOnce(webUtilsSpy)
+      assert.notInclude(webUtilsSpy.getCall(0).lastArg, provider)
+    })
   })
 })
