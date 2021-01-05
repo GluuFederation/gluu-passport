@@ -1,0 +1,5 @@
+{
+    "diff": true,
+    "timeout": 20000,
+    "file": ["test/start-server-hook.js"]
+}
