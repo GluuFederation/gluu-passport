@@ -14,11 +14,17 @@
   },
   "scripts": {
     "start": "NODE_ENV=production node server/app.js",
-    "test": "NODE_ENV=test cucumber-js --exit test/features && NODE_ENV=test nyc mocha --exit --no-warnings test/*.test.js",
+    "test": "npm run test:unit && npm run test:integration && npm run test:behaviour",
+    "test:unit": "NODE_ENV=test ALLOW_CONFIG_MUTATIONS=true mocha --exit --no-warnings test/*.test.js",
+    "test:integration": "NODE_ENV=test mocha --config .mocharc-integration.json --exit --no-warnings test/*.spec.js",
+    "test:behaviour": "NODE_ENV=test cucumber-js --exit test/features",
+    "cover": "npm run cover:unit && npm run cover:integration && npm run cover:report",
+    "cover:unit": "nyc --silent npm run test:unit",
+    "cover:integration": "nyc --silent --no-clean npm run test:integration",
+    "cover:report": "nyc report --reporter=text-lcov > coverage.lcov",
     "dev": "NODE_ENV=development node server/app.js",
     "lint": "eslint 'server/**/*.js' 'test/**/*.js' 'config/**/*.js'",
-    "generate-coverage": "NODE_ENV=test nyc report --reporter=text-lcov > coverage.lcov",
-    "report-2": "NODE_ENV=test nyc mocha --report lcovonly -R spec && codecov"
+    "generate-coverage": "NODE_ENV=test nyc report --reporter=text-lcov > coverage.lcov"
   },
   "dependencies": {
     "@nicokaiser/passport-apple": "^0.2.1",
@@ -88,7 +94,7 @@
     "eslint-plugin-security": "^1.4.0",
     "eslint-utils": "^2.1.0",
     "fakeredis": "^2.0.0",
-    "got": "^11.8.0",
+    "got": "^11.8.1",
     "husky": "^4.3.5",
     "lint-staged": "^10.5.3",
     "mocha": "^8.2.1",
