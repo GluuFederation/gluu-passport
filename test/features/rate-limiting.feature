@@ -15,6 +15,8 @@ Feature: Rate limiting
     Examples:
     | endpoint      | requestsCount  | responseStatusCode | responseBody                                                         |
     | /health-check | 101            | 429                | "You have exceeded the 100 requests in 86400000 milliseconds limit!" |
-    | /token        | 101            | 429                | "You have exceeded the 100 requests in 86400000 milliseconds limit!" |
     | /health-check | 99             | 200                | '{"message":"Cool!!!"}'                                              |
+    | /token        | 101            | 429                | "You have exceeded the 100 requests in 86400000 milliseconds limit!" |
+    | /token        | 99             | 200                | '{"message":"Cool!!!"}'                                              |
+    | /health-check | 5              | 200                | '{"message":"Cool!!!"}'                                              |
 
