@@ -5,7 +5,7 @@ Feature: Rate limiting
 
   # Issue: https://github.com/GluuFederation/gluu-passport/issues/139
   
-  @RateLimiting
+  @rateLimiting
   Scenario Outline: Application should limit the request according to configuration file setup
     Given configured rate limit is 100 requests in 86400000 ms
     When "<endpoint>" is requested <requestsCount> times in less then 86400000 ms by the same client
@@ -17,6 +17,6 @@ Feature: Rate limiting
     | /health-check | 101            | 429                | "You have exceeded the 100 requests in 86400000 milliseconds limit!" |
     | /health-check | 99             | 200                | '{"message":"Cool!!!"}'                                              |
     | /token        | 101            | 429                | "You have exceeded the 100 requests in 86400000 milliseconds limit!" |
-    | /token        | 99             | 200                | '{"message":"Cool!!!"}'                                              |
-    | /health-check | 5              | 200                | '{"message":"Cool!!!"}'                                              |
+    | /health-check | 50             | 200                | '{"message":"Cool!!!"}'                                              |
+    | /health-check | 60             | 200               | '{"message":"Cool!!!"}'                                              |
 
