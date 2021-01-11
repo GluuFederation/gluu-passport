@@ -33,7 +33,7 @@ When('my aggregator access metrics endpoint', async () => {
 })
 
 Then('should return me the metrics', async () => {
-  const response = await requester.get('http://127.0.0.1:8090/passport/metrics')
+  const response = await requester.get('/passport/metrics')
   // const response = await got('http://127.0.0.1:8090/passport/metrics')
   assert.propertyVal(response.headers, 'content-type', 'text/plain')
 })
