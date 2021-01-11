@@ -6,15 +6,15 @@ Feature: Rate limiting
   # Issue: https://github.com/GluuFederation/gluu-passport/issues/139
   
   @RateLimiting
-  Scenario Outline: Application should limit the request
-    Given rate limit is <rateLimitMax> in <rateLimitWindowMs>
-    When "<endpoint>" is requested <requestsCount> times in less then <rateLimitMax> by the same client
+  Scenario Outline: Application should limit the request according to configuration file setup
+    Given configured rate limit is 100 requests in 86400000 ms
+    When "<endpoint>" is requested <requestsCount> times in less then 86400000 ms by the same client
     Then last request response should have status code <responseStatusCode>
       And response body should be "<responseBody>"
 
     Examples:
-    | rateLimitMax   | rateLimitWindowMs | endpoint      | requestsCount  | responseStatusCode | responseBody                                                         |
-    | 100            | 10000             | /health-check | 101            | 429                | "You have exceeded the 100 requests in 86400000 milliseconds limit!" |
-    | 100            | 20000             | /token        | 101            | 429                | "You have exceeded the 100 requests in 86400000 milliseconds limit!" |
-    | 100            | 10000             | /health-check | 99             | 200                | '{"message":"Cool!!!"}'                                              |
+    | endpoint      | requestsCount  | responseStatusCode | responseBody                                                         |
+    | /health-check | 101            | 429                | "You have exceeded the 100 requests in 86400000 milliseconds limit!" |
+    | /token        | 101            | 429                | "You have exceeded the 100 requests in 86400000 milliseconds limit!" |
+    | /health-check | 99             | 200                | '{"message":"Cool!!!"}'                                              |
 
