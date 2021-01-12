@@ -8,13 +8,11 @@ Feature: OpenMetrics for endpoints
   connect an aggregator such as Prometheus
   # Issue: https://github.com/GluuFederation/gluu-passport/issues/110
   
-  @endpointMetrics
   Scenario: Endpoint should be available for outside connections
     Given passport server is up and running
     When my aggregator access metrics endpoint
     Then should return me the metrics
 
-  @endpointMetrics
   Scenario Outline: Metrics should count how many times endpoint was accessed
     Given passport server is up and running
       And I access an "<endpointUrl>" <number> times

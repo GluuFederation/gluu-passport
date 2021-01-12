@@ -73,12 +73,12 @@
     "test": "test"
   },
   "devDependencies": {
+    "@cucumber/cucumber": "^7.0.0",
     "chai": "^4.2.0",
     "chai-files": "^1.4.0",
     "chai-http": "^4.3.0",
     "codecov": "^3.8.1",
     "commitizen": "^4.2.2",
-    "cucumber": "^6.0.5",
     "cz-conventional-changelog": "^3.3.0",
     "eslint": "^7.15.0",
     "eslint-config-scanjs": "^1.0.0-beta4",

@@ -1,4 +1,4 @@
-const { Given, When, Then, Before, After } = require('cucumber')
+const { Given, When, Then, BeforeStep, AfterStep } = require('@cucumber/cucumber')
 const chai = require('chai')
 const assert = chai.assert
 const chaiHttp = require('chai-http')
@@ -7,7 +7,7 @@ chai.use(chaiHttp)
 let app
 let requester
 
-Before('@endpointMetrics', async () => {
+BeforeStep(async () => {
   app = require('../../../server/app')
   await app.on('appStarted', () => {
     console.log('app started...')
@@ -16,9 +16,10 @@ Before('@endpointMetrics', async () => {
   await app.rateLimiter.resetKey('::ffff:127.0.0.1')
 })
 
-After('endpointMetrics', async () => {
+AfterStep(async () => {
   requester.close()
 })
+
 Given('passport server is up and running', async () => {
   const response = await requester.get('/passport/health-check')
   // const response = await got('http://127.0.0.1:8090/passport/health-check')

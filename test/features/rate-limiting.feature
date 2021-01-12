@@ -5,7 +5,6 @@ Feature: Rate limiting
 
   # Issue: https://github.com/GluuFederation/gluu-passport/issues/139
   
-  @rateLimiting
   Scenario Outline: Application should limit the request according to configuration file setup
     Given configured rate limit is 100 requests in 86400000 ms
     When "<endpoint>" is requested <requestsCount> times in less then 86400000 ms by the same client

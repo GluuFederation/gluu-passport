@@ -1,4 +1,4 @@
-const { Given, When, Then, After, Before } = require('cucumber')
+const { Given, When, Then, AfterStep, BeforeStep } = require('@cucumber/cucumber')
 const chai = require('chai')
 const config = require('config')
 const assert = chai.assert
@@ -8,7 +8,7 @@ let app
 let requester
 require('events').defaultMaxListeners = 100
 
-Before('@rateLimiting', async () => {
+BeforeStep(async () => {
   app = require('../../../server/app')
   await app.on('appStarted', () => {
     console.log('app started...')
@@ -17,7 +17,7 @@ Before('@rateLimiting', async () => {
   await app.rateLimiter.resetKey('::ffff:127.0.0.1')
 })
 
-After('@rateLimiting', async () => {
+AfterStep(async () => {
   await requester.close()
 })
 
