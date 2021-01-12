@@ -59,12 +59,7 @@ describe('connect-flash middleware', () => {
 
   it('should be called once as app.use arg', () => {
     const flash = require('connect-flash')
-    const app = appFactoryRewire.__get__('app')
-    const AppFactory = appFactoryRewire.__get__('AppFactory')
-    const appUseSpy = sinon.spy(app, 'use')
-    const appInstance = new AppFactory()
-
-    appInstance.createApp()
+    const appUseSpy = spyOnAppUse()
 
     assertCalledWithFunctionAsArg(appUseSpy, flash())
     sinon.restore()

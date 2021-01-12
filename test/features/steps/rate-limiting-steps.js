@@ -1,20 +1,14 @@
 const { Given, When, Then, AfterStep, BeforeStep } = require('@cucumber/cucumber')
 const chai = require('chai')
 const config = require('config')
+const { setupServer } = require('../../helper')
+
 const assert = chai.assert
-const chaiHttp = require('chai-http')
-chai.use(chaiHttp)
-let app
 let requester
 require('events').defaultMaxListeners = 100
 
 BeforeStep(async () => {
-  app = require('../../../server/app')
-  await app.on('appStarted', () => {
-    console.log('app started...')
-  })
-  requester = chai.request(app).keepOpen()
-  await app.rateLimiter.resetKey('::ffff:127.0.0.1')
+  requester = await setupServer()
 })
 
 AfterStep(async () => {
