@@ -66,13 +66,12 @@ describe('logging.js file', () => {
       assert.exists(rewiredLogger)
     })
     it('should be an object', () => {
-      // console.log(rewiredLogger)
       assert.isObject(rewiredLogger, 'logger is not an object')
     })
     it('should call winston.createLogger once', () => {
       const rewiredWinston = rewiredLogging.__get__('winston')
       const createLoggerSpy = sinon.spy(rewiredWinston, 'createLogger')
-      require('../server/utils/logging')
+      rewire('../server/utils/logging')
       sinon.assert.calledOnce(createLoggerSpy)
       sinon.restore()
     })
