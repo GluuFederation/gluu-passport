@@ -1,9 +1,12 @@
+/* eslint-disable security/detect-non-literal-fs-filename */
 const chai = require('chai')
 const rewire = require('rewire')
 const idpInitiated = rewire('../server/idp-initiated.js')
 const assert = chai.assert
 const base64url = require('base64url')
 const jwt = require('jsonwebtoken')
+const config = require('config')
+const helper = require('./helper')
 
 /* This is how passportFile looks like
 {
@@ -62,17 +65,11 @@ describe('idp-initiated.createAuthzRequest', () => {
   // "importing" not exported function
   const createAuthzRequest = idpInitiated.__get__('createAuthzRequest')
 
-  /**
-   * @todo: Activate this (uses `rewire`) to do unit instead of integration
-   * Mocks basic configuration, jwt...
-   * disableNetConnect so app don't try to get it from "external" sources.
-   */
-  beforeEach(() => {
-    // idpInitiated.__set__('config', mocked_conf)
-    // idpInitiated.__set__('basicConfig', basicConfig)
-    // idpInitiated.__set__('jwt', jwt)
-    // nock.disableNetConnect()
-    // idpInitiated.__set__('logger', logger)
+  before(() => {
+    // set stubs
+    helper.configureLogger()
+    idpInitiated.__set__('basicConfig', config.get('passportConfig'))
+    idpInitiated.__set__('config', config.get('passportConfigAuthorizedResponse'))
   })
 
   afterEach(() => {
@@ -108,7 +105,7 @@ describe('idp-initiated.createAuthzRequest', () => {
 
     assert.hasAllKeys(
       decodedJWT,
-      ['iss', 'sub', 'aud', 'jti', 'exp', 'iat', 'data'],
+      ['sub', 'aud', 'jti', 'exp', 'iat', 'data'],
       'decoded req.state has all keys:' +
       'iss, sub, aud, jti , exp, iat, data'
     )
