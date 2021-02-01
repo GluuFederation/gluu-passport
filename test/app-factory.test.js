@@ -4,6 +4,7 @@ const assert = chai.assert
 const rewire = require('rewire')
 const appFactoryRewire = rewire('../server/app-factory.js')
 const sinon = require('sinon')
+const { rateLimiter } = require('../server/utils/rate-limiter')
 
 /**
  * Helper: Returns the argument call number with matching args
@@ -28,6 +29,19 @@ function assertCalledWithFunctionAsArg (spyFn, argFn) {
     'Spy function/method was not called with expected function')
 }
 
+/**
+ * spy on app.use
+ */
+function spyOnAppUse () {
+  const app = appFactoryRewire.__get__('app')
+  const AppFactory = appFactoryRewire.__get__('AppFactory')
+  const appUseSpy = sinon.spy(app, 'use')
+  const appInstance = new AppFactory()
+
+  appInstance.createApp()
+  return appUseSpy
+}
+
 describe('connect-flash middleware', () => {
   const rewiredFlash = appFactoryRewire.__get__('flash')
 
@@ -45,12 +59,7 @@ describe('connect-flash middleware', () => {
 
   it('should be called once as app.use arg', () => {
     const flash = require('connect-flash')
-    const app = appFactoryRewire.__get__('app')
-    const AppFactory = appFactoryRewire.__get__('AppFactory')
-    const appUseSpy = sinon.spy(app, 'use')
-    const appInstance = new AppFactory()
-
-    appInstance.createApp()
+    const appUseSpy = spyOnAppUse()
 
     assertCalledWithFunctionAsArg(appUseSpy, flash())
     sinon.restore()
@@ -69,13 +78,30 @@ describe('error-handler middleware', () => {
   })
 
   it('should be called once as app.use arg', () => {
-    const app = appFactoryRewire.__get__('app')
-    const AppFactory = appFactoryRewire.__get__('AppFactory')
-    const appUseSpy = sinon.spy(app, 'use')
-    const appInstance = new AppFactory()
-
-    appInstance.createApp()
+    const appUseSpy = spyOnAppUse()
     assertCalledWithFunctionAsArg(appUseSpy, rewiredGlobalErrorHandler)
+    sinon.restore()
+  })
+})
+
+describe('rateLimiter middleware', () => {
+  const rewiredRateLimiter = appFactoryRewire.__get__('rateLimiter')
+
+  it('should exist', () => {
+    assert.exists(rewiredRateLimiter)
+  })
+
+  it('should be a function', () => {
+    assert.isFunction(rewiredRateLimiter)
+  })
+
+  it('should be equal rateLimiter middleware', () => {
+    assert.strictEqual(rewiredRateLimiter, rateLimiter)
+  })
+
+  it('should be called once as app.use arg', () => {
+    const appUseSpy = spyOnAppUse()
+    assertCalledWithFunctionAsArg(appUseSpy, rewiredRateLimiter)
     sinon.restore()
   })
 })

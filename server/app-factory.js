@@ -12,6 +12,7 @@ const metricsMiddleware = require('../server/utils/metrics')
 const { randomSecret } = require('./utils/misc')
 const { globalErrorHandler } = require('./utils/error-handler')
 const flash = require('connect-flash')
+const { rateLimiter } = require('./utils/rate-limiter')
 
 class AppFactory {
   createApp () {
@@ -21,6 +22,7 @@ class AppFactory {
     app.use(bodyParser.urlencoded({ extended: false }))
     app.use(cookieParser())
     app.use(flash())
+    app.use(rateLimiter)
 
     app.use(session({
       cookie: {
@@ -45,6 +47,8 @@ class AppFactory {
     passport.deserializeUser((user, done) => {
       done(null, user)
     })
+    // store rateLimiter middleware for later manipulation/reset
+    app.rateLimiter = rateLimiter
     return app
   }
 }

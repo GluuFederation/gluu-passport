@@ -7,7 +7,7 @@ Feature: OpenMetrics for endpoints
   We gonna expose a OpenMetrics endpoint so SRE will be able to
   connect an aggregator such as Prometheus
   # Issue: https://github.com/GluuFederation/gluu-passport/issues/110
-
+  
   Scenario: Endpoint should be available for outside connections
     Given passport server is up and running
     When my aggregator access metrics endpoint
