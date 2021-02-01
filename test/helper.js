@@ -4,6 +4,9 @@ const InitMock = require('./testdata/init-mock')
 const logger = require('../server/utils/logging')
 const config = require('config')
 const basicConfig = config.get('passportConfig')
+const chai = require('chai')
+const chaiHttp = require('chai-http')
+chai.use(chaiHttp)
 
 /**
  * Mocks external endpoints for app initalization
@@ -26,7 +29,20 @@ const configureLogger = () => {
     })
 }
 
+/**
+ * Setup and start server for cucumber test
+ */
+const setupServer = async function () {
+  const app = require('../server/app')
+  await app.on('appStarted', () => {
+    console.log('app started...')
+  })
+  await app.rateLimiter.resetKey('::ffff:127.0.0.1')
+  return chai.request(app).keepOpen()
+}
+
 module.exports = {
   mockedAppInit,
-  configureLogger
+  configureLogger,
+  setupServer
 }
