@@ -1,4 +1,6 @@
+/* eslint-disable node/handle-callback-err */
 const reqp = require('request-promise')
+const got = require('got')
 const parsers = require('www-authenticate').parsers
 const R = require('ramda')
 const { v4: uuidv4 } = require('uuid')
@@ -16,23 +18,28 @@ let rpt
 
 function getTokenEndpoint (umaConfigURL) {
   logger.log2('verbose', 'getTokenEndpoint called for ' + umaConfigURL)
-  return reqp({ uri: umaConfigURL, json: true })
-    .then(obj => {
+  return got.get(umaConfigURL)
+    .then(response => {
+      const body = JSON.parse(response.body)
       logger.log2(
         'debug',
-        `getTokenEndpoint. obj = ${JSON.stringify(obj)}`
+        `getTokenEndpoint. obj = ${JSON.stringify(body)}`
       )
-      const endpoint = obj.token_endpoint
-      if (endpoint) {
+      const tokenEndpoint = body.token_endpoint
+      if (tokenEndpoint) {
         logger.log2(
           'info',
-          `getTokenEndpoint. Found endpoint at ${endpoint}`)
-        return endpoint
+          `getTokenEndpoint. Found token endpoint at ${tokenEndpoint}`)
+        return tokenEndpoint
       } else {
         const msg = 'getTokenEndpoint. No token endpoint was found'
         logger.log2('error', msg)
         throw new Error(msg)
       }
+    })
+    .catch(err => {
+      logger.log2('error', err)
+      throw new Error(err.message)
     })
 }
 
