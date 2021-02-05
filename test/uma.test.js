@@ -104,7 +104,7 @@ describe('uma.js test', () => {
       assert(miscGetRpJWT.calledOnce)
       assert(gotPOST.calledWith(umaConfigTokenEndpoint, {
         responseType: 'json',
-        json: {
+        form: {
           grant_type: 'urn:ietf:params:oauth:grant-type:uma-ticket',
           client_assertion_type:
             'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
@@ -126,7 +126,7 @@ describe('uma.js test', () => {
       const gotPOST = sinon.stub(got, 'post')
       gotPOST.reset()
       const errorMessage = 'Failed to get RPT Token'
-      gotPOST.resolves(errorMessage)
+      gotPOST.rejects(new Error(errorMessage))
 
       const ticket = 'ticket'
       try {

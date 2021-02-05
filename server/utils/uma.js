@@ -65,7 +65,7 @@ function getRPT (ticket, tokenEndpoint) {
   })
   const options = {
     responseType: 'json',
-    json: {
+    form: {
       grant_type: 'urn:ietf:params:oauth:grant-type:uma-ticket',
       client_assertion_type:
           'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
@@ -79,7 +79,8 @@ function getRPT (ticket, tokenEndpoint) {
       options, null, 4)}`
   )
   return got.post(tokenEndpoint, options)
-    .then(rptDetails => {
+    .then(response => {
+      const rptDetails = response.body
       logger.log2(
         'debug', `getRPT. response: ${JSON.stringify(
           rptDetails, null, 4)}`)
