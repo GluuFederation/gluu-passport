@@ -18,9 +18,9 @@ let rpt
 
 function getTokenEndpoint (umaConfigURL) {
   logger.log2('verbose', 'getTokenEndpoint called for ' + umaConfigURL)
-  return got.get(umaConfigURL)
+  return got.get(umaConfigURL, { responseType: 'json' })
     .then(response => {
-      const body = JSON.parse(response.body)
+      const body = response.body
       logger.log2(
         'debug',
         `getTokenEndpoint. obj = ${JSON.stringify(body)}`
@@ -38,6 +38,7 @@ function getTokenEndpoint (umaConfigURL) {
       }
     })
     .catch(err => {
+      logger.log2('error', 'getTokenEndpoint. Failed to get token endpoint')
       logger.log2('error', err)
       throw new Error(err.message)
     })
@@ -63,10 +64,8 @@ function getRPT (ticket, tokenEndpoint) {
     iat: now
   })
   const options = {
-    method: 'POST',
-    uri: tokenEndpoint,
-    json: true,
-    form: {
+    responseType: 'json',
+    json: {
       grant_type: 'urn:ietf:params:oauth:grant-type:uma-ticket',
       client_assertion_type:
           'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
@@ -76,10 +75,10 @@ function getRPT (ticket, tokenEndpoint) {
     }
   }
   logger.log2(
-    'debug', `getRPT request options = ${JSON.stringify(
+    'debug', `getRPT request to ${tokenEndpoint} endpoint with options = ${JSON.stringify(
       options, null, 4)}`
   )
-  return reqp(options)
+  return got.post(tokenEndpoint, options)
     .then(rptDetails => {
       logger.log2(
         'debug', `getRPT. response: ${JSON.stringify(
@@ -89,6 +88,11 @@ function getRPT (ticket, tokenEndpoint) {
         'debug',
         `getRPT. Access token is ${rptDetails.access_token}`)
       return rptDetails
+    })
+    .catch((err) => {
+      logger.log2('error', 'getRPT. Failed to get RPT token')
+      logger.log2('error', err)
+      throw new Error(err.message)
     })
 }
 
