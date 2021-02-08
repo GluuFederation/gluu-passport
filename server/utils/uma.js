@@ -1,5 +1,4 @@
 /* eslint-disable node/handle-callback-err */
-const reqp = require('request-promise')
 const got = require('got')
 const parsers = require('www-authenticate').parsers
 const R = require('ramda')
@@ -99,10 +98,11 @@ function getRPT (ticket, tokenEndpoint) {
 
 /**
  * Do UMA requests and handle response according to UMA Flow.
- * @param options : Object containing UMA request options
- * @returns {PromiseLike<options> | Promise<response>}
+ * @param requestOptions : Object containing UMA request options
+ * @returns {PromiseLike<requestOptions> | Promise<response>}
  */
-function doRequest (options) {
+function doRequest (requestOptions) {
+  const { uri, ...options } = requestOptions
   // if RPT was already fetched
   if (rpt) {
     const headers = {
@@ -116,18 +116,18 @@ function doRequest (options) {
     'debug', `doRequest. options = ${JSON.stringify(
       options, null, 4)}`
   )
-  return reqp(options)
+  return got.get(uri, options)
     .then(response => {
+      const { body, statusCode, headers } = response
       logger.log2(
         'debug',
-        `doRequest. response is: ${JSON.stringify(
-          response, null, 4)}`
+        `doRequest. response is: ${JSON.stringify({ body, statusCode, headers }, null, 4)}`
       )
-      switch (response.statusCode) {
+      switch (statusCode) {
         // usually first response, without RPT
         case 401: {
           const parsed = new parsers.WWW_Authenticate(
-            response.headers['www-authenticate']
+            headers['www-authenticate']
           )
           logger.log2(
             'verbose',
@@ -135,10 +135,10 @@ function doRequest (options) {
           `with ticket ${parsed.parms.ticket}`)
           logger.log2('debug',
           `getConfiguration. Reponse Headers ${JSON.stringify(
-            response.headers, null, 4)}`
+            headers, null, 4)}`
           )
           logger.log2('debug',
-          `getConfiguration. parsed.params = ${parsed.params}`
+          `getConfiguration. parsed.params = ${JSON.stringify(parsed.parms)}`
           )
           // return this as val to function(val) inside request
           return parsed.parms
@@ -151,15 +151,15 @@ function doRequest (options) {
           )
           logger.log2(
             'debug',
-          `getConfiguration. Passport configs are: ${response.body}`
+          `getConfiguration. Passport configs are: ${body}`
           )
           // return this as val to function(val) inside request
-          return JSON.parse(response.body)
+          return JSON.parse(body)
         }
         default: {
           throw new Error(
             'Received unexpected HTTP status code ' +
-          `of ${response.statusCode}`
+          `of ${statusCode}`
           )
         }
       }
