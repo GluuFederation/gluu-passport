@@ -12,6 +12,7 @@ const passportConfigAuthorizedResponse = config.get('passportConfigAuthorizedRes
 const umaConfigURL = passportConfigAuthorizedResponse.conf.serverURI + '/.well-known/uma2-configuration'
 const umaConfigTokenEndpoint = passportConfigAuthorizedResponse.conf.serverURI + '/oxauth/restv1/token'
 const passportConfig = config.get('passportConfig')
+const passportConfigurationEndpoint = passportConfig.configurationEndpoint
 
 describe('uma.js test', () => {
   describe('test getTokenEndpoint', () => {
@@ -137,6 +138,128 @@ describe('uma.js test', () => {
 
       miscGetRpJWT.restore()
       gotPOST.restore()
+    })
+  })
+
+  describe('test doRequest', () => {
+    const doRequest = umaRewire.__get__('doRequest')
+
+    it('should exist', () => {
+      assert.exists(doRequest)
+    })
+
+    it('should be request to config endpoint and get ticker', async () => {
+      const gotGet = sinon.stub(got, 'get')
+      gotGet.reset()
+      const mockTicket = '016f84e8-f9b9-11e0-bd6f-0021cc6004de'
+      gotGet.resolves({
+        body: '',
+        statusCode: 401,
+        headers: {
+          server: 'Apache/2.4.29 (Ubuntu)',
+          'x-xss-protection': '1; mode=block',
+          'x-content-type-options': 'nosniff',
+          'strict-transport-security': 'max-age=31536000; includeSubDomains',
+          'www-authenticate': `UMA realm="Authentication Required", host_id=chris.gluuthree.org, as_uri=https://chris.gluuthree.org/.well-known/uma2-configuration, ticket=${mockTicket}`,
+          'content-length': '0',
+          connection: 'close'
+        }
+      })
+      const requestParams = {
+        uri: passportConfigurationEndpoint,
+        throwHttpErrors: false
+      }
+      const ticketRepsponse = await doRequest(requestParams)
+      assert(gotGet.calledWith(requestParams.uri, {
+        throwHttpErrors: false
+      }))
+      assert.equal(ticketRepsponse.ticket, mockTicket)
+      gotGet.restore()
+    })
+
+    it('should return configurations', async () => {
+      const rpt = {
+        access_token: 'tEmPtEmPtEmPtEmPtEmPtEmP',
+        pct: 'PmEtPmEtPmEtPmEtPmEtPmEt'
+      }
+      umaRewire.__set__('rpt', rpt)
+
+      const gotGet = sinon.stub(got, 'get')
+      gotGet.reset()
+      gotGet.resolves({
+        statusCode: 200,
+        body: JSON.stringify(passportConfigAuthorizedResponse)
+      })
+      const doRequestParams = {
+        uri: passportConfigurationEndpoint,
+        throwHttpErrors: false
+      }
+      const configRepsponse = await doRequest(doRequestParams)
+      assert(gotGet.calledWith(doRequestParams.uri, {
+        throwHttpErrors: false,
+        headers: {
+          authorization: `Bearer ${rpt.access_token}`,
+          pct: rpt.pct
+        }
+      }))
+      assert.isNotNull(configRepsponse.conf)
+      assert.isNotNull(configRepsponse.idpInitiated)
+      assert.isNotNull(configRepsponse.providers)
+      assert.isNotEmpty(configRepsponse.providers)
+      gotGet.restore()
+    })
+  })
+
+  describe('test processUnauthorized', () => {
+    const processUnauthorized = umaRewire.__get__('processUnauthorized')
+
+    it('should exist', () => {
+      assert.exists(processUnauthorized)
+    })
+
+    it('should return configurations', async () => {
+      const rpt = {
+        access_token: 'tEmPtEmPtEmPtEmPtEmPtEmP',
+        pct: 'PmEtPmEtPmEtPmEtPmEtPmEt'
+      }
+      umaRewire.__set__('rpt', rpt)
+
+      // mock get token endpoint
+      const gotGet = sinon.stub(got, 'get')
+      gotGet.reset()
+      gotGet.onCall(0).resolves({
+        body: {
+          token_endpoint: umaConfigTokenEndpoint
+        }
+      })
+
+      // mock rpt request
+      const gotGetRPTToken = sinon.stub(got, 'post')
+      gotGetRPTToken.reset()
+      gotGetRPTToken.resolves({
+        body: {
+          access_token: 'TeMpTeMpTeMpTeMpTeMp'
+        }
+      })
+
+      // mock get config request
+      const mockTicket = '016f84e8-f9b9-11e0-bd6f-0021cc6004de'
+      gotGet.onCall(1).resolves({
+        statusCode: 200,
+        body: JSON.stringify(passportConfigAuthorizedResponse)
+      })
+
+      const processUnauthorizedResponse = await processUnauthorized(mockTicket, umaConfigURL, {
+        uri: passportConfigurationEndpoint,
+        throwHttpErrors: false
+      })
+      assert.isNotNull(processUnauthorizedResponse.conf)
+      assert.isNotNull(processUnauthorizedResponse.idpInitiated)
+      assert.isNotNull(processUnauthorizedResponse.providers)
+      assert.isNotEmpty(processUnauthorizedResponse.providers)
+
+      gotGet.restore()
+      gotGetRPTToken.restore()
     })
   })
 })
