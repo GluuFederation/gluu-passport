@@ -13,6 +13,57 @@ const umaConfigURL = passportConfigAuthorizedResponse.conf.serverURI + '/.well-k
 const umaConfigTokenEndpoint = passportConfigAuthorizedResponse.conf.serverURI + '/oxauth/restv1/token'
 const passportConfig = config.get('passportConfig')
 const passportConfigurationEndpoint = passportConfig.configurationEndpoint
+const mockTicket = '016f84e8-f9b9-11e0-bd6f-0021cc6004de'
+
+/**
+ * Stub RPT Token Request and return access_token
+ * @returns <sinon.stub>
+ */
+const stubRPTTokenRequest = function () {
+  const gotPOST = sinon.stub(got, 'post')
+  gotPOST.reset()
+  gotPOST.resolves({
+    body: {
+      access_token: 'TeMpTeMpTeMpTeMpTeMp'
+    }
+  })
+  return gotPOST
+}
+
+/**
+ * Stub resource endpoint request(in which it return 401 with ticket)
+ * @returns <sinon.stub>
+ */
+const stubTicketRequest = function () {
+  const gotGet = sinon.stub(got, 'get')
+  gotGet.reset()
+  gotGet.resolves({
+    body: '',
+    statusCode: 401,
+    headers: {
+      server: 'Apache/2.4.29 (Ubuntu)',
+      'x-xss-protection': '1; mode=block',
+      'x-content-type-options': 'nosniff',
+      'strict-transport-security': 'max-age=31536000; includeSubDomains',
+      'www-authenticate': `UMA realm="Authentication Required", host_id=chris.gluuthree.org, as_uri=https://chris.gluuthree.org/.well-known/uma2-configuration, ticket=${mockTicket}`,
+      'content-length': '0',
+      connection: 'close'
+    }
+  })
+
+  return gotGet
+}
+
+const umaConfigGotResponse = {
+  body: {
+    token_endpoint: umaConfigTokenEndpoint
+  }
+}
+
+const passportConfigAuthorizedGotResponse = {
+  statusCode: 200,
+  body: JSON.stringify(passportConfigAuthorizedResponse)
+}
 
 describe('uma.js test', () => {
   describe('test getTokenEndpoint', () => {
@@ -26,11 +77,7 @@ describe('uma.js test', () => {
       const gotGet = sinon.stub(got, 'get')
 
       gotGet.reset()
-      gotGet.resolves({
-        body: {
-          token_endpoint: umaConfigTokenEndpoint
-        }
-      })
+      gotGet.resolves(umaConfigGotResponse)
       const tokenEndpoint = await getTokenEndpoint(umaConfigURL)
       assert(gotGet.calledWith(umaConfigURL, { responseType: 'json' }))
       assert.equal(tokenEndpoint, umaConfigTokenEndpoint)
@@ -92,13 +139,7 @@ describe('uma.js test', () => {
       miscGetRpJWT.reset()
       miscGetRpJWT.returns(clientAssertionToken)
 
-      const gotPOST = sinon.stub(got, 'post')
-      gotPOST.reset()
-      gotPOST.resolves({
-        body: {
-          access_token: 'TeMpTeMpTeMpTeMpTeMp'
-        }
-      })
+      const gotPOST = stubRPTTokenRequest()
 
       const ticket = 'ticket'
       const rptToken = await getRPT(ticket, umaConfigTokenEndpoint)
@@ -149,22 +190,8 @@ describe('uma.js test', () => {
     })
 
     it('should be request to config endpoint and get ticker', async () => {
-      const gotGet = sinon.stub(got, 'get')
-      gotGet.reset()
-      const mockTicket = '016f84e8-f9b9-11e0-bd6f-0021cc6004de'
-      gotGet.resolves({
-        body: '',
-        statusCode: 401,
-        headers: {
-          server: 'Apache/2.4.29 (Ubuntu)',
-          'x-xss-protection': '1; mode=block',
-          'x-content-type-options': 'nosniff',
-          'strict-transport-security': 'max-age=31536000; includeSubDomains',
-          'www-authenticate': `UMA realm="Authentication Required", host_id=chris.gluuthree.org, as_uri=https://chris.gluuthree.org/.well-known/uma2-configuration, ticket=${mockTicket}`,
-          'content-length': '0',
-          connection: 'close'
-        }
-      })
+      const gotGet = stubTicketRequest()
+
       const requestParams = {
         uri: passportConfigurationEndpoint,
         throwHttpErrors: false
@@ -186,10 +213,7 @@ describe('uma.js test', () => {
 
       const gotGet = sinon.stub(got, 'get')
       gotGet.reset()
-      gotGet.resolves({
-        statusCode: 200,
-        body: JSON.stringify(passportConfigAuthorizedResponse)
-      })
+      gotGet.resolves(passportConfigAuthorizedGotResponse)
       const doRequestParams = {
         uri: passportConfigurationEndpoint,
         throwHttpErrors: false
@@ -218,36 +242,16 @@ describe('uma.js test', () => {
     })
 
     it('should return configurations', async () => {
-      const rpt = {
-        access_token: 'tEmPtEmPtEmPtEmPtEmPtEmP',
-        pct: 'PmEtPmEtPmEtPmEtPmEtPmEt'
-      }
-      umaRewire.__set__('rpt', rpt)
-
       // mock get token endpoint
       const gotGet = sinon.stub(got, 'get')
       gotGet.reset()
-      gotGet.onCall(0).resolves({
-        body: {
-          token_endpoint: umaConfigTokenEndpoint
-        }
-      })
+      gotGet.onCall(0).resolves(umaConfigGotResponse)
 
       // mock rpt request
-      const gotGetRPTToken = sinon.stub(got, 'post')
-      gotGetRPTToken.reset()
-      gotGetRPTToken.resolves({
-        body: {
-          access_token: 'TeMpTeMpTeMpTeMpTeMp'
-        }
-      })
+      const gotGetRPTToken = stubRPTTokenRequest()
 
       // mock get config request
-      const mockTicket = '016f84e8-f9b9-11e0-bd6f-0021cc6004de'
-      gotGet.onCall(1).resolves({
-        statusCode: 200,
-        body: JSON.stringify(passportConfigAuthorizedResponse)
-      })
+      gotGet.onCall(1).resolves(passportConfigAuthorizedGotResponse)
 
       const processUnauthorizedResponse = await processUnauthorized(mockTicket, umaConfigURL, {
         uri: passportConfigurationEndpoint,
@@ -260,6 +264,39 @@ describe('uma.js test', () => {
 
       gotGet.restore()
       gotGetRPTToken.restore()
+    })
+  })
+
+  describe('test request', () => {
+    const request = umaRewire.__get__('request')
+
+    it('should exist', () => {
+      assert.exists(request)
+    })
+
+    it('should return configurations', async () => {
+      const gotGet = stubTicketRequest()
+
+      // mock get token endpoint
+      gotGet.onCall(1).resolves(umaConfigGotResponse)
+
+      // mock rpt request
+      const gotGetRPTToken = stubRPTTokenRequest()
+
+      // mock get config request
+      gotGet.onCall(2).resolves(passportConfigAuthorizedGotResponse)
+
+      const requestResponse = await request({
+        uri: passportConfigurationEndpoint,
+        throwHttpErrors: false
+      })
+
+      assert.isNotNull(requestResponse.conf)
+      assert.isNotNull(requestResponse.idpInitiated)
+      assert.isNotNull(requestResponse.providers)
+      assert.isNotEmpty(requestResponse.providers)
+      gotGetRPTToken.restore()
+      gotGet.restore()
     })
   })
 })
