@@ -19,7 +19,7 @@ const mockTicket = '016f84e8-f9b9-11e0-bd6f-0021cc6004de'
  * Stub RPT Token Request and return access_token
  * @returns <sinon.stub>
  */
-const stubRPTTokenRequest = function () {
+const stubRPTTokenRequest = () => {
   const gotPOST = sinon.stub(got, 'post')
   gotPOST.reset()
   gotPOST.resolves({
@@ -34,7 +34,7 @@ const stubRPTTokenRequest = function () {
  * Stub resource endpoint request(in which it return 401 with ticket)
  * @returns <sinon.stub>
  */
-const stubTicketRequest = function () {
+const stubTicketRequest = () => {
   const gotGet = sinon.stub(got, 'get')
   gotGet.reset()
   gotGet.resolves({

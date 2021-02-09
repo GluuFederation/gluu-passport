@@ -11,6 +11,15 @@ const passportConfigAuthorizedResponse = config.get('passportConfigAuthorizedRes
 const passportConfig = config.get('passportConfig')
 const passportConfigurationEndpoint = passportConfig.configurationEndpoint
 
+const assertData = (data) => {
+  assert.isNotNull(data.conf)
+  assert.isNotNull(data.conf.logging)
+  assert.isNotNull(data.conf.serverWebPort)
+  assert.isNotNull(data.idpInitiated)
+  assert.isNotNull(data.providers)
+  assert.isNotEmpty(data.providers)
+}
+
 describe('test ConfigDiscovery', () => {
   describe('test validate', () => {
     const validate = configDiscoveryRewire.__get__('validate')
@@ -25,12 +34,7 @@ describe('test ConfigDiscovery', () => {
 
     it('should return data if valid', () => {
       const response = validate(passportConfigAuthorizedResponse)
-      assert.isNotNull(response.conf)
-      assert.isNotNull(response.conf.logging)
-      assert.isNotNull(response.conf.serverWebPort)
-      assert.isNotNull(response.idpInitiated)
-      assert.isNotNull(response.providers)
-      assert.isNotEmpty(response.providers)
+      assertData(response)
     })
 
     it('should return error if data is invalid', () => {
@@ -59,12 +63,7 @@ describe('test ConfigDiscovery', () => {
       stubUMARequest.resolves(passportConfigAuthorizedResponse)
 
       const data = await retrieve(passportConfigurationEndpoint)
-      assert.isNotNull(data.conf)
-      assert.isNotNull(data.conf.logging)
-      assert.isNotNull(data.conf.serverWebPort)
-      assert.isNotNull(data.idpInitiated)
-      assert.isNotNull(data.providers)
-      assert.isNotEmpty(data.providers)
+      assertData(data)
     })
   })
 })
