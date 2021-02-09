@@ -73,6 +73,10 @@ describe('uma.js test', () => {
       assert.exists(getTokenEndpoint)
     })
 
+    it('should be function', () => {
+      assert.isFunction(getTokenEndpoint)
+    })
+
     it('should be request to uma config endpoint and get token endpoint', async () => {
       const gotGet = sinon.stub(got, 'get')
 
@@ -134,6 +138,10 @@ describe('uma.js test', () => {
       assert.exists(getRPT)
     })
 
+    it('should be function', () => {
+      assert.isFunction(getRPT)
+    })
+
     it('should get RPT token', async () => {
       const miscGetRpJWT = sinon.stub(misc, 'getRpJWT')
       miscGetRpJWT.reset()
@@ -189,6 +197,10 @@ describe('uma.js test', () => {
       assert.exists(doRequest)
     })
 
+    it('should be function', () => {
+      assert.isFunction(doRequest)
+    })
+
     it('should be request to config endpoint and get ticker', async () => {
       const gotGet = stubTicketRequest()
 
@@ -241,6 +253,10 @@ describe('uma.js test', () => {
       assert.exists(processUnauthorized)
     })
 
+    it('should be function', () => {
+      assert.isFunction(processUnauthorized)
+    })
+
     it('should return configurations', async () => {
       // mock get token endpoint
       const gotGet = sinon.stub(got, 'get')
@@ -272,6 +288,10 @@ describe('uma.js test', () => {
 
     it('should exist', () => {
       assert.exists(request)
+    })
+
+    it('should be function', () => {
+      assert.isFunction(request)
     })
 
     it('should return configurations', async () => {
