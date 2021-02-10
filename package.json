@@ -73,7 +73,7 @@
   },
   "devDependencies": {
     "@cucumber/cucumber": "^7.0.0",
-    "chai": "^4.2.0",
+    "chai": "^4.3.0",
     "chai-files": "^1.4.0",
     "chai-http": "^4.3.0",
     "codecov": "^3.8.1",
