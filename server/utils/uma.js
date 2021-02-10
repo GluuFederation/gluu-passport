@@ -1,4 +1,5 @@
-const reqp = require('request-promise')
+/* eslint-disable node/handle-callback-err */
+const got = require('got')
 const parsers = require('www-authenticate').parsers
 const R = require('ramda')
 const { v4: uuidv4 } = require('uuid')
@@ -16,23 +17,29 @@ let rpt
 
 function getTokenEndpoint (umaConfigURL) {
   logger.log2('verbose', 'getTokenEndpoint called for ' + umaConfigURL)
-  return reqp({ uri: umaConfigURL, json: true })
-    .then(obj => {
+  return got.get(umaConfigURL, { responseType: 'json' })
+    .then(response => {
+      const body = response.body
       logger.log2(
         'debug',
-        `getTokenEndpoint. obj = ${JSON.stringify(obj)}`
+        `getTokenEndpoint. obj = ${JSON.stringify(body)}`
       )
-      const endpoint = obj.token_endpoint
-      if (endpoint) {
+      const tokenEndpoint = body.token_endpoint
+      if (tokenEndpoint) {
         logger.log2(
           'info',
-          `getTokenEndpoint. Found endpoint at ${endpoint}`)
-        return endpoint
+          `getTokenEndpoint. Found token endpoint at ${tokenEndpoint}`)
+        return tokenEndpoint
       } else {
         const msg = 'getTokenEndpoint. No token endpoint was found'
         logger.log2('error', msg)
         throw new Error(msg)
       }
+    })
+    .catch(err => {
+      logger.log2('error', 'getTokenEndpoint. Failed to get token endpoint')
+      logger.log2('error', err)
+      throw new Error(err.message)
     })
 }
 
@@ -56,9 +63,7 @@ function getRPT (ticket, tokenEndpoint) {
     iat: now
   })
   const options = {
-    method: 'POST',
-    uri: tokenEndpoint,
-    json: true,
+    responseType: 'json',
     form: {
       grant_type: 'urn:ietf:params:oauth:grant-type:uma-ticket',
       client_assertion_type:
@@ -69,11 +74,12 @@ function getRPT (ticket, tokenEndpoint) {
     }
   }
   logger.log2(
-    'debug', `getRPT request options = ${JSON.stringify(
+    'debug', `getRPT request to ${tokenEndpoint} endpoint with options = ${JSON.stringify(
       options, null, 4)}`
   )
-  return reqp(options)
-    .then(rptDetails => {
+  return got.post(tokenEndpoint, options)
+    .then(response => {
+      const rptDetails = response.body
       logger.log2(
         'debug', `getRPT. response: ${JSON.stringify(
           rptDetails, null, 4)}`)
@@ -83,14 +89,20 @@ function getRPT (ticket, tokenEndpoint) {
         `getRPT. Access token is ${rptDetails.access_token}`)
       return rptDetails
     })
+    .catch((err) => {
+      logger.log2('error', 'getRPT. Failed to get RPT token')
+      logger.log2('error', err)
+      throw new Error(err.message)
+    })
 }
 
 /**
  * Do UMA requests and handle response according to UMA Flow.
- * @param options : Object containing UMA request options
- * @returns {PromiseLike<options> | Promise<response>}
+ * @param requestOptions : Object containing UMA request options
+ * @returns {PromiseLike<requestOptions> | Promise<response>}
  */
-function doRequest (options) {
+function doRequest (requestOptions) {
+  const { uri, ...options } = requestOptions
   // if RPT was already fetched
   if (rpt) {
     const headers = {
@@ -104,18 +116,18 @@ function doRequest (options) {
     'debug', `doRequest. options = ${JSON.stringify(
       options, null, 4)}`
   )
-  return reqp(options)
+  return got.get(uri, options)
     .then(response => {
+      const { body, statusCode, headers } = response
       logger.log2(
         'debug',
-        `doRequest. response is: ${JSON.stringify(
-          response, null, 4)}`
+        `doRequest. response is: ${JSON.stringify({ body, statusCode, headers }, null, 4)}`
       )
-      switch (response.statusCode) {
+      switch (statusCode) {
         // usually first response, without RPT
         case 401: {
           const parsed = new parsers.WWW_Authenticate(
-            response.headers['www-authenticate']
+            headers['www-authenticate']
           )
           logger.log2(
             'verbose',
@@ -123,10 +135,10 @@ function doRequest (options) {
           `with ticket ${parsed.parms.ticket}`)
           logger.log2('debug',
           `getConfiguration. Reponse Headers ${JSON.stringify(
-            response.headers, null, 4)}`
+            headers, null, 4)}`
           )
           logger.log2('debug',
-          `getConfiguration. parsed.params = ${parsed.params}`
+          `getConfiguration. parsed.params = ${JSON.stringify(parsed.parms)}`
           )
           // return this as val to function(val) inside request
           return parsed.parms
@@ -139,15 +151,15 @@ function doRequest (options) {
           )
           logger.log2(
             'debug',
-          `getConfiguration. Passport configs are: ${response.body}`
+          `getConfiguration. Passport configs are: ${body}`
           )
           // return this as val to function(val) inside request
-          return JSON.parse(response.body)
+          return JSON.parse(body)
         }
         default: {
           throw new Error(
             'Received unexpected HTTP status code ' +
-          `of ${response.statusCode}`
+          `of ${statusCode}`
           )
         }
       }
