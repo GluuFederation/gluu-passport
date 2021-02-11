@@ -246,6 +246,111 @@ class InitMock {
       .query(true)
       .reply(405)
   }
+
+  /**
+   * Mocking discovery endpoint
+   */
+  discoveryURL (url = this._gluuUrl) {
+    const discoveryEndpoint = '/.well-known/openid-configuration'
+
+    const discoveryEndpointResponse = {
+      request_parameter_supported: true,
+      token_revocation_endpoint: `${url}/oxauth/restv1/revoke`,
+      introspection_endpoint: `${url}/oxauth/restv1/introspection`,
+      claims_parameter_supported: false,
+      issuer: `${url}`,
+      userinfo_encryption_enc_values_supported: ['RSA1_5', 'RSA-OAEP', 'A128KW', 'A256KW'],
+      id_token_encryption_enc_values_supported: ['A128CBC+HS256', 'A256CBC+HS512', 'A128GCM', 'A256GCM'],
+      authorization_endpoint: `${url}/oxauth/restv1/authorize`,
+      service_documentation: 'http://gluu.org/docs',
+      id_generation_endpoint: `${url}/oxauth/restv1/id`,
+      claims_supported: ['street_address', 'country', 'zoneinfo', 'birthdate', 'role', 'gender', 'formatted', 'user_name', 'phone_mobile_number', 'preferred_username', 'locale', 'inum', 'updated_at', 'nickname', 'email', 'website', 'email_verified', 'profile', 'locality', 'phone_number_verified', 'given_name', 'middle_name', 'picture', 'name', 'phone_number', 'postal_code', 'region', 'family_name'],
+      scope_to_claims_mapping: [{
+        profile: ['name', 'family_name', 'given_name', 'middle_name', 'nickname', 'preferred_username', 'profile', 'picture', 'website', 'gender', 'birthdate', 'zoneinfo', 'locale', 'updated_at']
+      }, {
+        openid: []
+      }, {
+        permission: ['role']
+      }, {
+        super_gluu_ro_session: []
+      }, {
+        phone: ['phone_number_verified', 'phone_number']
+      }, {
+        revoke_session: []
+      }, {
+        address: ['formatted', 'postal_code', 'street_address', 'locality', 'country', 'region']
+      }, {
+        clientinfo: ['name', 'inum']
+      }, {
+        mobile_phone: ['phone_mobile_number']
+      }, {
+        email: ['email_verified', 'email']
+      }, {
+        user_name: ['user_name']
+      }, {
+        'oxtrust-api-write': []
+      }, {
+        oxd: []
+      }, {
+        uma_protection: []
+      }, {
+        'oxtrust-api-read': []
+      }, {
+        offline_access: []
+      }],
+      op_policy_uri: 'http://ox.gluu.org/doku.php?id=oxauth:policy',
+      token_endpoint_auth_methods_supported: ['client_secret_basic', 'client_secret_post', 'client_secret_jwt', 'private_key_jwt'],
+      tls_client_certificate_bound_access_tokens: true,
+      response_modes_supported: ['fragment', 'form_post', 'query'],
+      backchannel_logout_session_supported: true,
+      token_endpoint: `${url}/oxauth/restv1/token`,
+      response_types_supported: ['code id_token', 'code', 'id_token token', 'id_token', 'code token', 'token', 'code id_token token'],
+      request_uri_parameter_supported: true,
+      backchannel_user_code_parameter_supported: false,
+      grant_types_supported: ['authorization_code', 'password', 'urn:ietf:params:oauth:grant-type:uma-ticket', 'refresh_token', 'implicit', 'urn:ietf:params:oauth:grant-type:device_code', 'client_credentials'],
+      ui_locales_supported: ['en', 'bg', 'de', 'es', 'fr', 'it', 'ru', 'tr'],
+      userinfo_endpoint: `${url}/oxauth/restv1/userinfo`,
+      op_tos_uri: 'http://ox.gluu.org/doku.php?id=oxauth:tos',
+      auth_level_mapping: {
+        '-1': ['simple_password_auth'],
+        60: ['passport_saml'],
+        40: ['otp', 'passport_social']
+      },
+      require_request_uri_registration: false,
+      id_token_encryption_alg_values_supported: ['RSA1_5', 'RSA-OAEP', 'A128KW', 'A256KW'],
+      frontchannel_logout_session_supported: true,
+      claims_locales_supported: ['en'],
+      clientinfo_endpoint: `${url}/oxauth/restv1/clientinfo`,
+      request_object_signing_alg_values_supported: ['none', 'HS256', 'HS384', 'HS512', 'RS256', 'RS384', 'RS512', 'ES256', 'ES384', 'ES512'],
+      request_object_encryption_alg_values_supported: ['RSA1_5', 'RSA-OAEP', 'A128KW', 'A256KW'],
+      session_revocation_endpoint: `${url}/oxauth/restv1/revoke_session`,
+      check_session_iframe: `${url}/oxauth/opiframe.htm`,
+      scopes_supported: ['address', `${url}/oxauth/restv1/uma/scopes/scim_access`, 'openid', 'clientinfo', 'user_name', 'profile', 'uma_protection', 'permission', `${url}/oxauth/restv1/uma/scopes/passport_access`, 'revoke_session', 'oxtrust-api-write', 'oxtrust-api-read', 'phone', 'mobile_phone', 'offline_access', 'oxd', 'super_gluu_ro_session', 'email'],
+      backchannel_logout_supported: true,
+      acr_values_supported: ['simple_password_auth', 'passport_saml', 'urn:oasis:names:tc:SAML:2.0:ac:classes:Password', 'urn:oasis:names:tc:SAML:2.0:ac:classes:InternetProtocol', 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport', 'otp', 'passport_social'],
+      request_object_encryption_enc_values_supported: ['A128CBC+HS256', 'A256CBC+HS512', 'A128GCM', 'A256GCM'],
+      device_authorization_endpoint: `${url}/oxauth/restv1/device_authorization`,
+      display_values_supported: ['page', 'popup'],
+      userinfo_signing_alg_values_supported: ['HS256', 'HS384', 'HS512', 'RS256', 'RS384', 'RS512', 'ES256', 'ES384', 'ES512'],
+      claim_types_supported: ['normal'],
+      userinfo_encryption_alg_values_supported: ['RSA1_5', 'RSA-OAEP', 'A128KW', 'A256KW'],
+      end_session_endpoint: `${url}/oxauth/restv1/end_session`,
+      revocation_endpoint: `${url}/oxauth/restv1/revoke`,
+      backchannel_authentication_endpoint: `${url}/oxauth/restv1/bc-authorize`,
+      token_endpoint_auth_signing_alg_values_supported: ['HS256', 'HS384', 'HS512', 'RS256', 'RS384', 'RS512', 'ES256', 'ES384', 'ES512'],
+      frontchannel_logout_supported: true,
+      jwks_uri: `${url}/oxauth/restv1/jwks`,
+      subject_types_supported: ['public', 'pairwise'],
+      id_token_signing_alg_values_supported: ['none', 'HS256', 'HS384', 'HS512', 'RS256', 'RS384', 'RS512', 'ES256', 'ES384', 'ES512'],
+      registration_endpoint: `${url}/oxauth/restv1/register`,
+      id_token_token_binding_cnf_values_supported: ['tbh']
+    }
+
+    nock(url)
+      .persist()
+      .get(discoveryEndpoint)
+      .reply(200, discoveryEndpointResponse)
+  }
 }
 
 module.exports = InitMock
