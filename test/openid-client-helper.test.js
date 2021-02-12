@@ -68,7 +68,7 @@ describe('Test OpenID Client Helper', () => {
 
     it('we have now already client initialize so we should get client from state', async () => {
       const client = await getClient(testProvider)
-      assert.exists(client, 'failed to make client for openid-client strategy')
+      assert.exists(client, 'failed to get client for openid-client strategy')
       const strategy = new Strategy({ client }, () => {})
       assert.exists(strategy, 'Failed to create strategy')
     })
