@@ -121,15 +121,19 @@ async function setupStrategy (provider) {
     passport.use(id, samlStrategy)
     spMetadata.generate(provider, samlStrategy)
   } else if (strategyModule === 'openid-client') {
-    const client = await getClient(provider, providerOptions)
-    const strategyOptions = { client }
-    if (providerOptions.usePKCE) {
-      strategyOptions.usePKCE = true
+    try {
+      const client = await getClient(provider)
+      const oidcStrategyOptions = { client }
+
+      oidcStrategyOptions.usePKCE = providerOptions.usePKCE || false
+
+      if (providerOptions.params) {
+        oidcStrategyOptions.params = providerOptions.params
+      }
+      passport.use(id, new Strategy(oidcStrategyOptions, verify))
+    } catch (error) {
+      logger.log2('error', error.message)
     }
-    if (providerOptions.params) {
-      strategyOptions.params = providerOptions.params
-    }
-    passport.use(id, new Strategy(strategyOptions, verify))
   } else {
     passport.use(id, new Strategy(providerOptions, verify))
   }

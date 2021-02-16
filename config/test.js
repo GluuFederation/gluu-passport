@@ -182,13 +182,13 @@ const passportConfigAuthorizedResponse = {
     mapping: 'openid-client',
     passportStrategyId: 'openid-client',
     enabled: true,
-    callbackUrl: 'https://chris.gluuthree.org/passport/auth/oidccedev6/callback',
+    callbackUrl: 'https://gluu.test.ce6.local.org/passport/auth/oidccedev6/callback',
     requestForEmail: false,
     emailLinkingSafe: false,
     options: {
       client_id: 'b4e0f241-a8c1-4c75-8fc8-4ae7163e9695',
       client_secret: 'nmGIw7bAIKjrACXODzjPJyfYDaECAWSYzE1Temqz',
-      redirect_uris: '["https://chris.gluuthree.org/passport/auth/oidccedev6/callback"]',
+      redirect_uris: '["https://gluu.test.ce6.local.org/passport/auth/oidccedev6/callback"]',
       scope: '["openid", "email", "profile"]',
       issuer: 'https://gluu.test.ce6.local.org',
       token_endpoint_auth_method: 'client_secret_post'
@@ -200,13 +200,13 @@ const passportConfigAuthorizedResponse = {
     mapping: 'openid-client',
     passportStrategyId: 'openid-client',
     enabled: true,
-    callbackUrl: 'https://chris.gluuthree.org/passport/auth/oidccedev6privatejwt/callback',
+    callbackUrl: 'https://gluu.test.ce6.local.org/passport/auth/oidccedev6privatejwt/callback',
     requestForEmail: false,
     emailLinkingSafe: false,
     options: {
       client_id: 'b4e0f241-a8c1-4c75-8fc8-4ae7163e9695',
       client_secret: 'nmGIw7bAIKjrACXODzjPJyfYDaECAWSYzE1Temqz',
-      redirect_uris: '["https://chris.gluuthree.org/passport/auth/oidccedev6privatejwt/callback"]',
+      redirect_uris: '["https://gluu.test.ce6.local.org/passport/auth/oidccedev6privatejwt/callback"]',
       scope: '["openid", "email", "profile"]',
       issuer: 'https://gluu.test.ce6.local.org',
       token_endpoint_auth_method: 'private_key_jwt'
