@@ -213,18 +213,18 @@ const passportConfigAuthorizedResponse = {
     }
   }, {
     id: 'oidccedev6_pkce',
-    displayName: 'openid-client-ce-dev6-passport',
+    displayName: 'openid-client-ce-dev6-pkce-flow',
     type: 'openid-client',
     mapping: 'openid-client',
     passportStrategyId: 'openid-client',
     enabled: true,
-    callbackUrl: 'https://gluu.test.ce6.local.org/passport/auth/oidccedev6/callback',
+    callbackUrl: 'https://gluu.test.ce6.local.org/passport/auth/oidccedev6_pkce/callback',
     requestForEmail: false,
     emailLinkingSafe: false,
     options: {
-      client_id: 'b4e0f241-a8c1-4c75-8fc8-4ae7163e9695',
-      client_secret: 'nmGIw7bAIKjrACXODzjPJyfYDaECAWSYzE1Temqz',
-      redirect_uris: '["https://gluu.test.ce6.local.org/passport/auth/oidccedev6/callback"]',
+      client_id: 'b4e0f241-a8c1-4c75-8fc8-4ae7163e9795',
+      client_secret: 'nmGIw7bAIKjrACXODzjPJyfYDaECAWSzzE1Temqz',
+      redirect_uris: '["https://gluu.test.ce6.local.org/passport/auth/oidccedev6_pkce/callback"]',
       scope: '["openid", "email", "profile"]',
       issuer: 'https://gluu.test.ce6.local.org',
       token_endpoint_auth_method: 'client_secret_post',
