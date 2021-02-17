@@ -135,25 +135,6 @@ const passportConfigAuthorizedResponse = {
       issuer: 'chris.testingenv.org'
     }
   }, {
-    id: 'cedev6',
-    displayName: 'ce-dev6-passport',
-    type: 'openidconnect',
-    mapping: 'openidconnect-default',
-    passportStrategyId: 'passport-openidconnect',
-    enabled: true,
-    callbackUrl: 'https://chris.gluuthree.org/passport/auth/cedev6/callback',
-    requestForEmail: false,
-    emailLinkingSafe: false,
-    options: {
-      userInfoURL: 'https://gluu.test.ce6.local.org/oxauth/restv1/userinfo',
-      clientID: 'b4e0f241-a8c1-4c75-8fc8-4ae7163e9695',
-      tokenURL: 'https://gluu.test.ce6.local.org/oxauth/restv1/token',
-      authorizationURL: 'https://gluu.test.ce6.local.org/oxauth/restv1/authorize',
-      scope: '["openid", "email", "profile"]',
-      clientSecret: 'Admin1Admin!',
-      issuer: 'https://gluu.test.ce6.local.org'
-    }
-  }, {
     id: 'saml-redis-test',
     displayName: 'saml redis',
     type: 'saml',
