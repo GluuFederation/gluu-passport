@@ -2,7 +2,6 @@ const logger = require('./logging')
 const misc = require('./misc')
 const fs = require('fs')
 const Promise = require('bluebird')
-const R = require('ramda')
 
 /**
  * Write given data to given file
@@ -37,12 +36,12 @@ const writeDataToFile = (fileNameWithPath, data) => {
 * @param path: directory path
 * @returns directory path
 */
-const makeDir = R.once((path) => {
+const makeDir = (path) => {
   if (!fs.existsSync(path)) {
     fs.mkdirSync(path)
   }
   return path
-})
+}
 
 module.exports = {
   makeDir,

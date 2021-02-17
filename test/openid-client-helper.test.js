@@ -18,15 +18,15 @@ describe('Test OpenID Client Helper', () => {
   describe('generateJWKS test', () => {
     const generateJWKS = rewiredOpenIDClientHelper.__get__('generateJWKS')
 
-    it('generateJWKS should exist', () => {
+    it('should exist', () => {
       assert.exists(generateJWKS)
     })
 
-    it('generateJWKS should be function', () => {
+    it('should be function', () => {
       assert.isFunction(generateJWKS, 'generateJWKS is not a function')
     })
 
-    it('generateJWKS should generate jwks for provider in jwks folder', async () => {
+    it('should generate jwks for provider in jwks folder', async () => {
       await generateJWKS(testProvider)
       assert.exists(jwksFilePath, `${jwksFilePath} file not found`)
     })
@@ -48,15 +48,15 @@ describe('Test OpenID Client Helper', () => {
   describe('getClient test', () => {
     const getClient = rewiredOpenIDClientHelper.__get__('getClient')
 
-    it('getClient should exist', () => {
+    it('should exist', () => {
       assert.exists(getClient)
     })
 
-    it('getClient should be function', () => {
+    it('should be function', () => {
       assert.isFunction(getClient, 'getClient is not a function')
     })
 
-    it('getClient should return the client object to initialize openid-client strategy', async () => {
+    it('should return the client object to initialize openid-client strategy', async () => {
       const initMock = new InitMock()
       initMock.discoveryURL(testProvider.options.issuer)
 
