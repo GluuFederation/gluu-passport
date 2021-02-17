@@ -40,5 +40,23 @@ describe('provider.js', () => {
       )
       assertResponse(response)
     })
+
+    it('for pkce flow should redirect with code challenge and custom params', async () => {
+      const tokenResponse = await got(
+        'http://127.0.0.1:8090/passport/token',
+        { responseType: 'json' }
+      )
+      const token = tokenResponse.body.token_
+      const oidcProviderId = 'oidccedev6_pkce'
+      const response = await got(
+          `http://127.0.0.1:8090/passport/auth/${oidcProviderId}/${token}`,
+          { throwHttpErrors: false, followRedirect: false }
+      )
+      assertResponse(response)
+      assert.match(response.headers.location, /code_challenge/)
+      assert.match(response.headers.location, /code_challenge_method/)
+      assert.match(response.headers.location, /preselectedExternalProvider=tEmp/)
+      assert.match(response.headers.location, /acr_values=duo/)
+    })
   })
 })
