@@ -2,6 +2,7 @@
 const chai = require('chai')
 const fileUtils = require('../server/utils/file-utils')
 const path = require('path')
+const sinon = require('sinon')
 
 const assert = chai.assert
 
@@ -29,14 +30,12 @@ describe('fileUtils.writeDataToFile', () => {
     assert.isFunction(fileUtils.writeDataToFile)
   })
 
-  it('writeJWKS should write content in file', async () => {
+  it('should called correctly with valid arguments', async () => {
     const expectedJWKSFolderPath = path.join(__dirname, '../server/jwks')
     const fileName = path.join(fileUtils.makeDir(expectedJWKSFolderPath), 'test-provider-unit-test.json')
+    const writeDataToFileSpy = sinon.spy(fileUtils, 'writeDataToFile')
     await fileUtils.writeDataToFile(fileName, JSON.stringify({ ktype: 'RS256' }))
 
-    assert.exists(fileName)
-    // eslint-disable-next-line security/detect-non-literal-require
-    const jwksFile = require(fileName)
-    assert.equal(jwksFile.ktype, 'RS256')
+    assert(writeDataToFileSpy.calledOnceWith(fileName, JSON.stringify({ ktype: 'RS256' })))
   })
 })
