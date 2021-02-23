@@ -187,7 +187,6 @@ const passportConfigAuthorizedResponse = {
     options: {
       client_id: 'b4e0f241-a8c1-4c75-8fc8-4ae7163e9695',
       client_secret: 'nmGIw7bAIKjrACXODzjPJyfYDaECAWSYzE1Temqz',
-      redirect_uris: '["https://gluu.test.ce6.local.org/passport/auth/oidccedev6privatejwt/callback"]',
       scope: '["openid", "email", "profile"]',
       issuer: 'https://gluu.test.ce6.local.org',
       token_endpoint_auth_method: 'private_key_jwt'
@@ -205,7 +204,6 @@ const passportConfigAuthorizedResponse = {
     options: {
       client_id: 'b4e0f241-a8c1-4c75-8fc8-4ae7163e9795',
       client_secret: 'nmGIw7bAIKjrACXODzjPJyfYDaECAWSzzE1Temqz',
-      redirect_uris: '["https://gluu.test.ce6.local.org/passport/auth/oidccedev6_pkce/callback"]',
       scope: '["openid", "email", "profile"]',
       issuer: 'https://gluu.test.ce6.local.org',
       token_endpoint_auth_method: 'client_secret_post',

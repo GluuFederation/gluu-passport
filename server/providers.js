@@ -200,6 +200,8 @@ function fillMissingData (providers) {
     if (isSaml) {
       // Different casing in saml
       options.callbackUrl = R.defaultTo(`${prefix}/saml/${provider.id}/callback`, callbackUrl)
+    } else if (strategyId === 'openid-client') {
+      options.redirect_uris = [R.defaultTo(`${prefix}/${provider.id}/callback`, callbackUrl)]
     } else {
       options.callbackURL = R.defaultTo(`${prefix}/${provider.id}/callback`, callbackUrl)
       // Some passport strategies expect consumer* instead of client*
