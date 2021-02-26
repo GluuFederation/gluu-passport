@@ -8,7 +8,7 @@ const config = require('config')
 const assert = chai.assert
 const passportConfigAuthorizedResponse = config.get('passportConfigAuthorizedResponse')
 
-describe('Test OpenID Client Helper', () => {
+describe('Integration Test OpenID Client Helper', () => {
   const testProvider = passportConfigAuthorizedResponse.providers.find(p => p.id === 'oidccedev6privatejwt')
   let kid = null
   const jwksFilePath = `../server/jwks/${testProvider.id}.json`

@@ -116,10 +116,8 @@ async function setupStrategy (provider) {
       const oidcStrategyOptions = { client }
 
       oidcStrategyOptions.usePKCE = providerOptions.usePKCE || false
+      oidcStrategyOptions.params = providerOptions.params ? providerOptions.params : {}
 
-      if (providerOptions.params) {
-        oidcStrategyOptions.params = providerOptions.params
-      }
       passport.use(id, new Strategy(oidcStrategyOptions, verify))
     } catch (error) {
       logger.log2('error', error.message)
