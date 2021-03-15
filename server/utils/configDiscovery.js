@@ -26,9 +26,8 @@ function validate (data) {
  */
 function retrieve (cfgEndpoint) {
   const options = {
-    simple: false,
-    resolveWithFullResponse: true,
-    uri: cfgEndpoint
+    uri: cfgEndpoint,
+    throwHttpErrors: false
   }
   const chain = misc.pipePromise(
     uma.request,
