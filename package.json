@@ -38,7 +38,7 @@
     "csurf": "^1.11.0",
     "express": "^4.16.4",
     "express-prom-bundle": "^6.3.0",
-    "express-rate-limit": "^5.2.3",
+    "express-rate-limit": "^5.2.6",
     "express-session": "^1.15.6",
     "got": "^11.8.1",
     "jsonwebtoken": "^8.4.0",
