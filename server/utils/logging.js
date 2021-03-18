@@ -16,12 +16,14 @@ const defaultLogOptions = {
   datePattern: 'YYYY-MM-DD',
   maxSize: '20m'
 }
-const flogOpts = {
+
+const fileLogOptions = {
   filename: dir + '/passport.log',
   maxSize: defaultLogOptions.maxSize,
   maxFiles: 5,
   options: { flags: 'w' }
 }
+
 const logger = winston.createLogger({
   exitOnError: false,
   format: format.combine(
@@ -45,7 +47,9 @@ if (!fs.existsSync(dir)) {
 }
 
 function addFileTransport (level) {
-  fileTransport = new winston.transports.File(R.assoc('level', level, flogOpts))
+  fileLogOptions.level = level
+  fileTransport = new winston.transports.File(fileLogOptions)
+  // fileTransport = new winston.transports.File(R.assoc('level', level, flogOpts))
   logger.add(fileTransport, {}, true)
 }
 
