@@ -30,7 +30,7 @@ router.post('/auth/:provider/callback',
   authenticateRequestCallback,
   callbackResponse)
 
-router.get('/auth/:provider/:token',
+router.get('/auth/:provider/:token/locale/:locale',
   validateProvider,
   validateToken,
   authenticateRequest)
