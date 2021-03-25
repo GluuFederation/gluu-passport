@@ -8,7 +8,6 @@ const AppFactory = require('./app-factory')
 
 let httpServer
 let httpPort = -1
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
 const appFactoryInstance = new AppFactory()
 const app = appFactoryInstance.createApp()
