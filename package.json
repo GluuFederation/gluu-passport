@@ -29,6 +29,7 @@
   "dependencies": {
     "@nicokaiser/passport-apple": "^0.2.1",
     "@sokratis/passport-linkedin-oauth2": "^2.1.0",
+    "applicationinsights": "^1.8.10",
     "base64url": "^3.0.1",
     "bluebird": "^3.5.3",
     "body-parser": "^1.18.3",
