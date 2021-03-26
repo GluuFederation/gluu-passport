@@ -78,7 +78,6 @@
     "chai-files": "^1.4.0",
     "chai-http": "^4.3.0",
     "codecov": "^3.8.1",
-    "commitizen": "^4.2.2",
     "cz-conventional-changelog": "^3.3.0",
     "eslint": "^7.20.0",
     "eslint-config-scanjs": "^1.0.0-beta4",
