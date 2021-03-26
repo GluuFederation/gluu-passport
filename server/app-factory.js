@@ -23,10 +23,12 @@ class AppFactory {
     app.use(cookieParser())
     app.use(flash())
     app.use(rateLimiter)
-
+    app.set('trust proxy', 1)
     app.use(session({
       cookie: {
-        maxAge: 86400000
+        maxAge: 86400000,
+        sameSite: 'none',
+        secure: true
       },
       store: new MemoryStore({
         checkPeriod: 86400000 // prune expired entries every 24h
