@@ -34,4 +34,7 @@ describe('productioncfg', function () {
       productioncfg.sameSite, 'sameSite does not exist'
     )
   })
+  it('production.js should have sameSite value none', () => {
+    assert.equal(productioncfg.sameSite, 'none', 'sameSite value is NOT none')
+  })
 })
