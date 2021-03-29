@@ -18,6 +18,18 @@ describe('defaultcfg', function () {
     assert.exists(
       defaultcfg.saltFile, 'saltFile is not null or undefined')
   })
+
+  it('default.js should have sameSite value lax', () => {
+    assert.exists(defaultcfg.sameSite, 'sameSite does NOT exists')
+    assert.equal(defaultcfg.sameSite, 'lax', 'sameSite value is NOT lax')
+  })
+
+  // it('default.js should have secure value false', () => {
+  //   assert.exists(
+  //     defaultcfg.secure, 'secure does NOT exist'
+  //   )
+  //   assert.isFalse(defaultcfg.secure)
+  // })
 })
 
 describe('productioncfg', function () {
