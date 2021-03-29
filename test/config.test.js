@@ -25,8 +25,13 @@ describe('productioncfg', function () {
     assert.exists(
       productioncfg.passportFile, 'passportFile is not null or undefined')
   })
-  it('default.js should have saltFile not null or undefined', () => {
+  it('production.js should have saltFile not null or undefined', () => {
     assert.exists(
       productioncfg.saltFile, 'saltFile is not null or undefined')
+  })
+  it('production.js shoud have sameSite', () => {
+    assert.exists(
+      productioncfg.sameSite, 'sameSite does not exist'
+    )
   })
 })
