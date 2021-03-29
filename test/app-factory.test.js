@@ -105,3 +105,10 @@ describe('rateLimiter middleware', () => {
     sinon.restore()
   })
 })
+
+describe('session middleware', () => {
+  const rewiredSession = appFactoryRewire.__get__('session')
+  it('shoud exist', () => {
+    assert.exists(rewiredSession)
+  })
+})
