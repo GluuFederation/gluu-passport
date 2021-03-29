@@ -49,6 +49,7 @@ class AppFactory {
     })
     // store rateLimiter middleware for later manipulation/reset
     app.rateLimiter = rateLimiter
+    app.session = session
     return app
   }
 }
