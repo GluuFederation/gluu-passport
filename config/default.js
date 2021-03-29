@@ -9,5 +9,6 @@ module.exports = {
   // Max number of connections during windowMs milliseconds before sending a 429 response.
   rateLimitMaxRequestAllow: 1000,
 
-  sameSite: 'lax'
+  sameSite: 'lax',
+  secure: false
 }

@@ -24,12 +24,12 @@ describe('defaultcfg', function () {
     assert.equal(defaultcfg.sameSite, 'lax', 'sameSite value is NOT lax')
   })
 
-  // it('default.js should have secure value false', () => {
-  //   assert.exists(
-  //     defaultcfg.secure, 'secure does NOT exist'
-  //   )
-  //   assert.isFalse(defaultcfg.secure)
-  // })
+  it('default.js should have secure value false', () => {
+    assert.exists(
+      defaultcfg.secure, 'secure does NOT exist'
+    )
+    assert.isFalse(defaultcfg.secure)
+  })
 })
 
 describe('productioncfg', function () {
