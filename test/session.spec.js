@@ -24,7 +24,6 @@ describe('/passport/metrics - metrics endpoint (integration)', () => {
       .get('/passport/health-check')
       .set('Cookie', 'SameSite=None')
       .end((_err, res) => {
-        console.log(res.body)
         res.body.sessionCookie.should.include(
           {
             sameSite: sameSiteConfig,
