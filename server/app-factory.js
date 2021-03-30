@@ -35,9 +35,8 @@ class AppFactory {
     passport.deserializeUser((user, done) => {
       done(null, user)
     })
-    // store middlewares for later manipulation/reset
+    // store rateLimiter for later manipulation/reset
     app.rateLimiter = rateLimiter
-    app.session = session
     return app
   }
 }

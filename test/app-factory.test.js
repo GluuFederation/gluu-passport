@@ -9,11 +9,10 @@ const { rateLimiter } = require('../server/utils/rate-limiter')
 /**
  * Helper: Returns the argument call number with matching args
  * If none found, returns undefined
- * @param {*} spyFn sinon.Spy function
- * @param {*} argFn callback / function param
+ * @param {Function} spyFn sinon.Spy function
+ * @param {Function} argFn callback / function param
  */
 
-// eslint-disable-next-line no-unused-vars
 function assertCalledWithFunctionAsArg (spyFn, argFn) {
   const calls = spyFn.getCalls()
   const argFnString = argFn.toString()
@@ -126,5 +125,17 @@ describe('session middleware', () => {
     const appUseSpy = spyOnAppUse()
     assertCalledWithFunctionAsArg(appUseSpy, rewiredSession)
     sinon.restore()
+  })
+
+  describe('proxy setup', () => {
+    it('app.set should be called once w/ params', () => {
+      const app = appFactoryRewire.__get__('app')
+      const AppFactory = appFactoryRewire.__get__('AppFactory')
+      const appSetSpy = sinon.spy(app, 'set')
+      const appInstance = new AppFactory()
+      appInstance.createApp()
+      sinon.assert.calledWith(appSetSpy, 'trust proxy', 1)
+      sinon.restore()
+    })
   })
 })
