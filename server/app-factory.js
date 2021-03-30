@@ -13,6 +13,7 @@ const { randomSecret } = require('./utils/misc')
 const { globalErrorHandler } = require('./utils/error-handler')
 const flash = require('connect-flash')
 const { rateLimiter } = require('./utils/rate-limiter')
+const cfg = require('config')
 
 class AppFactory {
   createApp () {
@@ -26,7 +27,9 @@ class AppFactory {
 
     app.use(session({
       cookie: {
-        maxAge: 86400000
+        maxAge: 86400000,
+        sameSite: cfg.get('sameSite'),
+        secure: cfg.get('secure')
       },
       store: new MemoryStore({
         checkPeriod: 86400000 // prune expired entries every 24h
@@ -54,8 +57,4 @@ class AppFactory {
   }
 }
 
-const settings = ''
-
-module.exports = {
-  AppFactory, settings
-}
+module.exports = AppFactory

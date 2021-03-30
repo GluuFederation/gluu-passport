@@ -10,7 +10,12 @@ const logger = require('./utils/logging')
 const path = require('path')
 
 router.get('/health-check', function (req, res) {
-  return res.send({ message: 'Cool!!!' })
+  // console.log(req.session)
+  console.log(req.cookies)
+  // res.cookie('testname', 'testval')
+  // console.log(res)
+  // const jsonReq = JSON.stringify(req) // comented return 200, not commented return 404
+  return res.send({ message: 'Cool!!!', sessionCookie: req.session.cookie })
 })
 
 router.post('/auth/saml/:provider/callback',
