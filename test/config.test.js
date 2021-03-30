@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-non-literal-fs-filename */
 const chai = require('chai')
 const assert = chai.assert
 
@@ -19,16 +20,16 @@ describe('defaultcfg', function () {
       defaultcfg.saltFile, 'saltFile is not null or undefined')
   })
 
-  it('default.js should have sameSite value lax', () => {
-    assert.exists(defaultcfg.sameSite, 'sameSite does NOT exists')
-    assert.equal(defaultcfg.sameSite, 'lax', 'sameSite value is NOT lax')
+  it('default.js should have cookieSameSite value lax', () => {
+    assert.exists(defaultcfg.cookieSameSite, 'cookieSameSite does NOT exists')
+    assert.equal(defaultcfg.cookieSameSite, 'lax', 'cookieSameSite value is NOT lax')
   })
 
-  it('default.js should have secure value false', () => {
+  it('default.js should have cookieSecure value false', () => {
     assert.exists(
-      defaultcfg.secure, 'secure does NOT exist'
+      defaultcfg.cookieSecure, 'cookieSecure does NOT exist'
     )
-    assert.isFalse(defaultcfg.secure)
+    assert.isFalse(defaultcfg.cookieSecure)
   })
 })
 
@@ -41,18 +42,18 @@ describe('productioncfg', function () {
     assert.exists(
       productioncfg.saltFile, 'saltFile is not null or undefined')
   })
-  it('production.js shoud have sameSite', () => {
+  it('production.js shoud have cookieSameSite', () => {
     assert.exists(
-      productioncfg.sameSite, 'sameSite does not exist'
+      productioncfg.cookieSameSite, 'cookieSameSite does not exist'
     )
   })
-  it('production.js should have sameSite value none', () => {
-    assert.equal(productioncfg.sameSite, 'none', 'sameSite value is NOT none')
+  it('production.js should have cookieSameSite value none', () => {
+    assert.equal(productioncfg.cookieSameSite, 'none', 'cookieSameSite value is NOT none')
   })
-  it('production should have secure value true', () => {
+  it('production should have cookieSecure value true', () => {
     assert.exists(
-      productioncfg.secure, 'secure does NOT exist'
+      productioncfg.cookieSecure, 'cookieSecure does NOT exist'
     )
-    assert.isTrue(productioncfg.secure)
+    assert.isTrue(productioncfg.cookieSecure)
   })
 })
