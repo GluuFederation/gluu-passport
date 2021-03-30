@@ -105,3 +105,26 @@ describe('rateLimiter middleware', () => {
     sinon.restore()
   })
 })
+
+describe('session middleware', () => {
+  const rewiredSession = appFactoryRewire.__get__('session')
+  const { session } = require('../server/utils/session')
+
+  it('should exist', () => {
+    assert.exists(rewiredSession)
+  })
+
+  it('should be a function', () => {
+    assert.isFunction(rewiredSession)
+  })
+
+  it('should be equal session middleware', () => {
+    assert.equal(rewiredSession, session)
+  })
+
+  it('should be called once as app.use arg', () => {
+    const appUseSpy = spyOnAppUse()
+    assertCalledWithFunctionAsArg(appUseSpy, rewiredSession)
+    sinon.restore()
+  })
+})
