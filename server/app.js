@@ -4,7 +4,7 @@ const misc = require('./utils/misc')
 const confDiscovery = require('./utils/configDiscovery')
 const providers = require('./providers')
 const passportFile = config.get('passportFile')
-const AppFactory = require('./app-factory')
+const { AppFactory } = require('./app-factory')
 
 let httpServer
 let httpPort = -1

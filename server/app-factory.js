@@ -47,11 +47,15 @@ class AppFactory {
     passport.deserializeUser((user, done) => {
       done(null, user)
     })
-    // store rateLimiter middleware for later manipulation/reset
+    // store middlewares for later manipulation/reset
     app.rateLimiter = rateLimiter
     app.session = session
     return app
   }
 }
 
-module.exports = AppFactory
+const settings = ''
+
+module.exports = {
+  AppFactory, settings
+}
