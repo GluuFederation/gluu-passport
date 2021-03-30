@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.5.0](https://github.com/GluuFederation/gluu-passport/compare/v4.4.0...v4.5.0) (2021-03-30)
+
+
+### Features
+
+* **config:** ensure sameSite exists and value is lax in default ([aeff791](https://github.com/GluuFederation/gluu-passport/commit/aeff791b6d68add2e33da13d204592c28f903cc5))
+* **config:** ensure sameSite exists in production ([3ee1504](https://github.com/GluuFederation/gluu-passport/commit/3ee1504c2fd4aa1079ea5de99440d0576e8e38e9))
+* **config:** ensure secure exists in production ([e3d41c3](https://github.com/GluuFederation/gluu-passport/commit/e3d41c37d0e6ae4da26e5aab303c2a2b6040b647))
+* **config:** ensure secure is true in production ([5747cba](https://github.com/GluuFederation/gluu-passport/commit/5747cbaf9497d99363cda519705e82b5281d67dd))
+* **config:** ensure secure value is false in default ([9709ab9](https://github.com/GluuFederation/gluu-passport/commit/9709ab9a7c398bea4ae6e8ce21aa04cbc3a65121))
+* **session** make separate file for session config ([5092baf](https://github.com/GluuFederation/gluu-passport/commit/5092bafe75a6240f095c1aff5d84f4521383a084)), closes [#242](https://github.com/GluuFederation/gluu-passport/issues/242)
+
+
+### Bug Fixes
+
+* **config.test.js:** update cookie config keys title ([72646a5](https://github.com/GluuFederation/gluu-passport/commit/72646a5600a68e3229f6faba60f126e776f6b597)), closes [#242](https://github.com/GluuFederation/gluu-passport/issues/242)
+* **session:** ensure cookies settings are correct ([7c24b83](https://github.com/GluuFederation/gluu-passport/commit/7c24b835c0580aa3a09c16486edb9045d88eca36))
+* package.json & package-lock.json to reduce vulnerabilities ([218b7ce](https://github.com/GluuFederation/gluu-passport/commit/218b7cef7f8b2cf465d0b059246fabc3da4458e4))
+
 ## [4.4.0](https://github.com/GluuFederation/gluu-passport/compare/v4.3.6...v4.4.0) (2021-02-22)
 
 
