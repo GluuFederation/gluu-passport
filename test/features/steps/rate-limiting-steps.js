@@ -31,7 +31,3 @@ Then('last request response should have status code {int}', async (responseStatu
   assert.equal(this.lastResponse.statusCode, responseStatusCode,
     `response.statusCode is NOT ${responseStatusCode}`)
 })
-
-Then('response body should be "{string}"', async (responseBody) => {
-  assert.equal(this.lastResponse.text, responseBody)
-})
