@@ -182,8 +182,9 @@ const root = process.cwd()
 const passportFile = `${root}/test/testdata/passport-config.json`
 const rateLimitWindowMs = 24 * 60 * 60 * 1000
 const rateLimitMaxRequestAllow = 100
-const sameSite = 'none'
-const secure = true
+const cookieSameSite = 'none'
+const cookieSecure = true
+
 module.exports = {
   saltFile,
   passportConfig,
@@ -192,6 +193,6 @@ module.exports = {
   timerInterval,
   passportFile,
   passportConfigAuthorizedResponse,
-  sameSite,
-  secure
+  cookieSameSite,
+  cookieSecure
 }
