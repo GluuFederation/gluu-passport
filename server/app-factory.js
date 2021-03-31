@@ -1,7 +1,5 @@
 const express = require('express')
 const app = express()
-const session = require('express-session')
-const MemoryStore = require('memorystore')(session)
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const passport = require('passport')
@@ -9,10 +7,10 @@ const morgan = require('morgan')
 const logger = require('./utils/logging')
 const routes = require('./routes')
 const metricsMiddleware = require('../server/utils/metrics')
-const { randomSecret } = require('./utils/misc')
 const { globalErrorHandler } = require('./utils/error-handler')
 const flash = require('connect-flash')
 const { rateLimiter } = require('./utils/rate-limiter')
+const { session } = require('./utils/session')
 
 class AppFactory {
   createApp () {
@@ -23,18 +21,8 @@ class AppFactory {
     app.use(cookieParser())
     app.use(flash())
     app.use(rateLimiter)
-
-    app.use(session({
-      cookie: {
-        maxAge: 86400000
-      },
-      store: new MemoryStore({
-        checkPeriod: 86400000 // prune expired entries every 24h
-      }),
-      secret: randomSecret(),
-      resave: false,
-      saveUninitialized: false
-    }))
+    app.set('trust proxy', 1)
+    app.use(session)
 
     app.use(passport.initialize())
     app.use(passport.session())
@@ -47,7 +35,7 @@ class AppFactory {
     passport.deserializeUser((user, done) => {
       done(null, user)
     })
-    // store rateLimiter middleware for later manipulation/reset
+    // store rateLimiter for later manipulation/reset
     app.rateLimiter = rateLimiter
     return app
   }
