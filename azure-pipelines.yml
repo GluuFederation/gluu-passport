@@ -1,0 +1,53 @@
+# Node.js
+# Build a general Node.js project with npm.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
+
+trigger: none
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '10.x'
+  displayName: 'Install Node.js'
+
+- task: Npm@1
+  inputs:
+    command: install
+    publishRegistry: useFeed
+    publishFeed: 'Sign in Canada/SignInCanada'
+
+- script: |
+    tar -czvf $(Build.ArtifactStagingDirectory)/passport-version_4.4.0-node_modules.tar.gz node_modules
+  displayName: 'Package dependencies'
+  continueOnError: true
+
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: '$(Pipeline.Workspace)/s'
+    Contents: |
+      **LICENSE
+      **package.json
+      **package-lock.json
+      **README.md
+      **server/**
+      **config/**
+    TargetFolder: '$(Pipeline.Workspace)/package'
+
+- script: |
+    echo 'packaging the files'
+    cd $(Pipeline.Workspace)
+    pwd
+    tar -czv --owner=node --group=node -f $(Build.ArtifactStagingDirectory)/passport.tgz package
+  displayName: 'create application tarball'
+  continueOnError: true
+
+- task: PublishPipelineArtifact@1
+  inputs:
+    targetPath: '$(Build.ArtifactStagingDirectory)'
+    artifact: 'gluu-passport'
+    publishLocation: 'pipeline'
+  condition: succeededOrFailed()
