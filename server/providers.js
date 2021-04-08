@@ -116,7 +116,22 @@ function setupStrategy (provider) {
       }
     }
 
-    const samlStrategy = new Strategy(providerOptions, verify)
+    const samlStrategy = new Strategy(
+      providerOptions, 
+      (req, profile, cb) => {
+				// Stash the SAML subject & SessionIndex for future logout
+				req.session.samlSubject = {
+					"nameIDFormat": profile.nameIDFormat,
+					"nameQualifier": profile.nameQualifier,
+					"spNameQualifier": profile.spNameQualifier,
+					"nameID": profile.nameID,
+					"sessionIndex": profile.sessionIndex
+				}
+
+				verify(req, profile, cb)
+			}
+    )
+
     passport.use(id, samlStrategy)
     spMetadata.generate(provider, samlStrategy)
   } else {

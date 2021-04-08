@@ -7,17 +7,24 @@ const providersModule = require('./providers')
 const webutil = require('./utils/web-utils')
 const misc = require('./utils/misc')
 const logger = require('./utils/logging')
+const url = require('url')
 const path = require('path')
 
 router.get('/health-check', function (req, res) {
   return res.send({ message: 'Cool!!!' })
 })
 
+// CATS SAML Authentication Responses use the HTTP POST binding
 router.post('/auth/saml/:provider/callback',
   validateProvider,
   authenticateRequestCallback,
   idpInitiated.process,
   callbackResponse)
+
+  // CATS SAML Logout Requests and Responses use the HTTP Redirect binding
+router.get('/auth/saml/:provider/callback',
+  validateProvider,
+  processLogout)
 
 router.get('/auth/:provider/callback',
   validateProvider,
@@ -31,6 +38,16 @@ router.post('/auth/:provider/callback',
   callbackResponse)
 
 router.get('/auth/:provider/:token/locale/:locale',
+  validateProvider,
+  validateToken,
+  authenticateRequest)
+
+router.get('/auth/:provider/:token/saml/:samlissuer',
+  validateProvider,
+  validateToken,
+  authenticateRequest)
+
+router.get('/auth/:provider/:token/locale/:locale/id/:mfapai',
   validateProvider,
   validateToken,
   authenticateRequest)
@@ -86,6 +103,68 @@ router.get('/auth/meta/idp/:idp',
       })
   })
 
+// SP-initiated logout
+router.get('/logout/request', (req, res, next) => {
+  if (!(req.user && req.user.providerKey)) {
+    res.status(400).send('No Session')
+  } else {
+    const provider = req.user.providerKey
+    var strategy = passport._strategy(provider)
+
+    // MFA exception: second retry using session provider which should be set in callbackResponse 
+    if (strategy.name != 'saml') {
+      strategy = passport._strategy(req.session.provider)
+    }
+          
+    if (strategy.name === 'saml' && strategy._saml.options.logoutUrl && !req.user.logoutRequest) {
+      const relayState = req.query && req.query.post_logout_redirect_uri
+      if (relayState) {
+        req.query.RelayState = relayState
+      }
+      // Restore the SAML Subject for the logout request
+      req.user = req.session.samlSubject
+      logger.log2('debug', 'SAML Logout of subject ' + JSON.stringify(req.user))
+      strategy.logout(req, (err, uri) => {
+        req.logout()
+        res.redirect(uri)
+      })
+    } else {
+      res.send("Success")
+    }
+  }
+});
+
+// Propagate SP Logout Response
+router.get('/logout/response/:status?', (req, res, next) => {
+  const status = req.params.status || 'Success'
+  if (!(req.user && req.user.providerKey)) {
+    res.status(400).send('No Session')
+  } else {
+    const provider = req.user.providerKey
+    var strategy = passport._strategy(provider)
+
+    // MFA exception: second retry using session provider which should be set in callbackResponse 
+    if (strategy.name != 'saml') {
+      strategy = passport._strategy(req.session.provider)
+    }
+          
+    if (req.user.logoutRequest) {
+      logger.log2('verbose', 'Sending SAML logout response to provider ' + provider)
+      req.samlLogoutRequest = req.user.logoutRequest
+      req.samlLogoutRequest.status = 'urn:oasis:names:tc:SAML:2.0:status:' + status
+      strategy._saml.getLogoutResponseUrl(req, {}, (err, url) => {
+        if (err) {
+          webutil.handleError(req, res, err.message)
+        } else {
+          res.redirect(url)
+        }
+      })
+    } else {
+      res.status(400).send("No logout request to respond to!")
+    }
+  }
+});
+
 // Supporting functions
 
 function validateProvider (req, res, next) {
@@ -104,6 +183,7 @@ function validateProvider (req, res, next) {
 
 function authenticateRequest (req, res, next) {
   logger.log2('verbose', `Authenticating request against ${req.params.provider}`)
+  req.session.authenticating = true
   passport.authenticate(req.params.provider, req.passportAuthenticateParams)(req, res, next)
 }
 
@@ -159,10 +239,14 @@ function callbackResponse (req, res) {
 
   const sub = user.uid
   logger.log2('info', `User ${sub} authenticated with provider ${provider}`)
+  req.session.authenticating = false
 
   // Apply transformation to user object and restore original provider value
   user = misc.arrify(user)
   user.provider = provider
+
+  // Save the current provider in case of 2FA (saving the first provider)
+  if (!req.session.provider) req.session.provider = provider
 
   const now = new Date().getTime()
   const jwt = misc.getRpJWT({
@@ -179,26 +263,87 @@ function callbackResponse (req, res) {
 
   res.set('content-type', 'text/html;charset=UTF-8')
   return res.status(200).send(`
-    <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
-      <body onload="document.forms[0].submit()">
-        <noscript>
-          <p>
-            <b>Note:</b> your browser does not support JavaScript, please press the Continue
-            button to proceed.
-          </p>
-        </noscript>
-
-        <form action="${postUrl}" method="post">
-          <div>
-            <input type="hidden" name="user" value="${jwt}"/>
-            <noscript>
-              <input type="submit" value="Continue"/>
-            </noscript>
-          </div>
-        </form>
-      </body>
-    </html>`
+    <html xmlns="http://www.w3.org/1999/xhtml">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.js"></script>
+    <script type="text/javascript">
+      function getLanguage() {
+        $.ajax({
+          url: '${global.basicConfig.languageAPI}',
+          type: 'GET',
+          contentType: 'application/json',
+          xhrFields: {
+            withCredentials: true
+          },
+          success: function (data) {
+            var lang =  data.lang.substring(0, 2);
+            document.forms[0].elements[1].value = lang;
+            document.forms[0].submit();
+          },
+          error: function (jqXHR, textStatus, errorThrown) { console.log(errorThrown); document.forms[0].submit() }
+        });
+      }
+    </script>
+    <body onload="getLanguage()">
+      <noscript>
+        <p>
+          <b>Note:</b> your browser does not support JavaScript, please press the Continue
+          button to proceed.
+        </p>
+        <p>
+          <b>Remarque:</b> votre navigateur ne prend pas en charge JavaScript, veuillez appuyer sur le bouton Continuer
+          pour continuer.
+        </p>
+      </noscript>
+      <img style='display:block;margin-left:auto;margin-right:auto;padding:10% 0;' src='/oxauth/ext/resources/assets/icon_flag_rotation_080x080.gif'>
+      <form action="${postUrl}" method="post">
+        <div>
+          <input type="hidden" name="user" value="${jwt}"/>
+          <input id="ui_locale" type="hidden" name="ui_locale"/>
+          <noscript>
+            <input type="submit" value="Continue / Continuer"/>
+          </noscript>
+        </div>
+      </form>
+    </body>
+    </html> `
   )
+}
+
+function processLogout(req, res) {
+  const validateCallback = ({ profile, loggedOut }) => {
+    logger.log2('debug', 'logout callback '+ JSON.stringify(profile) + ' ' + loggedOut)
+    if (profile) { // Logout Request
+      if (req.session && req.session.authenticating) {
+        req.samlLogoutRequest = profile
+        strategy._saml.getLogoutResponseUrl(req, {}, (err, url) => {
+          if (err) {
+            webutil.handleError(req, res, err.message)
+          } else {
+            res.redirect(url)
+          }
+        })
+      } else {
+        req.user.logoutRequest = profile
+        const redirectUri = encodeURIComponent('https://' + req.hostname + '/passport/logout/response')
+        res.redirect('/oxauth/restv1/end_session?post_logout_redirect_uri=' + redirectUri)
+      }
+    } else { // Logout Response
+      res.send("Success")
+    }  
+  };
+
+  const provider = req.params.provider
+  logger.log2('verbose', 'received logout from provider ' + provider)
+  const strategy = passport._strategy(provider)
+  var originalQuery = url.parse(req.url).query
+  
+  strategy._saml
+  .validateRedirectAsync(req.query, originalQuery)
+  .then(validateCallback)
+  .catch((err) => {
+    logger.log2('error', err.stack) // Partial or failed Logout
+    res.send(JSON.stringify(err))
+  });
 }
 
 module.exports = router

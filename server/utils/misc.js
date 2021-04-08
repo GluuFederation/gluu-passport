@@ -144,5 +144,6 @@ module.exports = {
   getJWT: getJWT,
   verifyJWT: verifyJWT,
   encrypt: encrypt,
-  randomSecret: randomSecret
+  randomSecret: randomSecret,
+  secretKey: secretKey
 }

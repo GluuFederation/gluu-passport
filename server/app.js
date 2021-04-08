@@ -91,7 +91,8 @@ function init () {
     'keyId',
     'keyAlg',
     'configurationEndpoint',
-    'failureRedirectUrl'
+    'failureRedirectUrl',
+    'languageAPI'
   ]
   if (misc.hasData(props, basicConfig)) {
     global.basicConfig = basicConfig

@@ -9,7 +9,7 @@ const morgan = require('morgan')
 const logger = require('./utils/logging')
 const routes = require('./routes')
 const metricsMiddleware = require('../server/utils/metrics')
-const { randomSecret } = require('./utils/misc')
+const { secretKey } = require('./utils/misc')
 const { globalErrorHandler } = require('./utils/error-handler')
 const flash = require('connect-flash')
 const { rateLimiter } = require('./utils/rate-limiter')
@@ -23,19 +23,23 @@ class AppFactory {
     app.use(cookieParser())
     app.use(flash())
     app.use(rateLimiter)
+    app.set('trust proxy', 1)
 
     app.use(session({
       cookie: {
-        maxAge: 86400000
+        maxAge: 86400000,
+        secure: true,
+        path: '/passport',
+        sameSite: 'none'
       },
       store: new MemoryStore({
         checkPeriod: 86400000 // prune expired entries every 24h
       }),
-      secret: randomSecret(),
+      secret: secretKey(),
       resave: false,
       saveUninitialized: false
     }))
-
+    
     app.use(passport.initialize())
     app.use(passport.session())
     app.use('/passport', routes)

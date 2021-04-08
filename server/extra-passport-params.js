@@ -8,8 +8,10 @@ const R = require('ramda')
 const params = R.once(() => [
   {
     strategy: 'passport-saml',
+		verifyCallbackArity: 3,
     passportAuthnParams: {},
     options: {
+			passReqToCallback: true,
       validateInResponseTo: true,
       requestIdExpirationPeriodMs: 3600000,
       decryptionPvk: fs.readFileSync(global.config.spTLSKey, 'utf-8'),
