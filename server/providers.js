@@ -39,7 +39,7 @@ function getVerifyFunction (provider) {
     // except for passport-openidconnect which does not follow this convention
     let profile, extras
 
-    if (provider.passportStrategyId === 'passport-openidconnect') {
+    if (provider.passportStrategyId === '@sic/passport-openidconnect') {
       // Check passport-openidconnect/lib/strategy.js
       const index = provider.options.passReqToCallback ? 1 : 0
 
@@ -88,7 +88,7 @@ function setupStrategy (provider) {
   }
 
   const providerOptions = provider.options
-  const isSaml = strategyModule === 'passport-saml'
+  const isSaml = strategyModule === '@sic/passport-saml'
   const verify = getVerifyFunction(provider)
 
   // Create strategy
@@ -119,16 +119,16 @@ function setupStrategy (provider) {
     const samlStrategy = new Strategy(
       providerOptions, 
       (req, profile, cb) => {
-				// Stash the SAML subject & SessionIndex for future logout
-				req.session.samlSubject = {
-					"nameIDFormat": profile.nameIDFormat,
-					"nameQualifier": profile.nameQualifier,
-					"spNameQualifier": profile.spNameQualifier,
-					"nameID": profile.nameID,
-					"sessionIndex": profile.sessionIndex
-				}
-				verify(req, profile, cb)
-			}
+        // Stash the SAML subject & SessionIndex for future logout
+        req.session.samlSubject = {
+          "nameIDFormat": profile.nameIDFormat,
+          "nameQualifier": profile.nameQualifier,
+          "spNameQualifier": profile.spNameQualifier,
+          "nameID": profile.nameID,
+          "sessionIndex": profile.sessionIndex
+        }
+        verify(req, profile, cb)
+      }
     )
 
     passport.use(id, samlStrategy)
@@ -202,7 +202,7 @@ function fillMissingData (providers) {
   for (const provider of providers) {
     const options = provider.options
     const strategyId = provider.passportStrategyId
-    const isSaml = strategyId === 'passport-saml'
+    const isSaml = strategyId === '@sic/passport-saml'
     const callbackUrl = R.defaultTo(options.callbackUrl, options.callbackURL)
     const prefix = global.config.serverURI + '/passport/auth'
 
