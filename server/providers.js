@@ -127,7 +127,6 @@ function setupStrategy (provider) {
 					"nameID": profile.nameID,
 					"sessionIndex": profile.sessionIndex
 				}
-
 				verify(req, profile, cb)
 			}
     )
