@@ -7,5 +7,8 @@ module.exports = {
   rateLimitWindowMs: 24 * 60 * 60 * 1000,
 
   // Max number of connections during windowMs milliseconds before sending a 429 response.
-  rateLimitMaxRequestAllow: 1000
+  rateLimitMaxRequestAllow: 1000,
+
+  cookieSameSite: 'lax',
+  cookieSecure: false
 }
