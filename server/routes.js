@@ -42,6 +42,11 @@ router.get('/auth/:provider/:token/locale/:locale',
   validateToken,
   authenticateRequest)
 
+router.get('/auth/:provider/:token',
+  validateProvider,
+  validateToken,
+  authenticateRequest)
+
 router.get('/auth/:provider/:token/saml/:samlissuer',
   validateProvider,
   validateToken,
