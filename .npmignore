@@ -1,0 +1,21 @@
+.*.swp
+._*
+.DS_Store
+.git
+.hg
+.lock-wscript
+.svn
+.wafpickle-*
+config.gypi
+CVS
+npm-debug.log
+.nyc_output
+.idea
+server/idp-metadata
+.vscode
+logs
+*.log
+npm-debug.log*
+
+# do not ignore .npmrc
+!.npmrc
