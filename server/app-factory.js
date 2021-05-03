@@ -11,6 +11,7 @@ const { globalErrorHandler } = require('./utils/error-handler')
 const flash = require('connect-flash')
 const { rateLimiter } = require('./utils/rate-limiter')
 const { session } = require('./utils/session')
+const twitterErrorHandler = require('./utils/twitter-error-handler')
 
 class AppFactory {
   createApp () {
@@ -28,6 +29,7 @@ class AppFactory {
     app.use(passport.session())
     app.use('/passport', routes)
     app.use(globalErrorHandler)
+    twitterErrorHandler()
 
     passport.serializeUser((user, done) => {
       done(null, user)
