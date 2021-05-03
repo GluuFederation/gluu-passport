@@ -6,6 +6,8 @@ const config = require('config')
 const basicConfig = config.get('passportConfig')
 const chai = require('chai')
 const chaiHttp = require('chai-http')
+const TwitterStrategy = require('passport-twitter').Strategy
+
 chai.use(chaiHttp)
 
 /**
@@ -41,8 +43,26 @@ const setupServer = async function () {
   return chai.request(app).keepOpen()
 }
 
+/**
+ * initialize passport-twitter strategy
+ * @returns passport-twitter strategy object
+ */
+function initTwitterStrategy () {
+  const strategy = new TwitterStrategy({
+    consumerKey: 'TWITTER_CONSUMER_KEY',
+    consumerSecret: 'TWITTER_CONSUMER_SECRET',
+    callbackURL: 'http://127.0.0.1:3000/auth/twitter/callback'
+  },
+  function (token, tokenSecret, profile, cb) {
+  }
+  )
+
+  return strategy
+}
+
 module.exports = {
   mockedAppInit,
   configureLogger,
-  setupServer
+  setupServer,
+  initTwitterStrategy
 }
