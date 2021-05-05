@@ -4,7 +4,10 @@ const got = require('got')
 const sinon = require('sinon')
 const webUtils = require('../server/utils/web-utils')
 const InitMock = require('./testdata/init-mock')
+const config = require('config')
+
 const initMock = new InitMock()
+const passportConfig = config.get('passportConfig')
 
 describe('routes.js', () => {
   describe('security - normalization', () => {
@@ -34,6 +37,23 @@ describe('routes.js', () => {
       )
       sinon.assert.calledOnce(webUtilsSpy)
       assert.notInclude(webUtilsSpy.getCall(0).lastArg, provider)
+    })
+    it('user deny access, passport should redirect to /error endpoint', async () => {
+      const provider = 'cedev6'
+      const response = await got(
+        `http://127.0.0.1:8090/passport/auth/${provider}/callback?error_description=The+resource+owner+or+authorization+server+denied+the+request.&error=access_denied`,
+        { throwHttpErrors: false, followRedirect: false }
+      )
+      const headers = response.headers
+      assert.equal(headers.location, '/passport/error')
+    })
+    it('called /error endpoint, passport should redirect to config failureRedirect Url', async () => {
+      const response = await got(
+        'http://127.0.0.1:8090/passport/error',
+        { throwHttpErrors: false, followRedirect: false }
+      )
+      const headers = response.headers
+      assert.equal(headers.location, passportConfig.failureRedirectUrl)
     })
   })
 })
