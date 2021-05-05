@@ -13,6 +13,18 @@ router.get('/health-check', function (req, res) {
   return res.send({ message: 'Cool!!!', sessionCookie: req.session.cookie })
 })
 
+router.get('/error', function (req, res) {
+  logger.log2('error', 'Strategy Fail')
+  const flashMessages = req.flash('error')
+  try {
+    logger.log2('error', JSON.stringify(flashMessages))
+  } catch (e) {
+    logger.log2('error', 'Failed to read flash messages')
+    logger.log2('error', e.message)
+  }
+  return res.redirect(global.basicConfig.failureRedirectUrl)
+})
+
 router.post('/auth/saml/:provider/callback',
   validateProvider,
   authenticateRequestCallback,
@@ -123,7 +135,7 @@ function authenticateRequestCasa (req, res, next) {
 function authenticateRequestCallback (req, res, next) {
   logger.log2('verbose', `Authenticating request against ${req.params.provider}`)
   passport.authenticate(
-    req.params.provider, { failureRedirect: global.basicConfig.failureRedirectUrl, failureFlash: true }
+    req.params.provider, { failureRedirect: '/passport/error', failureFlash: true }
   )(req, res, next)
 }
 
