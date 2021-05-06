@@ -117,15 +117,15 @@ function setupStrategy (provider) {
     }
 
     const samlStrategy = new Strategy(
-      providerOptions, 
+      providerOptions,
       (req, profile, cb) => {
         // Stash the SAML subject & SessionIndex for future logout
         req.session.samlSubject = {
-          "nameIDFormat": profile.nameIDFormat,
-          "nameQualifier": profile.nameQualifier,
-          "spNameQualifier": profile.spNameQualifier,
-          "nameID": profile.nameID,
-          "sessionIndex": profile.sessionIndex
+          'nameIDFormat': profile.nameIDFormat,
+          'nameQualifier': profile.nameQualifier,
+          'spNameQualifier': profile.spNameQualifier,
+          'nameID': profile.nameID,
+          'sessionIndex': profile.sessionIndex
         }
         verify(req, profile, cb)
       }

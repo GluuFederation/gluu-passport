@@ -315,40 +315,38 @@ function callbackResponse (req, res) {
 }
 
 function processLogout(req, res) {
-  const validateCallback = ({ profile, loggedOut }) => {
-    logger.log2('debug', 'logout callback '+ JSON.stringify(profile) + ' ' + loggedOut)
-    if (profile) { // Logout Request
-      if (req.session && req.session.authenticating) {
-        req.samlLogoutRequest = profile
-        strategy._saml.getLogoutResponseUrl(req, {}, (err, url) => {
-          if (err) {
-            webutil.handleError(req, res, err.message)
-          } else {
-            res.redirect(url)
-          }
-        })
-      } else {
-        req.user.logoutRequest = profile
-        const redirectUri = encodeURIComponent('https://' + req.hostname + '/passport/logout/response')
-        res.redirect('/oxauth/restv1/end_session?post_logout_redirect_uri=' + redirectUri)
-      }
-    } else { // Logout Response
-      res.send("Success")
-    }  
-  };
+	function validateCallback(err, profile, loggedOut) {
+		logger.log2('debug', 'logout callback ' + JSON.stringify(err) + ' ' + JSON.stringify(profile) + ' ' + loggedOut)
 
-  const provider = req.params.provider
-  logger.log2('verbose', 'received logout from provider ' + provider)
-  const strategy = passport._strategy(provider)
-  var originalQuery = url.parse(req.url).query
+		if (err) {
+			logger.log2('error', err.stack) // Partial or failed Logout
+			res.send(JSON.stringify(err))
+		} else if (profile) { // Logout Request
+			if (req.session && req.session.authenticating) {
+				req.samlLogoutRequest = profile
+				strategy._saml.getLogoutResponseUrl(req, {}, (err, url) => {
+					if (err) {
+						webutil.handleError(req, res, err.message)
+					} else {
+						res.redirect(url)
+					}
+				})
+			} else {
+				req.user.logoutRequest = profile
+				const redirectUri = encodeURIComponent('https://' + req.hostname + '/passport/logout/response')
+				res.redirect('/oxauth/restv1/end_session?post_logout_redirect_uri=' + redirectUri)
+			}
+		} else { // Logout Response
+			res.send("Success")
+		}
+	}
+
+	const provider = req.params.provider
+	logger.log2('verbose', 'received logout from provider ' + provider)
+	const strategy = passport._strategy(provider)
   
-  strategy._saml
-  .validateRedirectAsync(req.query, originalQuery)
-  .then(validateCallback)
-  .catch((err) => {
-    logger.log2('error', err.stack) // Partial or failed Logout
-    res.send(JSON.stringify(err))
-  });
+  var originalQuery = url.parse(req.url).query
+  strategy._saml.validateRedirect(req.query, originalQuery, validateCallback)
 }
 
 module.exports = router

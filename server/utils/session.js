@@ -1,7 +1,7 @@
 const expressSession = require('express-session')
 const MemoryStore = require('memorystore')(expressSession)
 const config = require('config')
-const { secretKey } = require('./utils/misc')
+const { secretKey } = require('./misc')
 
 const expressSessionConfig = {
   cookie: {
