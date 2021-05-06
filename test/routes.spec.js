@@ -39,11 +39,19 @@ describe('routes.js', () => {
       assert.notInclude(webUtilsSpy.getCall(0).lastArg, provider)
     })
     it('user deny access, passport should redirect to /error endpoint', async () => {
-      const provider = 'cedev6'
-      const response = await got(
-        `http://127.0.0.1:8090/passport/auth/${provider}/callback?error_description=The+resource+owner+or+authorization+server+denied+the+request.&error=access_denied`,
-        { throwHttpErrors: false, followRedirect: false }
-      )
+      const provider = 'apple'
+      const options = {
+        method: 'POST',
+        url: `http://127.0.0.1:8090/passport/auth/${provider}/callback`,
+        json: {
+          state: 'xxxxxxxxxxxx',
+          error: 'user_cancelled_authorize'
+        },
+        responseType: 'json',
+        throwHttpErrors: false,
+        followRedirect: false
+      }
+      const response = await got(options)
       const headers = response.headers
       assert.equal(headers.location, '/passport/error')
     })

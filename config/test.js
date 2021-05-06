@@ -135,23 +135,22 @@ const passportConfigAuthorizedResponse = {
       issuer: 'chris.testingenv.org'
     }
   }, {
-    id: 'cedev6',
-    displayName: 'ce-dev6-passport',
-    type: 'openidconnect',
-    mapping: 'openidconnect-default',
-    passportStrategyId: 'passport-openidconnect',
+    id: 'apple',
+    displayName: 'apple',
+    type: 'oauth',
+    mapping: 'apple',
+    passportStrategyId: '@nicokaiser/passport-apple',
     enabled: true,
-    callbackUrl: 'https://chris.gluuthree.org/passport/auth/cedev6/callback',
+    callbackUrl: 'https://chris.gluuthree.org/passport/auth/apple/callback',
     requestForEmail: false,
     emailLinkingSafe: false,
     options: {
-      userInfoURL: 'https://gluu.test.ce6.local.org/oxauth/restv1/userinfo',
-      clientID: 'b4e0f241-a8c1-4c75-8fc8-4ae7163e9695',
-      tokenURL: 'https://gluu.test.ce6.local.org/oxauth/restv1/token',
-      authorizationURL: 'https://gluu.test.ce6.local.org/oxauth/restv1/authorize',
-      scope: '["openid", "email", "profile"]',
-      clientSecret: 'Admin1Admin!',
-      issuer: 'https://gluu.test.ce6.local.org'
+      clientID: 'org.xxx',
+      scope: '["name", "email"]',
+      teamID: 'xxxxxxxx',
+      keyID: 'xxxxxxx',
+      // eslint-disable-next-line node/no-path-concat
+      key: `${__dirname}/../test/testdata/apple-auth.p8`
     }
   }, {
     id: 'saml-redis-test',
