@@ -4,5 +4,7 @@ module.exports = {
   timerInterval: 60000,
   rateLimitWindowMs: 24 * 60 * 60 * 1000, // 24 hrs in milliseconds
   rateLimitMaxRequestAllow: 1000,
-  appInsightsKey: process.env.APPINSIGHTS_INSTRUMENTATIONKEY
+  appInsightsKey: process.env.APPINSIGHTS_INSTRUMENTATIONKEY,
+  cookieSameSite: 'none',
+  cookieSecure: true
 }

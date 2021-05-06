@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-non-literal-fs-filename */
 const chai = require('chai')
 const assert = chai.assert
 
@@ -18,6 +19,18 @@ describe('defaultcfg', function () {
     assert.exists(
       defaultcfg.saltFile, 'saltFile is not null or undefined')
   })
+
+  it('default.js should have cookieSameSite value lax', () => {
+    assert.exists(defaultcfg.cookieSameSite, 'cookieSameSite does NOT exists')
+    assert.equal(defaultcfg.cookieSameSite, 'lax', 'cookieSameSite value is NOT lax')
+  })
+
+  it('default.js should have cookieSecure value false', () => {
+    assert.exists(
+      defaultcfg.cookieSecure, 'cookieSecure does NOT exist'
+    )
+    assert.isFalse(defaultcfg.cookieSecure)
+  })
 })
 
 describe('productioncfg', function () {
@@ -25,8 +38,22 @@ describe('productioncfg', function () {
     assert.exists(
       productioncfg.passportFile, 'passportFile is not null or undefined')
   })
-  it('default.js should have saltFile not null or undefined', () => {
+  it('production.js should have saltFile not null or undefined', () => {
     assert.exists(
       productioncfg.saltFile, 'saltFile is not null or undefined')
+  })
+  it('production.js shoud have cookieSameSite', () => {
+    assert.exists(
+      productioncfg.cookieSameSite, 'cookieSameSite does not exist'
+    )
+  })
+  it('production.js should have cookieSameSite value none', () => {
+    assert.equal(productioncfg.cookieSameSite, 'none', 'cookieSameSite value is NOT none')
+  })
+  it('production should have cookieSecure value true', () => {
+    assert.exists(
+      productioncfg.cookieSecure, 'cookieSecure does NOT exist'
+    )
+    assert.isTrue(productioncfg.cookieSecure)
   })
 })
