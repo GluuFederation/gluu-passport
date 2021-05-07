@@ -9,6 +9,8 @@ module.exports = {
   // Max number of connections during windowMs milliseconds before sending a 429 response.
   rateLimitMaxRequestAllow: 1000,
   appInsightsKey: process.env.APPINSIGHTS_INSTRUMENTATIONKEY,
+  cookieMaxAge: null,
+  cookiePath: '/passport',
   cookieSameSite: 'lax',
   cookieSecure: false
 }

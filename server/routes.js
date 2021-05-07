@@ -37,22 +37,7 @@ router.post('/auth/:provider/callback',
   authenticateRequestCallback,
   callbackResponse)
 
-router.get('/auth/:provider/:token/locale/:locale',
-  validateProvider,
-  validateToken,
-  authenticateRequest)
-
 router.get('/auth/:provider/:token',
-  validateProvider,
-  validateToken,
-  authenticateRequest)
-
-router.get('/auth/:provider/:token/saml/:samlissuer',
-  validateProvider,
-  validateToken,
-  authenticateRequest)
-
-router.get('/auth/:provider/:token/locale/:locale/id/:mfapai',
   validateProvider,
   validateToken,
   authenticateRequest)

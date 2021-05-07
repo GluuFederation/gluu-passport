@@ -79,6 +79,8 @@ function setupStrategy (provider) {
 
     if (provider.type === 'oauth' && Strategy.OAuth2Strategy) {
       Strategy = Strategy.OAuth2Strategy
+    } else if (provider.type === 'saml') {
+      Strategy = Strategy.MultiSamlStrategy
     } else {
       Strategy = Strategy.Strategy
     }

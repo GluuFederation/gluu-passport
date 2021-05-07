@@ -5,7 +5,8 @@ const { secretKey } = require('./misc')
 
 const expressSessionConfig = {
   cookie: {
-    maxAge: 86400000,
+    maxAge: config.get('cookieMaxAge'),
+    path: config.get('cookiePath'),
     sameSite: config.get('cookieSameSite'),
     secure: config.get('cookieSecure')
   },
