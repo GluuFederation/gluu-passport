@@ -79,7 +79,7 @@
     "chai-http": "^4.3.0",
     "codecov": "^3.8.1",
     "cz-conventional-changelog": "^3.3.0",
-    "eslint": "^7.24.0",
+    "eslint": "^7.25.0",
     "eslint-config-scanjs": "^1.0.0-beta4",
     "eslint-config-standard": "^16.0.2",
     "eslint-plugin-chai-friendly": "^0.6.0",
