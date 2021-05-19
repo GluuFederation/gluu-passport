@@ -8,6 +8,7 @@ const webutil = require('./utils/web-utils')
 const misc = require('./utils/misc')
 const logger = require('./utils/logging')
 const path = require('path')
+const { StrategyError } = require('./utils/error-handler')
 
 router.get('/health-check', function (req, res) {
   return res.send({ message: 'Cool!!!', sessionCookie: req.session.cookie })
@@ -16,13 +17,7 @@ router.get('/health-check', function (req, res) {
 router.get('/error', function (req, res) {
   logger.log2('error', 'Strategy Fail')
   const flashMessages = req.flash('error')
-  try {
-    logger.log2('error', JSON.stringify(flashMessages))
-  } catch (e) {
-    logger.log2('error', 'Failed to read flash messages')
-    logger.log2('error', e.message)
-  }
-  return res.redirect(global.basicConfig.failureRedirectUrl)
+  throw new StrategyError(JSON.stringify(flashMessages))
 })
 
 router.post('/auth/saml/:provider/callback',

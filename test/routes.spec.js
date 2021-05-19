@@ -61,7 +61,7 @@ describe('routes.js', () => {
         { throwHttpErrors: false, followRedirect: false }
       )
       const headers = response.headers
-      assert.equal(headers.location, passportConfig.failureRedirectUrl)
+      assert.equal(headers.location, `${passportConfig.failureRedirectUrl}?failure=An%20error%20occurred`)
     })
   })
 })
