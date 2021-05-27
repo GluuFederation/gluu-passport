@@ -15,7 +15,6 @@ router.get('/health-check', function (req, res) {
 })
 
 router.get('/error', function (req, res) {
-  logger.log2('error', 'Strategy Fail')
   const flashMessages = req.flash('error')
   throw new StrategyError(JSON.stringify(flashMessages))
 })
