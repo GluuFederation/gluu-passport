@@ -1,4 +1,7 @@
+const appInsights = require('applicationinsights')
+
 module.exports = profile => {
+    appInsights.defaultClient.trackEvent({name: "SAML Assertion", properties: profile})
     return {
             uid: profile.nameID,
             issuer: profile.issuer,

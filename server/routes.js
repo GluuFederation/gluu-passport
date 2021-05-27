@@ -9,6 +9,7 @@ const misc = require('./utils/misc')
 const logger = require('./utils/logging')
 const url = require('url')
 const path = require('path')
+const appInsights = require('applicationinsights')
 
 router.get('/health-check', function (req, res) {
   return res.send({ message: 'Cool!!!', sessionCookie: req.session.cookie })
@@ -114,6 +115,7 @@ router.get('/logout/request', (req, res, next) => {
       // Restore the SAML Subject for the logout request
       req.user = req.session.samlSubject
       logger.log2('debug', 'SAML Logout of subject ' + JSON.stringify(req.user))
+      appInsights.defaultClient.trackEvent({name: "SP-initiated Logout Request", properties: req.user})
       strategy.logout(req, (err, uri) => {
         req.logout()
         res.redirect(uri)
@@ -146,6 +148,7 @@ router.get('/logout/response/:status?', (req, res, next) => {
         if (err) {
           webutil.handleError(req, res, err.message)
         } else {
+          appInsights.defaultClient.trackEvent({name: "IDP-initiated Logout Response", properties: req.samlLogoutRequest})
           res.redirect(url)
         }
       })
@@ -174,6 +177,9 @@ function validateProvider (req, res, next) {
 function authenticateRequest (req, res, next) {
   logger.log2('verbose', `Authenticating request against ${req.params.provider}`)
   req.session.authenticating = true
+  appInsights.defaultClient.trackEvent({name: "Authentication Request",
+                                       properties: {...{provider: req.params.provider},
+                                                    ...req.query, ...req.session}})
   passport.authenticate(req.params.provider, req.passportAuthenticateParams)(req, res, next)
 }
 
@@ -313,15 +319,18 @@ function processLogout(req, res) {
 					if (err) {
 						webutil.handleError(req, res, err.message)
 					} else {
+            appInsights.defaultClient.trackEvent({name: "IDP-Administrative Logout Response", properties: req.samlLogoutRequest})
 						res.redirect(url)
 					}
 				})
 			} else {
 				req.user.logoutRequest = profile
 				const redirectUri = encodeURIComponent('https://' + req.hostname + '/passport/logout/response')
+        appInsights.defaultClient.trackEvent({name: "IDP-Initiated Logout Request", properties: req.user.logoutRequest})
 				res.redirect('/oxauth/restv1/end_session?post_logout_redirect_uri=' + redirectUri)
 			}
 		} else { // Logout Response
+      appInsights.defaultClient.trackEvent({name: "SP-Initiated Logout Response", properties: profile})
 			res.send("Success")
 		}
 	}
