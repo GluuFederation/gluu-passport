@@ -115,9 +115,12 @@ router.get('/logout/request', (req, res, next) => {
       // Restore the SAML Subject for the logout request
       req.user = req.session.samlSubject
       logger.log2('debug', 'SAML Logout of subject ' + JSON.stringify(req.user))
-      appInsights.defaultClient.trackEvent({name: "SP-initiated Logout Request", properties: req.user})
+      appInsights.defaultClient.trackEvent({name: "SP-initiated Logout Request",
+                                            properties: {...{provider: req.params.provider}, ...req.user}})
       strategy.logout(req, (err, uri) => {
         req.logout()
+        delete req.session
+        delete req.user
         res.redirect(uri)
       })
     } else {
@@ -242,7 +245,7 @@ function callbackResponse (req, res) {
   user.provider = provider
 
   // Save the current provider in case of 2FA (saving the first provider)
-  if (!req.session.provider) req.session.provider = provider
+  if (provider != "mfa") req.session.provider = provider
 
   const now = new Date().getTime()
   const jwt = misc.getRpJWT({
