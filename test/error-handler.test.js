@@ -2,7 +2,7 @@
 const chai = require('chai')
 const sinon = require('sinon')
 const { globalErrorHandler, handleStrategyError, StrategyError } = require('../server/utils/error-handler.js')
-const test = require('../config/test')
+const config = require('config')
 
 const assert = chai.assert
 const expect = chai.expect
@@ -22,8 +22,11 @@ describe('error-handler.js test', () => {
     }
 
     globalErrorHandler({ stack: 'fake' }, {}, res, {})
+    const failureRedirectUrl = config.get('passportConfig.failureRedirectUrl')
     expect(res.redirect.calledOnce).to.be.true
-    expect(res.redirect.firstCall.args[0]).to.equal(`${test.passportConfig.failureRedirectUrl}?failure=An error occurred`)
+    expect(res.redirect.firstCall.args[0]).to.equal(
+      `${failureRedirectUrl}?failure=An error occurred`
+    )
   })
 
   it('StrategyError should exist', () => {
@@ -75,6 +78,7 @@ describe('error-handler.js test', () => {
 
     it('should not throw if req.flash error does not exist', () => {
     // implement test after all tests above passes, then code.
+      assert.fail('Not implemented')
     })
   })
 })
