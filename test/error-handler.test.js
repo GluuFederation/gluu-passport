@@ -1,7 +1,7 @@
 /* eslint-disable security/detect-non-literal-fs-filename */
 const chai = require('chai')
 const sinon = require('sinon')
-const { globalErrorHandler, StrategyError } = require('../server/utils/error-handler.js')
+const { globalErrorHandler, handleStrategyError, StrategyError } = require('../server/utils/error-handler.js')
 const test = require('../config/test')
 
 const assert = chai.assert
@@ -34,10 +34,47 @@ describe('error-handler.js test', () => {
     assert.isFunction(StrategyError)
   })
 
-  it('StrategyError should allow to create error object', () => {
-    const oStrategyError = new StrategyError('Failed to get token')
-    assert(oStrategyError.name === 'StrategyError')
-    assert(oStrategyError.message === 'Failed to get token')
-    assert(typeof (oStrategyError) === 'object')
+  describe('handleStrategyError', () => {
+    it('should exist importable', () => {
+      expect(handleStrategyError).to.exist()
+    })
+
+    it('should throw StrategyError with req.flash message', () => {
+      const errorMessage = 'StrategyError: A valid strategy error message'
+
+      const requestStub = {
+        flash: (type, msg) => {
+          return errorMessage
+        }
+      }
+
+      const responseStub = () => {
+        const res = {}
+        res.status = sinon.stub().returns(res)
+        res.json = sinon.stub().returns(res)
+        return res
+      }
+      expect(
+        () => {
+          handleStrategyError(requestStub, responseStub())
+        }
+      ).to.throw()
+
+      expect(
+        () => {
+          handleStrategyError(requestStub, responseStub())
+        }
+      ).to.throw(StrategyError)
+
+      expect(
+        () => {
+          handleStrategyError(requestStub, responseStub())
+        }
+      ).to.throw(StrategyError, errorMessage)
+    })
+
+    it('should not throw if req.flash error does not exist', () => {
+    // implement test after all tests above passes, then code.
+    })
   })
 })
