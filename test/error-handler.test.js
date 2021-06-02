@@ -39,15 +39,15 @@ describe('error-handler.js test', () => {
 
   describe('handleStrategyError', () => {
     it('should exist importable', () => {
-      expect(handleStrategyError).to.exist()
+      expect(handleStrategyError).to.exist
     })
 
     it('should throw StrategyError with req.flash message', () => {
-      const errorMessage = 'StrategyError: A valid strategy error message'
+      const errorMessage = 'A valid strategy error message'
 
       const requestStub = {
         flash: (type, msg) => {
-          return errorMessage
+          return [errorMessage]
         }
       }
 
@@ -77,8 +77,17 @@ describe('error-handler.js test', () => {
     })
 
     it('should not throw if req.flash error does not exist', () => {
-    // implement test after all tests above passes, then code.
-      assert.fail('Not implemented')
+      const requestStub = {
+        flash: (type, msg) => {
+          return []
+        }
+      }
+
+      expect(
+        () => {
+          handleStrategyError(requestStub, null)
+        }
+      ).to.not.throw()
     })
   })
 })

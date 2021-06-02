@@ -8,6 +8,13 @@ const globalErrorHandler = (err, req, res, next) => {
   )
 }
 
+const handleStrategyError = (req, res) => {
+  const flashMessages = req.flash('error')
+  if (flashMessages && flashMessages.length) {
+    throw new StrategyError(JSON.stringify(flashMessages))
+  }
+}
+
 class StrategyError extends Error {
   constructor (message = 'Strategy Error') {
     super(message)
@@ -17,5 +24,6 @@ class StrategyError extends Error {
 
 module.exports = {
   globalErrorHandler,
+  handleStrategyError,
   StrategyError
 }
