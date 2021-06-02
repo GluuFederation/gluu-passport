@@ -16,7 +16,7 @@ describe('error-handler.js test', () => {
     assert.isFunction(globalErrorHandler)
   })
 
-  it('globalErrorHandler should redirect to login page', () => {
+  it('globalErrorHandler should call redirect with expected args', () => {
     const res = {
       redirect: sinon.spy()
     }
