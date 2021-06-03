@@ -2,6 +2,38 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.0.0](https://github.com/GluuFederation/gluu-passport/compare/v4.4.0...v5.0.0) (2021-06-03)
+
+
+### ⚠ BREAKING CHANGES
+
+* **openid-connect:** All openid providers needs to be reconfigured according to new specs. Changes
+required at oxTrust.
+* **security:** We need to update from ox trust breakingchnage descriptiotn
+
+### Features
+
+* **app-factory:** ensure session is handlable externaly ([e7106e6](https://github.com/GluuFederation/gluu-passport/commit/e7106e6545b422a149b457c96110a9ecc10ad1e6))
+* **config:** ensure sameSite exists and value is lax in default ([aeff791](https://github.com/GluuFederation/gluu-passport/commit/aeff791b6d68add2e33da13d204592c28f903cc5))
+* **config:** ensure sameSite exists in production ([3ee1504](https://github.com/GluuFederation/gluu-passport/commit/3ee1504c2fd4aa1079ea5de99440d0576e8e38e9))
+* **config:** ensure secure exists in production ([e3d41c3](https://github.com/GluuFederation/gluu-passport/commit/e3d41c37d0e6ae4da26e5aab303c2a2b6040b647))
+* **config:** ensure secure is true in production ([5747cba](https://github.com/GluuFederation/gluu-passport/commit/5747cbaf9497d99363cda519705e82b5281d67dd))
+* **config:** ensure secure value is false in default ([9709ab9](https://github.com/GluuFederation/gluu-passport/commit/9709ab9a7c398bea4ae6e8ce21aa04cbc3a65121))
+* **file-utils.js file-utils.test.js:** made a seperate utils for common file operations ([fbdf323](https://github.com/GluuFederation/gluu-passport/commit/fbdf32319527c91b5dc7c280a22b3cac50855a1d)), closes [#206](https://github.com/GluuFederation/gluu-passport/issues/206)
+* **openid-client-helper.js:** Added utility for openid client strategy initialization ([da25ac3](https://github.com/GluuFederation/gluu-passport/commit/da25ac39040bb10e0f8f9ac73f42205cdb4da277)), closes [#206](https://github.com/GluuFederation/gluu-passport/issues/206)
+* **openid-connect:** replace deprecated openid lib with openid-client ([e0e165f](https://github.com/GluuFederation/gluu-passport/commit/e0e165fbafdd9ad7074051af5b84d373c00c8756)), closes [#204](https://github.com/GluuFederation/gluu-passport/issues/204)
+* **package.json:** support node 14.16.0 to 15.11.0 ([da7fd3b](https://github.com/GluuFederation/gluu-passport/commit/da7fd3be36c65ff01d675fb9e0d37e3971c54589)), closes [#213](https://github.com/GluuFederation/gluu-passport/issues/213)
+* **providers.js:** added openid-client strategy support ([514aad8](https://github.com/GluuFederation/gluu-passport/commit/514aad8dac91b74ce29b9b23051b91b4542d0e22)), closes [#206](https://github.com/GluuFederation/gluu-passport/issues/206)
+* **session.js session.test.js:** make separate file for session config ([5092baf](https://github.com/GluuFederation/gluu-passport/commit/5092bafe75a6240f095c1aff5d84f4521383a084)), closes [#242](https://github.com/GluuFederation/gluu-passport/issues/242)
+
+
+### Bug Fixes
+
+* **config.test.js:** update cookie config keys title ([72646a5](https://github.com/GluuFederation/gluu-passport/commit/72646a5600a68e3229f6faba60f126e776f6b597)), closes [#242](https://github.com/GluuFederation/gluu-passport/issues/242)
+* **security:** reokacc openid connect dep ([224fbdd](https://github.com/GluuFederation/gluu-passport/commit/224fbdd44a50caab49d17cf0801b506bcfac4e70))
+* **session:** ensure cookies settings are correct ([7c24b83](https://github.com/GluuFederation/gluu-passport/commit/7c24b835c0580aa3a09c16486edb9045d88eca36))
+* package.json & package-lock.json to reduce vulnerabilities ([218b7ce](https://github.com/GluuFederation/gluu-passport/commit/218b7cef7f8b2cf465d0b059246fabc3da4458e4))
+
 ## [4.5.0](https://github.com/GluuFederation/gluu-passport/compare/v4.4.0...v4.5.0) (2021-03-30)
 
 
@@ -71,4 +103,3 @@ All notable changes to this project will be documented in this file. See [standa
 
 * **routes.js:** add extended option to urlencode function call ([74ae36c](https://github.com/GluuFederation/gluu-passport/commit/74ae36ca692423130bab5adccc7222c7fd8dc2b1)), closes [#126](https://github.com/GluuFederation/gluu-passport/issues/126)
 * solved the provider update strategy problem [#119](https://github.com/GluuFederation/gluu-passport/issues/119) ([3c4f725](https://github.com/GluuFederation/gluu-passport/commit/3c4f725003d2bfec1f8677b51b19b6ff01b512a5))
-
