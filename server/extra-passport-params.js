@@ -25,7 +25,9 @@ const params = R.once(() => [
   },
   {
     strategy: 'openid-client',
-    passportAuthnParams: {},
+    passportAuthnParams: {
+      scope: 'openid email profile'
+    },
     options: {},
     verifyCallbackArity: 3
   },
