@@ -73,10 +73,10 @@ describe('error-handler.js test', () => {
         () => {
           handleStrategyError(requestStub, responseStub())
         }
-      ).to.throw(StrategyError, errorMessage)
+      ).to.throw(StrategyError, '["A valid strategy error message"]')
     })
 
-    it('should not throw if req.flash error does not exist', () => {
+    it('should throw unknown error if req.flash error does not have any error value', () => {
       const requestStub = {
         flash: (type, msg) => {
           return []
@@ -87,7 +87,19 @@ describe('error-handler.js test', () => {
         () => {
           handleStrategyError(requestStub, null)
         }
-      ).to.not.throw()
+      ).to.throw()
+
+      expect(
+        () => {
+          handleStrategyError(requestStub, null)
+        }
+      ).to.throw(StrategyError)
+
+      expect(
+        () => {
+          handleStrategyError(requestStub, null)
+        }
+      ).to.throw(StrategyError, 'Unknown Strategy Error')
     })
   })
 })

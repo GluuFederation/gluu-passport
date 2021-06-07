@@ -12,6 +12,8 @@ const handleStrategyError = (req, res) => {
   const flashMessages = req.flash('error')
   if (flashMessages && flashMessages.length) {
     throw new StrategyError(JSON.stringify(flashMessages))
+  } else {
+    throw new StrategyError('Unknown Strategy Error')
   }
 }
 

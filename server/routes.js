@@ -8,15 +8,14 @@ const webutil = require('./utils/web-utils')
 const misc = require('./utils/misc')
 const logger = require('./utils/logging')
 const path = require('path')
-const { StrategyError } = require('./utils/error-handler')
+const { handleStrategyError } = require('./utils/error-handler')
 
 router.get('/health-check', function (req, res) {
   return res.send({ message: 'Cool!!!', sessionCookie: req.session.cookie })
 })
 
 router.get('/error', function (req, res) {
-  const flashMessages = req.flash('error')
-  throw new StrategyError(JSON.stringify(flashMessages))
+  handleStrategyError(req, res)
 })
 
 router.post('/auth/saml/:provider/callback',
