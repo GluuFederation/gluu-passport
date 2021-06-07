@@ -73,7 +73,7 @@ describe('error-handler.js test', () => {
         () => {
           handleStrategyError(requestStub, responseStub())
         }
-      ).to.throw(StrategyError, '["A valid strategy error message"]')
+      ).to.throw(StrategyError, `["${errorMessage}"]`)
     })
 
     it('should throw unknown error if req.flash error does not have any error value', () => {
