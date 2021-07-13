@@ -8,9 +8,14 @@ const webutil = require('./utils/web-utils')
 const misc = require('./utils/misc')
 const logger = require('./utils/logging')
 const path = require('path')
+const { handleStrategyError } = require('./utils/error-handler')
 
 router.get('/health-check', function (req, res) {
   return res.send({ message: 'Cool!!!', sessionCookie: req.session.cookie })
+})
+
+router.get('/error', function (req, res) {
+  handleStrategyError(req, res)
 })
 
 router.post('/auth/saml/:provider/callback',
@@ -123,7 +128,7 @@ function authenticateRequestCasa (req, res, next) {
 function authenticateRequestCallback (req, res, next) {
   logger.log2('verbose', `Authenticating request against ${req.params.provider}`)
   passport.authenticate(
-    req.params.provider, { failureRedirect: global.basicConfig.failureRedirectUrl, failureFlash: true }
+    req.params.provider, { failureRedirect: '/passport/error', failureFlash: true }
   )(req, res, next)
 }
 
