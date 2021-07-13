@@ -1,4 +1,4 @@
-/* eslint-disable security/detect-non-literal-fs-filename */
+
 const chai = require('chai')
 const fileUtils = require('../server/utils/file-utils')
 const path = require('path')

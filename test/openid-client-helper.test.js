@@ -1,5 +1,3 @@
-/* eslint-disable security/detect-non-literal-require */
-/* eslint-disable security/detect-non-literal-fs-filename */
 const chai = require('chai')
 const { Strategy } = require('openid-client')
 const rewire = require('rewire')

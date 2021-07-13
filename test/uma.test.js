@@ -1,4 +1,3 @@
-/* eslint-disable security/detect-non-literal-fs-filename */
 const rewire = require('rewire')
 const umaRewire = rewire('../server/utils/uma')
 const sinon = require('sinon')
