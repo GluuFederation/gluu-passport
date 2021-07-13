@@ -135,6 +135,24 @@ const passportConfigAuthorizedResponse = {
       issuer: 'chris.testingenv.org'
     }
   }, {
+    id: 'apple',
+    displayName: 'apple',
+    type: 'oauth',
+    mapping: 'apple',
+    passportStrategyId: '@nicokaiser/passport-apple',
+    enabled: true,
+    callbackUrl: 'https://chris.gluuthree.org/passport/auth/apple/callback',
+    requestForEmail: false,
+    emailLinkingSafe: false,
+    options: {
+      clientID: 'org.xxx',
+      scope: '["name", "email"]',
+      teamID: 'xxxxxxxx',
+      keyID: 'xxxxxxx',
+      // eslint-disable-next-line node/no-path-concat
+      key: `${__dirname}/../test/testdata/apple-auth.p8`
+    }
+  }, {
     id: 'saml-redis-test',
     displayName: 'saml redis',
     type: 'saml',

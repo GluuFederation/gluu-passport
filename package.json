@@ -1,6 +1,6 @@
 {
   "name": "passport",
-  "version": "5.0.0",
+  "version": "5.1.0",
   "private": true,
   "nyc": {
     "all": true,
@@ -56,7 +56,7 @@
     "passport-oxd": "^4.1.0",
     "passport-saml": "^2.2.0",
     "passport-tumblr": "^0.1.2",
-    "passport-twitter": "^1.0.4",
+    "passport-twitter": "git+https://github.com/GluuFederation/passport-twitter.git",
     "passport-windowslive": "^1.0.2",
     "prom-client": "^13.1.0",
     "ramda": "^0.27.1",
