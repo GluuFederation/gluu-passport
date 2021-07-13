@@ -1,6 +1,6 @@
 {
   "name": "passport",
-  "version": "4.5.0",
+  "version": "5.0.0",
   "private": true,
   "nyc": {
     "all": true,
@@ -10,7 +10,7 @@
     ]
   },
   "engines": {
-    "node": ">=12.19.0 <15.0.0"
+    "node": ">=12.19.0 <=15.11.0"
   },
   "scripts": {
     "start": "NODE_ENV=production node server/app.js",
@@ -40,22 +40,23 @@
     "express": "^4.16.4",
     "express-prom-bundle": "^6.3.6",
     "express-rate-limit": "^5.2.3",
-    "express-session": "^1.15.6",
+    "express-session": "^1.17.2",
     "got": "^11.8.1",
+    "jose": "^2.0.4",
     "jsonwebtoken": "^8.4.0",
     "memcached": "^2.2.2",
     "memorystore": "^1.6.6",
     "morgan": "^1.9.1",
+    "openid-client": "^4.7.4",
     "passport": "^0.4.0",
     "passport-dropbox-oauth2": "^1.1.0",
     "passport-facebook": "^3.0.0",
     "passport-github": "^1.1.0",
     "passport-google-oauth2": "^0.2.0",
-    "passport-openidconnect": "^0.0.2",
     "passport-oxd": "^4.1.0",
     "passport-saml": "^2.2.0",
     "passport-tumblr": "^0.1.2",
-    "passport-twitter": "^1.0.4",
+    "passport-twitter": "git+https://github.com/GluuFederation/passport-twitter.git",
     "passport-windowslive": "^1.0.2",
     "prom-client": "^13.1.0",
     "ramda": "^0.27.1",

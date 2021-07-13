@@ -5,6 +5,7 @@ const misc = require('./utils/misc')
 const logger = require('./utils/logging')
 const extraPassportParams = require('./extra-passport-params')
 const cacheProvider = require('./cache-provider')
+const { getClient } = require('./utils/openid-client-helper')
 
 let prevConfigHash = 0
 
@@ -35,21 +36,11 @@ function getVerifyFunction (provider) {
   const arity = provider.verifyCallbackArity
 
   const uncurried = (...args) => {
-    // profile and callback are the last 2 params in all passport verify functions,
-    // except for passport-openidconnect which does not follow this convention
-    let profile, extras
+    // profile and callback are the last 2 params in all passport verify functions
 
-    if (provider.passportStrategyId === 'passport-openidconnect') {
-      // Check passport-openidconnect/lib/strategy.js
-      const index = provider.options.passReqToCallback ? 1 : 0
+    const profile = args[arity - 2]
+    const extras = args.slice(0, arity - 2)
 
-      profile = args[2 + index]
-      extras = args.slice(0, 2 + index)
-      extras = extras.concat(args.slice(3 + index, arity - 1))
-    } else {
-      profile = args[arity - 2]
-      extras = args.slice(0, arity - 2)
-    }
     const cb = args[arity - 1]
     profile.providerKey = provider.id
     profile.extras = extras
@@ -61,7 +52,7 @@ function getVerifyFunction (provider) {
   return R.curryN(arity, uncurried)
 }
 
-function setupStrategy (provider) {
+async function setupStrategy (provider) {
   logger.log2('info', `Setting up strategy for provider ${provider.displayName}`)
   logger.log2('debug', `Provider data is\n${JSON.stringify(provider, null, 4)}`)
 
@@ -119,6 +110,18 @@ function setupStrategy (provider) {
     const samlStrategy = new Strategy(providerOptions, verify)
     passport.use(id, samlStrategy)
     spMetadata.generate(provider, samlStrategy)
+  } else if (strategyModule === 'openid-client') {
+    try {
+      const client = await getClient(provider)
+      const oidcStrategyOptions = { client }
+
+      oidcStrategyOptions.usePKCE = providerOptions.usePKCE || false
+      oidcStrategyOptions.params = providerOptions.params ? providerOptions.params : {}
+
+      passport.use(id, new Strategy(oidcStrategyOptions, verify))
+    } catch (error) {
+      logger.log2('error', error.message)
+    }
   } else {
     passport.use(id, new Strategy(providerOptions, verify))
   }
@@ -195,6 +198,8 @@ function fillMissingData (providers) {
     if (isSaml) {
       // Different casing in saml
       options.callbackUrl = R.defaultTo(`${prefix}/saml/${provider.id}/callback`, callbackUrl)
+    } else if (strategyId === 'openid-client') {
+      options.redirect_uris = [R.defaultTo(`${prefix}/${provider.id}/callback`, callbackUrl)]
     } else {
       options.callbackURL = R.defaultTo(`${prefix}/${provider.id}/callback`, callbackUrl)
       // Some passport strategies expect consumer* instead of client*
