@@ -1,4 +1,3 @@
-/* eslint-disable security/detect-non-literal-fs-filename */
 const chai = require('chai')
 const fileUtils = require('../server/utils/file-utils')
 const path = require('path')
@@ -12,7 +11,6 @@ describe('fileUtils.writeDataToFile', () => {
     await fileUtils.writeDataToFile(fileName, JSON.stringify({ ktype: 'RS256' }))
 
     assert.exists(fileName)
-    // eslint-disable-next-line security/detect-non-literal-require
     const jwksFile = require(fileName)
     assert.equal(jwksFile.ktype, 'RS256')
   })

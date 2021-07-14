@@ -1,5 +1,3 @@
-/* eslint-disable security/detect-non-literal-require */
-/* eslint-disable security/detect-non-literal-fs-filename */
 const chai = require('chai')
 const rewire = require('rewire')
 const rewiredOpenIDClientHelper = rewire('../server/utils/openid-client-helper')

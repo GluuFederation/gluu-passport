@@ -64,7 +64,6 @@ describe('providers.js', () => {
         const oPassportSAMLStrategy = new PassportSAMLStrategy(
           testProvider.options, (profile, done) => { }
         )
-        // eslint-disable-next-line security/detect-non-literal-fs-filename
         assert.exists(oPassportSAMLStrategy, 'Failed to initialize passport saml strategy')
       } catch (error) {
         assert.fail('Failed to intialize passport-saml strategy with redis setup')

@@ -15,7 +15,6 @@ async function generateJWKS (provider) {
   const keyType = generateSync('RSA')
   const keyStore = new KeyStore(keyType)
   const fileName = path.join(fileUtils.makeDir(clientJWKSFilePath), provider.id + '.json')
-  // eslint-disable-next-line security/detect-non-literal-fs-filename
   if (!fs.existsSync(fileName)) {
     await fileUtils.writeDataToFile(fileName, JSON.stringify(keyStore.toJWKS(true)))
   }
@@ -55,7 +54,6 @@ async function getClient (provider) {
   if (options.token_endpoint_auth_method && options.token_endpoint_auth_method === 'private_key_jwt') {
     // generate jwks
     await generateJWKS(provider)
-    // eslint-disable-next-line security/detect-non-literal-require
     const jwks = require(path.join(fileUtils.makeDir(clientJWKSFilePath), `${provider.id}.json`))
     const ks = asKeyStore(jwks)
     client = new issuer.Client(options, ks.toJWKS(true))

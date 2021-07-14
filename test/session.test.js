@@ -1,4 +1,3 @@
-/* eslint-disable security/detect-non-literal-fs-filename */
 const chai = require('chai')
 const assert = chai.assert
 const rewire = require('rewire')

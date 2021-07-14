@@ -1,4 +1,4 @@
-/* eslint-disable security/detect-non-literal-fs-filename */
+
 const chai = require('chai')
 const sinon = require('sinon')
 const { globalErrorHandler, handleStrategyError, StrategyError } = require('../server/utils/error-handler.js')
