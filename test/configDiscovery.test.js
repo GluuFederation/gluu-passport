@@ -1,4 +1,4 @@
-/* eslint-disable security/detect-non-literal-fs-filename */
+
 const rewire = require('rewire')
 const configDiscoveryRewire = rewire('../server/utils/configDiscovery')
 const chai = require('chai')

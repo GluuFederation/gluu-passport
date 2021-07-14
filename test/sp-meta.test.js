@@ -1,4 +1,3 @@
-/* eslint-disable security/detect-non-literal-fs-filename */
 const chai = require('chai')
 const rewire = require('rewire')
 const PassportSAMLStrategy = require('passport-saml').Strategy
