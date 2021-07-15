@@ -9,20 +9,20 @@ const sinon = require('sinon')
 describe('logging.js file', () => {
   describe('dir', () => {
     const dir = rewiredLogging.__get__('dir')
+    const logDirPath = path.join(__dirname, '../server/utils/logs')
 
     it('should exist', () => {
       assert.exists(dir, 'dir is none or undefined')
     })
 
     it('should be equal NODE_LOGGING_DIR env if it exists', () => {
-      process.env.NODE_LOGGING_DIR = 'dirname'
+      process.env.NODE_LOGGING_DIR = logDirPath
       const rewiredLoggingEnvStub = rewire('../server/utils/logging.js')
       const rewiredDir = rewiredLoggingEnvStub.__get__('dir')
-      assert.equal(rewiredDir, 'dirname')
+      assert.equal(rewiredDir, logDirPath)
     })
     it('should be equal absolute path for utils/logs', () => {
-      const expected = path.join(__dirname, '../server/utils/logs')
-      assert.equal(dir, expected)
+      assert.equal(dir, logDirPath)
     })
   })
   describe('defaultLogOptions', () => {
