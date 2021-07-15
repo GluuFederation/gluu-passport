@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.2.0](https://github.com/GluuFederation/gluu-passport/compare/v5.1.0...v5.2.0) (2021-07-15)
+
+
+### Features
+
+* **openid-client-helper.js:** init issuer with and without discovery endpoint ([c287f10](https://github.com/GluuFederation/gluu-passport/commit/c287f10da56ab7e1788bf79e5d4b5735a2ff9c0b)), closes [#241](https://github.com/GluuFederation/gluu-passport/issues/241)
+
+
+### Bug Fixes
+
+* **logging.test.js:** fix empty dirname and use existing log dir path ([003cf15](https://github.com/GluuFederation/gluu-passport/commit/003cf15d9b222755268dd0ff3a23e7f9933a82af)), closes [#297](https://github.com/GluuFederation/gluu-passport/issues/297)
+
 ## [5.1.0](https://github.com/GluuFederation/gluu-passport/compare/v5.0.0...v5.1.0) (2021-07-13)
 
 
