@@ -50,7 +50,7 @@ function makeClientAssertionJWTToken (clientId, tokenEndpoint) {
     sub: clientId,
     aud: tokenEndpoint,
     jti: uuidv4(),
-    exp: parseInt(now / 1000 + 30),
+    exp: Math.floor(now / 1000 + 30),
     iat: now
   })
 }
