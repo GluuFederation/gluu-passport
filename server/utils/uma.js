@@ -43,6 +43,18 @@ function getTokenEndpoint (umaConfigURL) {
     })
 }
 
+function makeClientAssertionJWTToken (clientId, tokenEndpoint) {
+  const now = new Date().getTime()
+  return misc.getRpJWT({
+    iss: clientId,
+    sub: clientId,
+    aud: tokenEndpoint,
+    jti: uuidv4(),
+    exp: Math.floor(now / 1000 + 30),
+    iat: now
+  })
+}
+
 /**
  * Request RP Token (RPT) from token endpoint and returns response
  * @param ticket : String ticket received on 401 first response
@@ -53,15 +65,8 @@ function getRPT (ticket, tokenEndpoint) {
   logger.log2('verbose', 'getRPT called')
   const
     clientId = global.basicConfig.clientId
-  const now = new Date().getTime()
-  const token = misc.getRpJWT({
-    iss: clientId,
-    sub: clientId,
-    aud: tokenEndpoint,
-    jti: uuidv4(),
-    exp: now / 1000 + 30,
-    iat: now
-  })
+
+  const token = makeClientAssertionJWTToken(clientId, tokenEndpoint)
   const options = {
     responseType: 'json',
     form: {

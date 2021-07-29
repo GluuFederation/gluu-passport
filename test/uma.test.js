@@ -5,6 +5,7 @@ const config = require('config')
 const chai = require('chai')
 const got = require('got')
 const { v4: uuidv4 } = require('uuid')
+const jwt = require('jsonwebtoken')
 
 const assert = chai.assert
 const passportConfigAuthorizedResponse = config.get('passportConfigAuthorizedResponse')
@@ -316,6 +317,32 @@ describe('uma.js test', () => {
       assert.isNotEmpty(requestResponse.providers)
       gotGetRPTToken.restore()
       gotGet.restore()
+    })
+  })
+
+  describe('test getClientAssertionJWTToken', () => {
+    const makeClientAssertionJWTToken = umaRewire.__get__('makeClientAssertionJWTToken')
+
+    it('should exists', () => {
+      assert.exists(makeClientAssertionJWTToken)
+    })
+
+    it('should be function', () => {
+      assert.isFunction(makeClientAssertionJWTToken)
+    })
+
+    let decodedToken = null
+    it('should return jwt token', () => {
+      const token = makeClientAssertionJWTToken('temp_clientId', 'https://temp_tokenEndpoint.com')
+      assert.isNotNull(token)
+      decodedToken = jwt.decode(token)
+      assert.isNotNull(decodedToken)
+    })
+
+    it('decoded token should have integer exp time', () => {
+      const exp = decodedToken.exp
+      assert.isNotNull(exp)
+      assert.isTrue(Number.isInteger(exp))
     })
   })
 })
