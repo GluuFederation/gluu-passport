@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [5.2.1](https://github.com/GluuFederation/gluu-passport/compare/v5.2.0...v5.2.1) (2021-07-30)
+
+
+### Bug Fixes
+
+* remove decimal points from Client assertion JWT exp time ([#315](https://github.com/GluuFederation/gluu-passport/issues/315)) ([6ba5b9b](https://github.com/GluuFederation/gluu-passport/commit/6ba5b9bc687e1cdd7cc17fb22053e659f961282b)), closes [#313](https://github.com/GluuFederation/gluu-passport/issues/313) [#313](https://github.com/GluuFederation/gluu-passport/issues/313) [#313](https://github.com/GluuFederation/gluu-passport/issues/313)
+
 ## [5.2.0](https://github.com/GluuFederation/gluu-passport/compare/v5.1.0...v5.2.0) (2021-07-15)
 
 
