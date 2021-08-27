@@ -5,5 +5,6 @@ module.exports = {
   rateLimitWindowMs: 24 * 60 * 60 * 1000, // 24 hrs in milliseconds
   rateLimitMaxRequestAllow: 1000,
   cookieSameSite: 'none',
-  cookieSecure: true
+  cookieSecure: true,
+  HTTP_PROXY: process.env.HTTP_PROXY
 }
