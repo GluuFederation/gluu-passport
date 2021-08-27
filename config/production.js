@@ -1,5 +1,3 @@
-process.env.GLOBAL_AGENT_NO_PROXY = 'localhost,127.0.0.1' || process.env.no_proxy
-
 module.exports = {
   passportFile: '/etc/gluu/conf/passport-config.json',
   saltFile: '/etc/gluu/conf/salt',
