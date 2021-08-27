@@ -238,6 +238,8 @@ const rateLimitMaxRequestAllow = 100
 const cookieSameSite = 'none'
 const cookieSecure = true
 
+const HTTP_PROXY = 'http://localhost:3128'
+
 module.exports = {
   saltFile,
   passportConfig,
@@ -247,5 +249,6 @@ module.exports = {
   passportFile,
   passportConfigAuthorizedResponse,
   cookieSameSite,
-  cookieSecure
+  cookieSecure,
+  HTTP_PROXY
 }
