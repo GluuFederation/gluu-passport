@@ -239,7 +239,7 @@ const cookieSameSite = 'none'
 const cookieSecure = true
 
 const HTTP_PROXY = 'http://localhost:3128'
-process.env.GLOBAL_AGENT_NO_PROXY = 'localhost,127.0.0.1'
+const NO_PROXY = 'localhost,127.0.0.1'
 
 module.exports = {
   saltFile,
@@ -251,5 +251,6 @@ module.exports = {
   passportConfigAuthorizedResponse,
   cookieSameSite,
   cookieSecure,
-  HTTP_PROXY
+  HTTP_PROXY,
+  NO_PROXY
 }

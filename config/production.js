@@ -8,5 +8,6 @@ module.exports = {
   rateLimitMaxRequestAllow: 1000,
   cookieSameSite: 'none',
   cookieSecure: true,
-  HTTP_PROXY: process.env.HTTP_PROXY
+  HTTP_PROXY: process.env.HTTP_PROXY,
+  NO_PROXY: process.env.NO_PROXY
 }
