@@ -4,6 +4,7 @@ const rewire = require('rewire')
 
 const assert = chai.assert
 const HTTP_PROXY = config.get('HTTP_PROXY')
+const NO_PROXY = config.get('NO_PROXY')
 
 describe('global agent proxy setup', () => {
   before(() => {
@@ -19,5 +20,6 @@ describe('global agent proxy setup', () => {
     assert.exists(global.GLOBAL_AGENT)
     assert.exists(global.GLOBAL_AGENT.HTTP_PROXY)
     assert.equal(global.GLOBAL_AGENT.HTTP_PROXY, HTTP_PROXY)
+    assert.equal(global.GLOBAL_AGENT.NO_PROXY, NO_PROXY)
   })
 })
