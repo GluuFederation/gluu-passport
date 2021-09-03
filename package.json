@@ -41,6 +41,7 @@
     "express-prom-bundle": "^6.3.6",
     "express-rate-limit": "^5.2.3",
     "express-session": "^1.17.2",
+    "global-agent": "^3.0.0",
     "got": "^11.8.1",
     "jose": "^2.0.4",
     "jsonwebtoken": "^8.4.0",
