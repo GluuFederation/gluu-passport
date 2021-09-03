@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.3.0](https://github.com/GluuFederation/gluu-passport/compare/v5.2.0...v5.3.0) (2021-09-03)
+
+
+### Features
+
+* **httpProxy:** add support to global http proxy ([#333](https://github.com/GluuFederation/gluu-passport/issues/333)) ([121a629](https://github.com/GluuFederation/gluu-passport/commit/121a629189e36d7b500ea10d82459d6906cda030))
+
+
+### Bug Fixes
+
+* **package-lock.json:** update node-xtraverse due to vulnerability in xmldom ([#327](https://github.com/GluuFederation/gluu-passport/issues/327)) ([903ebb4](https://github.com/GluuFederation/gluu-passport/commit/903ebb4b9e5900496c883d5e5e1f72fb39992a32))
+* remove decimal points from Client assertion JWT exp time ([#315](https://github.com/GluuFederation/gluu-passport/issues/315)) ([6ba5b9b](https://github.com/GluuFederation/gluu-passport/commit/6ba5b9bc687e1cdd7cc17fb22053e659f961282b)), closes [#313](https://github.com/GluuFederation/gluu-passport/issues/313) [#313](https://github.com/GluuFederation/gluu-passport/issues/313) [#313](https://github.com/GluuFederation/gluu-passport/issues/313)
+
 ### [5.2.1](https://github.com/GluuFederation/gluu-passport/compare/v5.2.0...v5.2.1) (2021-07-30)
 
 
