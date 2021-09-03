@@ -11,6 +11,8 @@ const { globalErrorHandler } = require('./utils/error-handler')
 const flash = require('connect-flash')
 const { rateLimiter } = require('./utils/rate-limiter')
 const { session } = require('./utils/session')
+// Setup http proxy config
+require('./utils/http-global-proxy')
 
 class AppFactory {
   createApp () {
