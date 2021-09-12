@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.6.0](https://github.com/GluuFederation/gluu-passport/compare/v4.5.0...v4.6.0) (2021-09-12)
+
+
+### Features
+
+* **http-global-proxy.js:**  add http proxy feature to 4.2.x ([#340](https://github.com/GluuFederation/gluu-passport/issues/340)) ([bf0b763](https://github.com/GluuFederation/gluu-passport/commit/bf0b76332edbdf2ba092a986b424ca25403c8fa0))
+
 ## [4.5.0](https://github.com/GluuFederation/gluu-passport/compare/v4.4.0...v4.5.0) (2021-03-30)
 
 
