@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.6.1](https://github.com/GluuFederation/gluu-passport/compare/v4.6.0...v4.6.1) (2021-09-13)
+
+
+### Bug Fixes
+
+* **security:** apply dependencies security patch for `gluu-passport 4.x` ([#344](https://github.com/GluuFederation/gluu-passport/issues/344)) ([29281fd](https://github.com/GluuFederation/gluu-passport/commit/29281fddda268cc71d8480dcc6ebb3b3ab1a548c))
+
 ## [4.6.0](https://github.com/GluuFederation/gluu-passport/compare/v4.5.0...v4.6.0) (2021-09-12)
 
 
