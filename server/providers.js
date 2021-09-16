@@ -21,12 +21,13 @@ function applyMapping (profile, provider) {
     const additionalParams = profile.extras
 
     delete profile.extras
-    logger.log2('silly', `Raw profile is ${JSON.stringify(profile._json)}`)
+    logger.log2('debug', `Raw profile is ${JSON.stringify(profile)}`)
     logger.log2('info', `Applying mapping '${mapping}' to profile`)
 
     mappedProfile = require('./mappings/' + mapping)(profile, additionalParams)
     logger.log2('debug', `Resulting profile data is\n${JSON.stringify(mappedProfile, null, 4)}`)
   } catch (err) {
+    console.log(err)
     logger.log2('error', `An error occurred: ${err}`)
   }
   return mappedProfile
