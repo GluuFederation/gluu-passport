@@ -27,7 +27,6 @@ function applyMapping (profile, provider) {
     mappedProfile = require('./mappings/' + mapping)(profile, additionalParams)
     logger.log2('debug', `Resulting profile data is\n${JSON.stringify(mappedProfile, null, 4)}`)
   } catch (err) {
-    console.log(err)
     logger.log2('error', `An error occurred: ${err}`)
   }
   return mappedProfile
