@@ -24,15 +24,14 @@
     "cover:report": "nyc report --reporter=text-lcov > coverage.lcov",
     "dev": "NODE_ENV=development node server/app.js",
     "lint": "eslint 'server/**/*.js' 'test/**/*.js' 'config/**/*.js'",
-    "generate-coverage": "NODE_ENV=test nyc report --reporter=text-lcov > coverage.lcov",
-    "prepare": "husky install"
+    "generate-coverage": "NODE_ENV=test nyc report --reporter=text-lcov > coverage.lcov"
   },
   "dependencies": {
     "@nicokaiser/passport-apple": "^0.2.1",
     "@sic/passport-openidconnect": "^0.0.4",
-    "@sic/passport-saml": "^2.2.2",
+    "@sic/passport-saml": "^2.2.3",
     "@sokratis/passport-linkedin-oauth2": "^2.1.0",
-    "applicationinsights": "^2.0.0",
+    "applicationinsights": "^2.1.7",
     "base64url": "^3.0.1",
     "bluebird": "^3.5.3",
     "body-parser": "^1.18.3",
@@ -95,7 +94,6 @@
     "eslint-utils": "^2.1.0",
     "fakeredis": "^2.0.0",
     "git-commit-msg-linter": "^3.1.0",
-    "husky": "^5.2.0",
     "lint-staged": "^10.5.4",
     "mocha": "^8.3.0",
     "nock": "^13.0.8",
