@@ -4,8 +4,11 @@ const providers = rewire('../server/providers.js')
 const config = require('config')
 const PassportSAMLStrategy = require('passport-saml').Strategy
 const helper = require('./helper')
+const fs = require('fs').promises
+const path = require('path')
 
 const assert = chai.assert
+const passportConfigAuthorizedResponse = config.get('passportConfigAuthorizedResponse')
 
 describe('providers.js', () => {
   describe('setupStrategy', () => {
@@ -20,7 +23,7 @@ describe('providers.js', () => {
     const passportStrategies = providers.__get__('passportStrategies')
     const setupStrategy = providers.__get__('setupStrategy')
     const testProvider = {
-      ...config.passportConfigAuthorizedResponse.providers[0],
+      ...passportConfigAuthorizedResponse.providers[0],
       verifyCallbackArity: 0
     }
 
@@ -57,7 +60,7 @@ describe('providers.js', () => {
     })
 
     it('Passport SAML Provider with redis setup should initialize the passport-saml strategy', () => {
-      const testProvider = config.passportConfigAuthorizedResponse.providers.find(
+      const testProvider = passportConfigAuthorizedResponse.providers.find(
         provider => provider.id === 'saml-redis-test'
       )
       try {
@@ -68,6 +71,43 @@ describe('providers.js', () => {
       } catch (error) {
         assert.fail('Failed to intialize passport-saml strategy with redis setup')
       }
+    })
+  })
+
+  describe('applyMapping', () => {
+    const applyMappingRewire = providers.__get__('applyMapping')
+    const fakeProfile = {
+      sub: 'loganXMen',
+      email: 'logan@gmail.com',
+      name: 'Logan',
+      given_name: 'Hugh Jackman'
+    }
+
+    it('should be a function', () => {
+      assert.isFunction(applyMappingRewire)
+    })
+
+    it('should return mapped data as per mapping file config', () => {
+      global.providers = passportConfigAuthorizedResponse.providers
+      const mappedProfileResult = applyMappingRewire(fakeProfile, 'oidccedev6privatejwt')
+      const fakeMappedProfile = {
+        uid: fakeProfile.sub,
+        mail: fakeProfile.email,
+        cn: fakeProfile.given_name,
+        displayName: fakeProfile.name,
+        givenName: fakeProfile.given_name,
+        sn: undefined
+      }
+
+      assert.deepStrictEqual(mappedProfileResult, fakeMappedProfile)
+    })
+
+    it('should log user profile data in log file', async () => {
+      const passportLogFilePath = path.join(__dirname, '../server/utils/logs/passport.log')
+      const data = await fs.readFile(passportLogFilePath, 'binary')
+      assert(data.includes('Raw profile is'))
+      assert(data.includes(fakeProfile.email))
+      assert(data.includes(fakeProfile.name))
     })
   })
 })
