@@ -1,3 +1,4 @@
+const appInsights = require('applicationinsights')
 const config = require('config')
 const logger = require('./utils/logging')
 const misc = require('./utils/misc')
@@ -8,7 +9,14 @@ const AppFactory = require('./app-factory')
 
 let httpServer
 let httpPort = -1
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
+
+const appInsightsKey = config.get('appInsightsKey')
+
+if (appInsightsKey) {
+	appInsights.setup(appInsightsKey)
+  appInsights.defaultClient.context.tags[appInsights.defaultClient.context.keys.cloudRole] = "Passport"
+  appInsights.start()
+}
 
 const appFactoryInstance = new AppFactory()
 const app = appFactoryInstance.createApp()
@@ -83,7 +91,8 @@ function init () {
     'keyId',
     'keyAlg',
     'configurationEndpoint',
-    'failureRedirectUrl'
+    'failureRedirectUrl',
+    'languageAPI'
   ]
   if (misc.hasData(props, basicConfig)) {
     global.basicConfig = basicConfig

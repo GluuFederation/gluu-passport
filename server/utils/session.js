@@ -1,18 +1,19 @@
 const expressSession = require('express-session')
 const MemoryStore = require('memorystore')(expressSession)
 const config = require('config')
-const { randomSecret } = require('../utils/misc')
+const { secretKey } = require('./misc')
 
 const expressSessionConfig = {
   cookie: {
-    maxAge: 86400000,
+    maxAge: config.get('cookieMaxAge'),
+    path: config.get('cookiePath'),
     sameSite: config.get('cookieSameSite'),
     secure: config.get('cookieSecure')
   },
   store: new MemoryStore({
     checkPeriod: 86400000 // prune expired entries every 24h
   }),
-  secret: randomSecret(),
+  secret: secretKey(),
   resave: false,
   saveUninitialized: false
 }

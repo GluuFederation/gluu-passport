@@ -7,13 +7,19 @@ const R = require('ramda')
 // This is wrapped in a function so params is not evaluated upon module load, only at first usage
 const params = R.once(() => [
   {
-    strategy: 'passport-saml',
+    strategy: '@sic/passport-saml',
+    verifyCallbackArity: 3,
     passportAuthnParams: {},
     options: {
+      passReqToCallback: true,
       validateInResponseTo: true,
       requestIdExpirationPeriodMs: 3600000,
       decryptionPvk: fs.readFileSync(global.config.spTLSKey, 'utf-8'),
-      decryptionCert: fs.readFileSync(global.config.spTLSCert, 'utf-8')
+      decryptionCert: fs.readFileSync(global.config.spTLSCert, 'utf-8'),
+      privateKey: fs.readFileSync(process.env.PRIVATE_KEY || '/etc/certs/passport-sp.key', 'utf-8'),
+      getSamlOptions: function(request, done) {
+        return done(null, request.query);
+      }
     }
   },
   {
