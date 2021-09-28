@@ -43,6 +43,7 @@ function getVerifyFunction (provider) {
     if (provider.passportStrategyId === '@sic/passport-openidconnect') {
       // Check passport-openidconnect/lib/strategy.js
       const index = provider.options.passReqToCallback ? 1 : 0
+    }
 
     const cb = args[arity - 1]
     profile.providerKey = provider.id
