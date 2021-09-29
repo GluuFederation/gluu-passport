@@ -28,7 +28,6 @@
   },
   "dependencies": {
     "@nicokaiser/passport-apple": "^0.2.1",
-    "@sic/passport-openidconnect": "^0.0.4",
     "@sic/passport-saml": "^2.2.3",
     "@sokratis/passport-linkedin-oauth2": "^2.1.0",
     "applicationinsights": "^2.1.7",
