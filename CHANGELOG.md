@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [5.3.1](https://github.com/GluuFederation/gluu-passport/compare/v5.3.0...v5.3.1) (2021-10-06)
+
+
+### Bug Fixes
+
+* change log level to `debug` as `silly` is not used ([#348](https://github.com/GluuFederation/gluu-passport/issues/348)) ([228ae5f](https://github.com/GluuFederation/gluu-passport/commit/228ae5fdf75a498be2c193565e0f0c91b7d4da1c))
+* **sp-meta.spec.js:** fix saml test case ([b3cb6b2](https://github.com/GluuFederation/gluu-passport/commit/b3cb6b26bdf9cbf44fe255fd20a62c89e009f4e8))
+
 ## [5.3.0](https://github.com/GluuFederation/gluu-passport/compare/v5.2.0...v5.3.0) (2021-09-03)
 
 
