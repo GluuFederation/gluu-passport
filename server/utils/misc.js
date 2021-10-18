@@ -132,6 +132,15 @@ function encrypt (obj) {
   return encrypted
 }
 
+function decrypt (encrypted) {
+  // Decryption compatible with Gluu EncryptionService
+  const decrypt = crypto.createDecipheriv('des-ede3-ecb', secretKey(), '')
+  let decrypted = decrypt.update(encrypted, 'base64', 'utf8')
+  decrypted += decrypt.final('utf8')
+  obj = JSON.parse(decrypted)
+  return obj
+}
+
 module.exports = {
   isObject: isObject,
   hash: hash,
@@ -144,6 +153,7 @@ module.exports = {
   getJWT: getJWT,
   verifyJWT: verifyJWT,
   encrypt: encrypt,
+  decrypt: decrypt,
   randomSecret: randomSecret,
   secretKey: secretKey
 }
