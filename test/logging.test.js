@@ -5,6 +5,7 @@ const rewire = require('rewire')
 const rewiredLogging = rewire('../server/utils/logging.js')
 const path = require('path')
 const sinon = require('sinon')
+const fs = require('fs').promises
 
 describe('logging.js file', () => {
   describe('dir', () => {
@@ -85,13 +86,16 @@ describe('logging.js file', () => {
       it('write property should be function', () => {
         assert.isFunction(rewiredLogger.stream.write, 'steam.write is not a function')
       })
-      it('write property should call log2 once', () => {
-        // Todo this case is failing
-        // const rewiredLog2 = rewiredLogging.__get__('log2')
-        // const log2Spy = sinon.spy(rewiredLog2)
-        // rewiredLogger.stream.write('tEMp')
-        // sinon.assert.calledOnce(log2Spy)
-      })
+    })
+
+    it('should log currect datetime', async () => {
+      const passportLogFilePath = path.join(__dirname, '../server/utils/logs/passport.log')
+      const data = await fs.readFile(passportLogFilePath, 'binary')
+      const newDate = new Date()
+      // YYYY-MM-DD HH
+      const currentDateTimeTillHour = `${newDate.getFullYear()}-${('0' + (newDate.getMonth() + 1)).slice(-2)}-${newDate.getDate()} ${newDate.getHours()}`
+      console.log(currentDateTimeTillHour)
+      assert(data.includes(currentDateTimeTillHour))
     })
   })
 })

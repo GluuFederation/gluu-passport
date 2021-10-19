@@ -29,7 +29,9 @@ const logger = winston.createLogger({
   format: format.combine(
     format.splat(),
     format.padLevels(),
-    format.timestamp(),
+    format.timestamp({
+      format: 'YYYY-MM-DD HH:mm:ss.SSSZZ'
+    }),
     format.printf(info => `${info.timestamp} [${info.level.toUpperCase()}] ${info.message}`)
   )
 })
