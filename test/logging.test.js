@@ -94,7 +94,6 @@ describe('logging.js file', () => {
       const newDate = new Date()
       // YYYY-MM-DD HH
       const currentDateTimeTillHour = `${newDate.getFullYear()}-${('0' + (newDate.getMonth() + 1)).slice(-2)}-${newDate.getDate()} ${newDate.getHours()}`
-      console.log(currentDateTimeTillHour)
       assert(data.includes(currentDateTimeTillHour))
     })
   })
