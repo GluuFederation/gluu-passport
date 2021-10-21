@@ -48,6 +48,12 @@ router.get('/auth/:provider/:token',
   validateToken,
   authenticateRequest)
 
+router.get('/auth/:provider/:token/:options',
+validateProvider,
+validateToken,
+parseOptions,
+authenticateRequest)
+
 router.get('/casa/:provider/:token',
   (req, res, next) => {
     req.failureUrl = '/casa/rest/pl/account-linking/idp-linking'
@@ -349,6 +355,27 @@ function processLogout(req, res) {
   
   var originalQuery = url.parse(req.url).query
   strategy._saml.validateRedirect(req.query, originalQuery, validateCallback)
+}
+
+function parseOptions (req, res, next) {
+  const opts = req.params.options
+  try {
+    if (opts) {
+      logger.log2('verbose', 'Parsing options')
+      const optionsObj = misc.decrypt(opts.replace('_', '/').replace('-','+'));
+
+      // Add the options to the req.query for future use
+      req.query = {
+        ...req.query,
+        ...optionsObj,
+      };
+    }
+    next()
+  } catch (err) {
+    const msg = 'Options were not parsed successfully'
+    logger.log2('error', `${msg}, error: ${err}`)
+    webutil.handleError(req, res, msg)
+  }
 }
 
 module.exports = router
