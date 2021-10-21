@@ -135,6 +135,9 @@ async function setupStrategy (provider) {
       oidcStrategyOptions.params = providerOptions.params ? providerOptions.params : {}
 
       passport.use(id, new Strategy(oidcStrategyOptions, verify))
+
+      // Override authenticate function of OIDC strategy: SIC customizations
+      require('./utils/sic-utils').setupSicOIDCStrategy(provider);
     } catch (error) {
       logger.log2('error', error.message)
     }
