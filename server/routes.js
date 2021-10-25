@@ -188,12 +188,29 @@ function validateProvider (req, res, next) {
   }
 }
 
-function authenticateRequest (req, res, next) {
-  logger.log2('verbose', `Authenticating request against ${req.params.provider}`)
+async function authenticateRequest (req, res, next) {
+  const provider_id = req.params.provider
+  logger.log2('verbose', `Authenticating request against ${provider_id}`)
   req.session.authenticating = true
   appInsights.defaultClient.trackEvent({name: "Authentication Request",
-                                       properties: {...{provider: req.params.provider},
+                                       properties: {...{provider: provider_id},
                                                     ...req.query, ...req.session}})
+                                            
+  const providerConfData = global.providers.find(cfg => cfg.id === provider_id)
+
+  if (providerConfData.type === "openidconnect") {
+    const strategy = passport._strategy(provider_id)
+    const client = strategy._client
+
+    if (client.use_request_object) { // Only for clients with use_request_object set to true
+      req.passportAuthenticateParams.nonce = uuidv4()
+
+      await client.requestObject(req.locals.dynamic_options).then(function(value) {
+        req.passportAuthenticateParams.request = value;
+      });
+    }
+  }
+
   passport.authenticate(req.params.provider, req.passportAuthenticateParams)(req, res, next)
 }
 
@@ -308,7 +325,7 @@ function callbackResponse (req, res) {
       <form action="${postUrl}" method="post">
         <div>
           <input type="hidden" name="user" value="${jwt}"/>
-          <input id="ui_locale" type="hidden" name="ui_locale"/>
+          <input id="locale" type="hidden" name="locale"/>
           <noscript>
             <input type="submit" value="Continue / Continuer"/>
           </noscript>
@@ -364,11 +381,9 @@ function parseOptions (req, res, next) {
       logger.log2('verbose', 'Parsing options')
       const optionsObj = misc.decrypt(opts.replace('_', '/').replace('-','+'));
 
-      // Add the options to the req.query for future use
-      req.query = {
-        ...req.query,
-        ...optionsObj,
-      };
+      // Add the options to the req.locals.dynamic_options for future use
+      req.locals = {};
+      req.locals.dynamic_options = {...optionsObj};
     }
     next()
   } catch (err) {
