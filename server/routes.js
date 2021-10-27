@@ -202,7 +202,7 @@ async function authenticateRequest (req, res, next) {
     const strategy = passport._strategy(provider_id)
     const client = strategy._client
 
-    if (client.use_request_object) { // Only for clients with use_request_object set to true
+    if (client.use_request_object && client.use_request_object.toString() === 'true') { // Only for clients with use_request_object set to true
       req.passportAuthenticateParams.nonce = uuidv4()
 
       await client.requestObject(req.locals.dynamic_options).then(function(value) {

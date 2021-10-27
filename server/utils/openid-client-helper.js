@@ -1,10 +1,13 @@
-const { JWK: { generateSync }, JWKS: { KeyStore, asKeyStore } } = require('jose')
+const { JWK: { generateSync, asKey }, JWKS: { KeyStore } } = require('jose')
 const { Issuer } = require('openid-client')
 const path = require('path')
 const fs = require('fs')
 const fileUtils = require('../utils/file-utils')
 const { logger } = require('./logging')
 const clientJWKSFilePath = path.join(`${process.cwd()}/server`, 'jwks')
+const secretKey = require('./misc').secretKey();
+let ks = new KeyStore();
+const keysPath = "/run/keyvault/keys/";
 
 /**
  * generate jwks and store it in file. file name will be like [provider.id].json
@@ -18,6 +21,46 @@ async function generateJWKS (provider) {
   if (!fs.existsSync(fileName)) {
     await fileUtils.writeDataToFile(fileName, JSON.stringify(keyStore.toJWKS(true)))
   }
+}
+
+/**
+ * get keystore after creating and adding private keys
+ * @returns keystore
+ */
+ async function getKeystore () {
+  logger.log('verbose', 'Importing private keys into the keystore')
+
+  fs.readdirSync(keysPath).forEach(file => {
+    const akeyPath = path.resolve(keysPath, file);
+    if (fs.lstatSync(akeyPath).isFile()) {
+      const fileNameRegExp = /(.*?)_(.*?)_(.*?)\.pem/;
+      const matches = file.match(fileNameRegExp);
+
+      if (matches.length == 4) { // file naming: keydId_use_alg.pem
+        try {
+          const keyObj = {
+            key: fs.readFileSync(akeyPath, 'utf8'),
+            passphrase: secretKey
+          }
+    
+          const opts = {
+            kid: matches[1],
+            use: matches[2],
+            alg: matches[3]
+          }
+    
+          // Create the key and add it to the keystore
+          const key = asKey(keyObj, opts)                    
+          ks.add(key)
+        } catch (err) {
+          const msg = 'Private key was not successfully added to the keystore.'
+          logger.log('error', `${msg} key: ${file}, error: ${err}`)
+        }
+      }
+    }
+  });
+
+  return ks
 }
 
 const clients = []
@@ -50,12 +93,9 @@ async function getClient (provider) {
   }
 
   const issuer = await getIssuer(options)
-
-  if (options.token_endpoint_auth_method && options.token_endpoint_auth_method === 'private_key_jwt') {
-    // generate jwks
-    await generateJWKS(provider)
-    const jwks = require(path.join(fileUtils.makeDir(clientJWKSFilePath), `${provider.id}.json`))
-    const ks = asKeyStore(jwks)
+  if (options.token_endpoint_auth_method && options.token_endpoint_auth_method === 'private_key_jwt' && options.use_request_object && options.use_request_object.toString() === 'true') {
+    // getKeystore with private keys
+    if (ks.size == 0) ks = await getKeystore()
     client = new issuer.Client(options, ks.toJWKS(true))
   } else {
     client = new issuer.Client(options)
