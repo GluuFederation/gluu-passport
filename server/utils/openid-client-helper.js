@@ -44,9 +44,9 @@ async function generateJWKS (provider) {
           }
     
           const opts = {
-            kid: matches[1],
+            kid: `${matches[1]}_${matches[2]}_${matches[3]}`,
             use: matches[2],
-            alg: matches[3]
+            alg: matches[3].toUpperCase()
           }
     
           // Create the key and add it to the keystore
