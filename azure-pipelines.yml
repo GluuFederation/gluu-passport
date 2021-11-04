@@ -21,6 +21,11 @@ steps:
     publishFeed: 'Sign in Canada/SignInCanada'
 
 - script: |
+    sed -i 's/oauth-authz-req+jwt/jwt/g' node_modules/openid-client/lib/client.js
+  displayName: 'RFC 9101 hack for 2ndFaaS'
+  continueOnError: true
+
+- script: |
     tar -czvf $(Build.ArtifactStagingDirectory)/passport-version_5.3.0-node_modules.tar.gz node_modules
   displayName: 'Package dependencies'
   continueOnError: true
