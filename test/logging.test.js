@@ -7,6 +7,10 @@ const path = require('path')
 const sinon = require('sinon')
 const fs = require('fs').promises
 
+const convertOneDigitToTwo = (number) => {
+  return ('0' + (number)).slice(-2)
+}
+
 describe('logging.js file', () => {
   describe('dir', () => {
     const dir = rewiredLogging.__get__('dir')
@@ -93,7 +97,8 @@ describe('logging.js file', () => {
       const data = await fs.readFile(passportLogFilePath, 'binary')
       const newDate = new Date()
       // YYYY-MM-DD HH
-      const currentDateTimeTillHour = `${newDate.getFullYear()}-${('0' + (newDate.getMonth() + 1)).slice(-2)}-${newDate.getDate()} ${newDate.getHours()}`
+      const currentDateTimeTillHour = `${newDate.getFullYear()}-${convertOneDigitToTwo(newDate.getMonth() + 1)}-${convertOneDigitToTwo(newDate.getDate())} ${convertOneDigitToTwo(newDate.getHours())}`
+      console.log(currentDateTimeTillHour)
       assert(data.includes(currentDateTimeTillHour))
     })
   })
