@@ -98,7 +98,6 @@ describe('logging.js file', () => {
       const newDate = new Date()
       // YYYY-MM-DD HH
       const currentDateTimeTillHour = `${newDate.getFullYear()}-${convertOneDigitToTwo(newDate.getMonth() + 1)}-${convertOneDigitToTwo(newDate.getDate())} ${convertOneDigitToTwo(newDate.getHours())}`
-      console.log(currentDateTimeTillHour)
       assert(data.includes(currentDateTimeTillHour))
     })
   })
