@@ -1,9 +1,9 @@
 let cookieSecure = process.env.PASSPORT_COOKIE_SECURE
 
-if (cookieSecure == undefined) {
+if (cookieSecure === undefined) {
   cookieSecure = true
 } else {
-  cookieSecure = cookieSecure === 'true' ? true : false
+  cookieSecure = cookieSecure === 'true'
 }
 
 module.exports = {
