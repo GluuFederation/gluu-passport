@@ -48,10 +48,10 @@ router.get('/auth/:provider/:token',
   validateToken,
   authenticateRequest)
 
-router.get('/auth/:provider/:token/:options',
+router.get('/auth/:provider/:token/:authParams',
 validateProvider,
 validateToken,
-parseOptions,
+parseParams,
 authenticateRequest)
 
 router.get('/casa/:provider/:token',
@@ -204,7 +204,7 @@ async function authenticateRequest (req, res, next) {
     req.passportAuthenticateParams.nonce = uuidv4()
 
     if (client.use_request_object && client.use_request_object.toString().toLowerCase() === 'true') { // Only for clients with use_request_object set to true
-      await client.requestObject(req.locals.dynamic_options).then(function(value) {
+      await client.requestObject(req.locals.authParams).then(function(value) {
         req.passportAuthenticateParams.request = value;
       });
     }
@@ -374,20 +374,24 @@ function processLogout(req, res) {
   strategy._saml.validateRedirect(req.query, originalQuery, validateCallback)
 }
 
-function parseOptions (req, res, next) {
-  const opts = req.params.options
+function parseParams (req, res, next) {
+  const params = req.params.authParams
   try {
-    if (opts) {
-      logger.log2('verbose', 'Parsing options')
-      const optionsObj = misc.decrypt(opts.replace('_', '/').replace('-','+'));
+    if (params) {
+      logger.log2('verbose', 'Parsing parameters')
+      const paramsObj = misc.decrypt(params.replace('_', '/').replace('-','+'));
 
-      // Add the options to the req.locals.dynamic_options for future use
+      if (paramsObj.exp && paramsObj.exp * 1000 <  Date.now()) {
+        throw("Authentication parameters have expired.")
+      }
+
+      // Add the options to the req.locals.authParams for future use
       req.locals = {};
-      req.locals.dynamic_options = {...optionsObj};
+      req.locals.authParams = {...paramsObj};
     }
     next()
   } catch (err) {
-    const msg = 'Options were not parsed successfully'
+    const msg = 'Authentication parameters were not parsed successfully'
     logger.log2('error', `${msg}, error: ${err}`)
     webutil.handleError(req, res, msg)
   }

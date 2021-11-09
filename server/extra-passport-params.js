@@ -18,7 +18,7 @@ const params = R.once(() => [
       decryptionCert: fs.readFileSync(global.config.spTLSCert, 'utf-8'),
       privateKey: fs.readFileSync(process.env.PRIVATE_KEY || '/etc/certs/passport-sp.key', 'utf-8'),
       getSamlOptions: function(request, done) {
-        return done(null, (request.locals != null ? request.locals.dynamic_options : {}));
+        return done(null, (request.locals != null ? request.locals.authParams : {}));
       }
     }
   },
