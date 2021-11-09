@@ -203,7 +203,7 @@ async function authenticateRequest (req, res, next) {
     const client = strategy._client
     req.passportAuthenticateParams.nonce = uuidv4()
 
-    if (client.use_request_object && client.use_request_object.toString() === 'true') { // Only for clients with use_request_object set to true
+    if (client.use_request_object && client.use_request_object.toString().toLowerCase() === 'true') { // Only for clients with use_request_object set to true
       await client.requestObject(req.locals.dynamic_options).then(function(value) {
         req.passportAuthenticateParams.request = value;
       });
@@ -271,9 +271,10 @@ function callbackResponse (req, res) {
   user = misc.arrify(user)
   user.provider = provider
 
-  // Save the current provider in case of 2FA (saving the first provider)
-  if (provider != "mfa") req.session.provider = provider
-
+  // Save the current provider in case of 2FA (saving the first GCCF provider)
+  const strategy = passport._strategy(provider)
+  if (strategy.name === 'saml' && strategy._saml.options.GCCF && strategy._saml.options.GCCF.toString().toLowerCase() === 'true') req.session.provider = provider
+  
   const now = new Date().getTime()
   const jwt = misc.getRpJWT({
     iss: postUrl,
