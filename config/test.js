@@ -180,8 +180,6 @@ const passportConfigAuthorizedResponse = {
 
 const root = process.cwd()
 const passportFile = `${root}/test/testdata/passport-config.json`
-const rateLimitWindowMs = 24 * 60 * 60 * 1000
-const rateLimitMaxRequestAllow = 100
 const cookieSameSite = 'none'
 const cookieSecure = true
 const HTTP_PROXY = 'http://localhost:3128'
@@ -191,8 +189,6 @@ const NO_PROXY = 'localhost,127.0.0.1'
 module.exports = {
   saltFile,
   passportConfig,
-  rateLimitWindowMs,
-  rateLimitMaxRequestAllow,
   timerInterval,
   passportFile,
   passportConfigAuthorizedResponse,
