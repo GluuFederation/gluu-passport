@@ -35,8 +35,7 @@ class AppFactory {
     passport.deserializeUser((user, done) => {
       done(null, user)
     })
-    // store rateLimiter for later manipulation/reset
-    app.rateLimiter = rateLimiter
+
     return app
   }
 }

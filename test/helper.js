@@ -37,7 +37,6 @@ const setupServer = async function () {
   await app.on('appStarted', () => {
     console.log('app started...')
   })
-  await app.rateLimiter.resetKey('::ffff:127.0.0.1')
   return chai.request(app).keepOpen()
 }
 

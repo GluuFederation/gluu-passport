@@ -4,7 +4,6 @@ const assert = chai.assert
 const rewire = require('rewire')
 const appFactoryRewire = rewire('../server/app-factory.js')
 const sinon = require('sinon')
-const { rateLimiter } = require('../server/utils/rate-limiter')
 
 /**
  * Helper: Returns the argument call number with matching args
@@ -79,28 +78,6 @@ describe('error-handler middleware', () => {
   it('should be called once as app.use arg', () => {
     const appUseSpy = spyOnAppUse()
     assertCalledWithFunctionAsArg(appUseSpy, rewiredGlobalErrorHandler)
-    sinon.restore()
-  })
-})
-
-describe('rateLimiter middleware', () => {
-  const rewiredRateLimiter = appFactoryRewire.__get__('rateLimiter')
-
-  it('should exist', () => {
-    assert.exists(rewiredRateLimiter)
-  })
-
-  it('should be a function', () => {
-    assert.isFunction(rewiredRateLimiter)
-  })
-
-  it('should be equal rateLimiter middleware', () => {
-    assert.strictEqual(rewiredRateLimiter, rateLimiter)
-  })
-
-  it('should be called once as app.use arg', () => {
-    const appUseSpy = spyOnAppUse()
-    assertCalledWithFunctionAsArg(appUseSpy, rewiredRateLimiter)
     sinon.restore()
   })
 })
