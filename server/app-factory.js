@@ -9,7 +9,6 @@ const routes = require('./routes')
 const metricsMiddleware = require('../server/utils/metrics')
 const { globalErrorHandler } = require('./utils/error-handler')
 const flash = require('connect-flash')
-const { rateLimiter } = require('./utils/rate-limiter')
 const { session } = require('./utils/session')
 // Setup http proxy config
 require('./utils/http-global-proxy')
@@ -22,7 +21,6 @@ class AppFactory {
     app.use(bodyParser.urlencoded({ extended: false }))
     app.use(cookieParser())
     app.use(flash())
-    app.use(rateLimiter)
     app.set('trust proxy', 1)
     app.use(session)
 
