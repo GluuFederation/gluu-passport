@@ -73,5 +73,13 @@ describe('productioncfg', function () {
         sinon.restore()
       })
     })
+    describe('maxRequestAllow', () => {
+      it('should load from env', () => {
+        const maxRequestAllow = 2
+        process.env.PASSPORT_RATE_LIMIT_MAX_REQUEST_ALLOW = maxRequestAllow
+        const rewiredProductionCfg = rewire('../config/production.js')
+        assert.equal(rewiredProductionCfg.rateLimitMaxRequestAllow, 2)
+      })
+    })
   })
 })
