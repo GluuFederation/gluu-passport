@@ -1,7 +1,8 @@
 /* eslint-disable security/detect-non-literal-fs-filename */
 const chai = require('chai')
 const assert = chai.assert
-
+const rewire = require('rewire')
+const sinon = require('sinon')
 /**
  * Testing configs (env) on /config/*.js (uses node-config module)
  */
@@ -34,7 +35,7 @@ describe('defaultcfg', function () {
 })
 
 describe('productioncfg', function () {
-  it('production.js should have passportFile  not null or undefined', () => {
+  it('production.js should have passportFile not null or undefined', () => {
     assert.exists(
       productioncfg.passportFile, 'passportFile is not null or undefined')
   })
@@ -55,5 +56,22 @@ describe('productioncfg', function () {
       productioncfg.cookieSecure, 'cookieSecure does NOT exist'
     )
     assert.isTrue(productioncfg.cookieSecure)
+  })
+  describe('rate limit', () => {
+    describe('limitWindowMs', () => {
+      it('should load from env', () => {
+        const rateLimitWindow = 1
+        process.env.PASSPORT_RATE_LIMIT_WINDOW_MS = rateLimitWindow
+        const rewiredProductionCfg = rewire('../config/production.js')
+        assert.equal(rewiredProductionCfg.rateLimitWindowMs, 1)
+      })
+      it('should call parseInt once with value', () => {
+        process.env.PASSPORT_RATE_LIMIT_WINDOW_MS = 'a valid rate limit'
+        const parseIntspy = sinon.spy(global, 'parseInt')
+        rewire('../config/production.js')
+        assert.isTrue(parseIntspy.calledOnceWith('a valid rate limit'))
+        sinon.restore()
+      })
+    })
   })
 })

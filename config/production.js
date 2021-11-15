@@ -2,7 +2,7 @@ module.exports = {
   passportFile: '/etc/gluu/conf/passport-config.json',
   saltFile: '/etc/gluu/conf/salt',
   timerInterval: 60000,
-  rateLimitWindowMs: process.env.PSP_RATE_LIMIT_WINDOW_MS || 24 * 60 * 60 * 1000, // 24 hrs in milliseconds
+  rateLimitWindowMs: parseInt(process.env.PASSPORT_RATE_LIMIT_WINDOW_MS) || 24 * 60 * 60 * 1000, // 24 hrs in milliseconds
   rateLimitMaxRequestAllow: process.env.PSP_RATE_MAX_REQUEST_ALLOW || 1000,
   cookieSameSite: 'none',
   cookieSecure: true,
