@@ -69,8 +69,8 @@ describe('productioncfg', function () {
         process.env.PASSPORT_RATE_LIMIT_WINDOW_MS = 'a valid rate limit'
         const parseIntspy = sinon.spy(global, 'parseInt')
         rewire('../config/production.js')
-        assert.isTrue(parseIntspy.calledOnceWith('a valid rate limit'))
-        sinon.restore()
+        assert.isTrue(parseIntspy.calledWith('a valid rate limit'))
+        global.parseInt.restore()
       })
     })
     describe('maxRequestAllow', () => {
@@ -79,6 +79,13 @@ describe('productioncfg', function () {
         process.env.PASSPORT_RATE_LIMIT_MAX_REQUEST_ALLOW = maxRequestAllow
         const rewiredProductionCfg = rewire('../config/production.js')
         assert.equal(rewiredProductionCfg.rateLimitMaxRequestAllow, 2)
+      })
+      it('should call parseInt with value', () => {
+        process.env.PASSPORT_RATE_LIMIT_MAX_REQUEST_ALLOW = 'a valid max request limit'
+        const parseIntspy = sinon.spy(global, 'parseInt')
+        rewire('../config/production.js')
+        assert.isTrue(parseIntspy.calledWith('a valid max request limit'))
+        global.parseInt.restore()
       })
     })
   })
