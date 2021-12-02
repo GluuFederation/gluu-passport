@@ -162,7 +162,8 @@ router.get('/logout/response/:status?', (req, res, next) => {
         if (err) {
           webutil.handleError(req, res, err.message)
         } else {
-          appInsights.defaultClient.trackEvent({name: "IDP-initiated Logout Response", properties: req.samlLogoutRequest})
+          req.samlLogoutRequest.reason = 'Session terminated'
+          appInsights.defaultClient.trackEvent({name: "IDP-Initiated Logout Response", properties: req.samlLogoutRequest})
           res.redirect(url)
         }
       })
@@ -343,24 +344,36 @@ function processLogout(req, res) {
 		if (err) {
 			logger.log2('error', err.stack) // Partial or failed Logout
 			res.send(JSON.stringify(err))
-		} else if (profile) { // Logout Request
-			if (req.session && req.session.authenticating) {
-				req.samlLogoutRequest = profile
+		} else if (profile) { // received a Logout Request
+      appInsights.defaultClient.trackEvent({name: "IDP-Initiated Logout Request", properties: profile})
+
+      req.samlLogoutRequest = profile
+      if (!req.session || !req.headers.cookie || !req.headers.cookie.includes('session_id=')) { // Can't find our session cookie(s). Probably blocked.
+        req.samlLogoutRequest.status = 'urn:oasis:names:tc:SAML:2.0:status:Responder'
+        req.samlLogoutRequest.reason = 'Session not found'
+      }
+			else if (req.session && req.session.authenticating) { // Login is in flight. Must be Administrative SLO.
+        req.samlLogoutRequest.reason = "New session"
+      }
+      else if (!req.cookies.session_id || req.cookies.session_id.length === 0) { // Already logged off. Possible duplicate request.
+        req.samlLogoutRequest.reason = "Old session"
+       }
+
+      if (req.samlLogoutRequest.reason) { // Respond immediately
 				strategy._saml.getLogoutResponseUrl(req, {}, (err, url) => {
 					if (err) {
 						webutil.handleError(req, res, err.message)
 					} else {
-            appInsights.defaultClient.trackEvent({name: "IDP-Administrative Logout Response", properties: req.samlLogoutRequest})
+            appInsights.defaultClient.trackEvent({name: "IDP-Initiated Logout Response", properties: req.samlLogoutRequest})
 						res.redirect(url)
 					}
 				})
-			} else {
+			} else { // Propogate logout to oxAuth
 				req.user.logoutRequest = profile
 				const redirectUri = encodeURIComponent('https://' + req.hostname + '/passport/logout/response')
-        appInsights.defaultClient.trackEvent({name: "IDP-Initiated Logout Request", properties: req.user.logoutRequest})
 				res.redirect('/oxauth/restv1/end_session?post_logout_redirect_uri=' + redirectUri)
 			}
-		} else { // Logout Response
+		} else { // Sending Logout Response
       appInsights.defaultClient.trackEvent({name: "SP-Initiated Logout Response", properties: profile})
 			res.send("Success")
 		}
