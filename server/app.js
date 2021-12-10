@@ -5,6 +5,7 @@ const confDiscovery = require('./utils/configDiscovery')
 const providers = require('./providers')
 const passportFile = config.get('passportFile')
 const AppFactory = require('./app-factory')
+const rateLimiter = require('./utils/rate-limiter')
 
 let httpServer
 let httpPort = -1
@@ -49,6 +50,7 @@ function reconfigure (cfg) {
   // Apply all runtime configuration changes
   logger.configure(cfg.conf.logging)
   providers.setup(cfg.providers)
+  app.rateLimiter = rateLimiter.configure(10000, 10)
   recreateHttpServer(cfg.conf.serverURI, cfg.conf.serverWebPort)
 }
 
