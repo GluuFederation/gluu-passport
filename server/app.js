@@ -46,11 +46,12 @@ function recreateHttpServer (serverURI, port) {
 function reconfigure (cfg) {
   global.config = cfg.conf
   global.iiconfig = cfg.idpInitiated
+  const { windoMs, max } = cfg.conf.rateLimit
 
   // Apply all runtime configuration changes
   logger.configure(cfg.conf.logging)
   providers.setup(cfg.providers)
-  app.rateLimiter = rateLimiter.configure(10000, 10)
+  rateLimiter.configure(app, windoMs, max)
   recreateHttpServer(cfg.conf.serverURI, cfg.conf.serverWebPort)
 }
 

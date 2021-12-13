@@ -39,6 +39,10 @@ const passportConfigAuthorizedResponse = {
         password: '',
         port: 0
       }
+    },
+    rateLimit: {
+      windowMs: 24 * 60 * 60 * 1000,
+      max: 100
     }
   },
   idpInitiated: {
