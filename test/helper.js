@@ -1,13 +1,15 @@
 // Use this file to avoid repeating yourself (DRY!), helper functions.
+const config = require('config')
+const chai = require('chai')
+const chaiHttp = require('chai-http')
 
 const InitMock = require('./testdata/init-mock')
 const logger = require('../server/utils/logging')
-const config = require('config')
-const basicConfig = config.get('passportConfig')
-const chai = require('chai')
-const chaiHttp = require('chai-http')
-chai.use(chaiHttp)
+const rateLimiter = require('../server/utils/rate-limiter')
 
+chai.use(chaiHttp)
+const basicConfig = config.get('passportConfig')
+const rateLimitConfig = config.get('passportConfigAuthorizedResponse').conf.rateLimit
 /**
  * Mocks external endpoints for app initalization
  */
@@ -37,7 +39,11 @@ const setupServer = async function () {
   await app.on('appStarted', () => {
     console.log('app started...')
   })
+
+  const { windowMs, max } = rateLimitConfig
+  rateLimiter.configure(app, windowMs, max)
   await app.rateLimiter.resetKey('::ffff:127.0.0.1')
+
   return chai.request(app).keepOpen()
 }
 
