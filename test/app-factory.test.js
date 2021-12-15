@@ -96,28 +96,21 @@ describe('empty rateLimiter middleware', () => {
   })
 })
 
-describe('session middleware', () => {
-  const rewiredSession = appFactoryRewire.__get__('session')
-  const { session } = require('../server/utils/session')
-
-  it('should exist', () => {
-    assert.exists(rewiredSession)
+describe('empty session middleware', () => {
+  let app
+  it('app should have session', () => {
+    const spyApp = spyOnAppUse()
+    app = spyApp.app
+    assert.exists(app.session)
   })
 
-  it('should be a function', () => {
-    assert.isFunction(rewiredSession)
-  })
-
-  it('should be equal session middleware', () => {
-    assert.equal(rewiredSession, session)
-  })
-
-  it('should be called once as app.use arg', () => {
-    const { appUseSpy } = spyOnAppUse()
-    assertCalledWithFunctionAsArg(appUseSpy, rewiredSession)
+  it('app should have session as a function', () => {
+    assert.isFunction(app.session)
     sinon.restore()
   })
+})
 
+describe('session middleware', () => {
   describe('proxy setup', () => {
     it('app.set should be called once w/ params', () => {
       const app = appFactoryRewire.__get__('app')
