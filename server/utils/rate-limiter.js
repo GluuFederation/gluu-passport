@@ -4,7 +4,7 @@ let checkWindowMs = 0
 let checkMax = 0
 
 const configure = (app, windowMs = 86400000, max = 1000) => {
-  if (windowMs === checkWindowMs && checkMax === max) {
+  if (windowMs === checkWindowMs && max === checkMax) {
     logger.log2('debug', 'Skip ratelimit config, already config with same values')
     return
   }
