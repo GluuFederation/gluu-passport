@@ -6,6 +6,7 @@ const providers = require('./providers')
 const passportFile = config.get('passportFile')
 const AppFactory = require('./app-factory')
 const rateLimiter = require('./utils/rate-limiter')
+const session = require('./utils/session')
 
 let httpServer
 let httpPort = -1
@@ -46,12 +47,16 @@ function recreateHttpServer (serverURI, port) {
 function reconfigure (cfg) {
   global.config = cfg.conf
   global.iiconfig = cfg.idpInitiated
+  // const { windoMs, max } = { windoMs: 10000, max: 10 }
+  // const { cookieSameSite, cookieSecure } = { cookieSameSite: 'none', cookieSecure: true }
   const { windoMs, max } = cfg.conf.rateLimit
+  const { cookieSameSite, cookieSecure } = cfg.conf.session
 
   // Apply all runtime configuration changes
   logger.configure(cfg.conf.logging)
   providers.setup(cfg.providers)
   rateLimiter.configure(app, windoMs, max)
+  session.configure(app, cookieSameSite, cookieSecure)
   recreateHttpServer(cfg.conf.serverURI, cfg.conf.serverWebPort)
 }
 

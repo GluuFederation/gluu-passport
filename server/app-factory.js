@@ -9,7 +9,6 @@ const routes = require('./routes')
 const metricsMiddleware = require('../server/utils/metrics')
 const { globalErrorHandler } = require('./utils/error-handler')
 const flash = require('connect-flash')
-const { session } = require('./utils/session')
 // Setup http proxy config
 require('./utils/http-global-proxy')
 
@@ -24,12 +23,13 @@ class AppFactory {
 
     // store rateLimiter for later manipulation/reset
     app.rateLimiter = (req, res, next) => next()
+    app.session = (req, res, next) => next()
     app.use((req, res, next) => {
-      return app.rateLimiter(req, res, next)
+      app.session(req, res, next)
+      app.rateLimiter(req, res, next)
     })
 
     app.set('trust proxy', 1)
-    app.use(session)
     app.use(passport.initialize())
     app.use(passport.session())
     app.use('/passport', routes)
