@@ -6,10 +6,13 @@ const chaiHttp = require('chai-http')
 const InitMock = require('./testdata/init-mock')
 const logger = require('../server/utils/logging')
 const rateLimiter = require('../server/utils/rate-limiter')
+const session = require('../server/utils/session')
 
 chai.use(chaiHttp)
 const basicConfig = config.get('passportConfig')
-const rateLimitConfig = config.get('passportConfigAuthorizedResponse').conf.rateLimit
+const passportConfig = config.get('passportConfigAuthorizedResponse').conf
+const rateLimitConfig = passportConfig.rateLimit
+const sessionConfig = passportConfig.session
 /**
  * Mocks external endpoints for app initalization
  */
@@ -42,6 +45,10 @@ const setupServer = async function () {
 
   const { windowMs, max } = rateLimitConfig
   rateLimiter.configure(app, windowMs, max)
+
+  const { cookieSameSite, cookieSecure } = sessionConfig
+  session.configure(app, cookieSameSite, cookieSecure)
+
   await app.rateLimiter.resetKey('::ffff:127.0.0.1')
 
   return chai.request(app).keepOpen()
