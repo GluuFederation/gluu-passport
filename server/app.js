@@ -47,8 +47,6 @@ function recreateHttpServer (serverURI, port) {
 function reconfigure (cfg) {
   global.config = cfg.conf
   global.iiconfig = cfg.idpInitiated
-  // const { windoMs, max } = { windoMs: 10000, max: 10 }
-  // const { cookieSameSite, cookieSecure } = { cookieSameSite: 'none', cookieSecure: true }
   const { windoMs, max } = cfg.conf.rateLimit
   const { cookieSameSite, cookieSecure } = cfg.conf.session
 
