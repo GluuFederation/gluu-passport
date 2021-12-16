@@ -25,8 +25,11 @@ class AppFactory {
     app.rateLimiter = (req, res, next) => next()
     app.session = (req, res, next) => next()
     app.use((req, res, next) => {
-      app.session(req, res, next)
       app.rateLimiter(req, res, next)
+    })
+
+    app.use((req, res, next) => {
+      app.session(req, res, next)
     })
 
     app.set('trust proxy', 1)
