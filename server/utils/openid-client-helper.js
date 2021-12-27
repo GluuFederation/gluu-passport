@@ -1,4 +1,4 @@
-const { JWK: { generateSync }, JWKS: { KeyStore, asKeyStore } } = require('jose')
+const { generateKeyPair, exportJWK, calculateJwkThumbprint } = require('jose')
 const { Issuer } = require('openid-client')
 const path = require('path')
 const fs = require('fs')
@@ -12,11 +12,14 @@ const clientJWKSFilePath = path.join(`${process.cwd()}/server`, 'jwks')
  * @returns undefined
  */
 async function generateJWKS (provider) {
-  const keyType = generateSync('RSA')
-  const keyStore = new KeyStore(keyType)
+  const { privateKey, publicKey } = await generateKeyPair('RS256')
+  const privateJwk = await exportJWK(privateKey)
+  const publicJwk = await exportJWK(publicKey)
+  const kid = await calculateJwkThumbprint(publicJwk)
+  privateJwk.kid = kid
   const fileName = path.join(fileUtils.makeDir(clientJWKSFilePath), provider.id + '.json')
   if (!fs.existsSync(fileName)) {
-    await fileUtils.writeDataToFile(fileName, JSON.stringify(keyStore.toJWKS(true)))
+    await fileUtils.writeDataToFile(fileName, JSON.stringify({ keys: [privateJwk] }))
   }
 }
 
@@ -55,8 +58,7 @@ async function getClient (provider) {
     // generate jwks
     await generateJWKS(provider)
     const jwks = require(path.join(fileUtils.makeDir(clientJWKSFilePath), `${provider.id}.json`))
-    const ks = asKeyStore(jwks)
-    client = new issuer.Client(options, ks.toJWKS(true))
+    client = new issuer.Client(options, jwks)
   } else {
     client = new issuer.Client(options)
   }
