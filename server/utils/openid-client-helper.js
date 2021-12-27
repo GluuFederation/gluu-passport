@@ -12,15 +12,17 @@ const clientJWKSFilePath = path.join(`${process.cwd()}/server`, 'jwks')
  * @returns undefined
  */
 async function generateJWKS (provider) {
+  const fileName = path.join(fileUtils.makeDir(clientJWKSFilePath), provider.id + '.json')
+  if (fs.existsSync(fileName)) {
+    return
+  }
+
   const { privateKey, publicKey } = await generateKeyPair('RS256')
   const privateJwk = await exportJWK(privateKey)
   const publicJwk = await exportJWK(publicKey)
   const kid = await calculateJwkThumbprint(publicJwk)
   privateJwk.kid = kid
-  const fileName = path.join(fileUtils.makeDir(clientJWKSFilePath), provider.id + '.json')
-  if (!fs.existsSync(fileName)) {
-    await fileUtils.writeDataToFile(fileName, JSON.stringify({ keys: [privateJwk] }))
-  }
+  await fileUtils.writeDataToFile(fileName, JSON.stringify({ keys: [privateJwk] }))
 }
 
 const clients = []
