@@ -19,11 +19,15 @@ describe('Integration Test OpenID Client Helper', () => {
       assert.exists(jwksFilePath, `${jwksFilePath} file not found`)
     })
 
-    it('make sure jwks has keys and kid', () => {
+    it('make sure jwks has keys, kid, n and kty', () => {
       const jwks = require(jwksFilePath)
       assert.isArray(jwks.keys, 'keys not found in jwks')
       kid = jwks.keys[0].kid
+      const n = jwks.keys[0].n
+      const kty = jwks.keys[0].kty
       assert.exists(kid, 'kid not found in jwks')
+      assert.exists(kty, 'kty not found in jwks')
+      assert.exists(n, 'n not found in jwks')
     })
 
     it('make sure generateJWKS not regenerating jwks again and rewrite existing jwks data', async () => {
