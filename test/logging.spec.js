@@ -9,12 +9,12 @@ const convertOneDigitToTwo = (number) => {
 }
 
 describe('logging', () => {
-  it('should log currect datetime', async () => {
+  it('should log currect datetime once app start', async () => {
     const passportLogFilePath = path.join(__dirname, '../server/utils/logs/passport.log')
-    const data = await fs.readFile(passportLogFilePath, 'binary')
+    const logText = await fs.readFile(passportLogFilePath, 'binary')
     const newDate = new Date()
     // YYYY-MM-DD HH
     const currentDateTimeTillHour = `${newDate.getFullYear()}-${convertOneDigitToTwo(newDate.getMonth() + 1)}-${convertOneDigitToTwo(newDate.getDate())} ${convertOneDigitToTwo(newDate.getHours())}`
-    assert(data.includes(currentDateTimeTillHour), 'date time is not syncing')
+    assert(logText.includes(currentDateTimeTillHour), 'date time is not syncing')
   })
 })
