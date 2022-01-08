@@ -39,7 +39,7 @@
     "csurf": "^1.11.0",
     "express": "^4.16.4",
     "express-prom-bundle": "^6.3.6",
-    "express-rate-limit": "^5.2.3",
+    "express-rate-limit": "^6.0.5",
     "express-session": "^1.17.2",
     "global-agent": "^3.0.0",
     "got": "^11.8.1",
