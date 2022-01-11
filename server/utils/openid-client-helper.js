@@ -1,4 +1,4 @@
-const { generateKeyPair, exportJWK, calculateJwkThumbprint } = require('jose')
+const jose = require('jose')
 const { Issuer } = require('openid-client')
 const path = require('path')
 const fs = require('fs')
@@ -17,10 +17,10 @@ async function generateJWKS (provider) {
     return
   }
 
-  const { privateKey, publicKey } = await generateKeyPair('RS256')
-  const privateJwk = await exportJWK(privateKey)
-  const publicJwk = await exportJWK(publicKey)
-  const kid = await calculateJwkThumbprint(publicJwk)
+  const { privateKey, publicKey } = await jose.generateKeyPair('RS256')
+  const privateJwk = await jose.exportJWK(privateKey)
+  const publicJwk = await jose.exportJWK(publicKey)
+  const kid = await jose.calculateJwkThumbprint(publicJwk)
   privateJwk.kid = kid
   await fileUtils.writeDataToFile(fileName, JSON.stringify({ keys: [privateJwk] }))
 }

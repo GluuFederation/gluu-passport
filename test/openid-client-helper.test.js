@@ -5,6 +5,10 @@ const rewiredOpenIDClientHelper = rewire('../server/utils/openid-client-helper')
 const InitMock = require('./testdata/init-mock')
 const config = require('config')
 const nock = require('nock')
+const sinon = require('sinon')
+const jose = require('jose')
+const { v4: uuidv4 } = require('uuid')
+const fileUtils = require('../server/utils/file-utils')
 
 const assert = chai.assert
 const passportConfigAuthorizedResponse = config.get('passportConfigAuthorizedResponse')
@@ -14,6 +18,11 @@ describe('Test OpenID Client Helper', () => {
 
   describe('generateJWKS test', () => {
     const generateJWKS = rewiredOpenIDClientHelper.__get__('generateJWKS')
+    const callGenerateJWKS = async () => {
+      try {
+        await generateJWKS({ id: uuidv4() })
+      } catch (e) {}
+    }
 
     it('should exist', () => {
       assert.exists(generateJWKS)
@@ -21,6 +30,44 @@ describe('Test OpenID Client Helper', () => {
 
     it('should be function', () => {
       assert.isFunction(generateJWKS, 'generateJWKS is not a function')
+    })
+
+    it('should call fileUtils.makeDir once', async () => {
+      const makeDirSpy = sinon.spy(fileUtils, 'makeDir')
+      await callGenerateJWKS()
+      assert.isTrue(makeDirSpy.calledOnce)
+      sinon.restore()
+    })
+
+    it('should call generateKeyPair once', async () => {
+      const generateKeyPairSpy = sinon.spy()
+      sinon.stub(jose, 'generateKeyPair').value(generateKeyPairSpy)
+      await callGenerateJWKS()
+      assert.isTrue(generateKeyPairSpy.calledOnce)
+      sinon.restore()
+    })
+
+    it('should call exportJWK twice', async () => {
+      const exportJWKSpy = sinon.spy()
+      sinon.stub(jose, 'exportJWK').value(exportJWKSpy)
+      await callGenerateJWKS()
+      assert.isTrue(exportJWKSpy.calledTwice)
+      sinon.restore()
+    })
+
+    it('should call calculateJwkThumbprint once', async () => {
+      const calculateJwkThumbprintSpy = sinon.spy()
+      sinon.stub(jose, 'calculateJwkThumbprint').value(calculateJwkThumbprintSpy)
+      await callGenerateJWKS()
+      assert.isTrue(calculateJwkThumbprintSpy.calledOnce)
+      sinon.restore()
+    })
+
+    it('should call fileUtils.writeDataToFile once', async () => {
+      const writeDataToFileSpy = sinon.spy(fileUtils, 'writeDataToFile')
+      await callGenerateJWKS()
+      assert.isTrue(writeDataToFileSpy.calledOnce)
+      sinon.restore()
     })
   })
 
