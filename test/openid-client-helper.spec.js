@@ -42,7 +42,7 @@ describe('Integration Test OpenID Client Helper', () => {
 
     it('make sure generateJWKS not regenerating jwks again and rewrite existing jwks data', async () => {
       await generateJWKS(testProvider)
-      const jwks = require(jwksFilePath)
+      jwks = require(jwksFilePath)
       assert.equal(kid, jwks.keys[0].kid, `${kid} is not matching with ${jwks.keys[0].kid}`)
     })
   })
