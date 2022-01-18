@@ -85,13 +85,6 @@ describe('logging.js file', () => {
       it('write property should be function', () => {
         assert.isFunction(rewiredLogger.stream.write, 'steam.write is not a function')
       })
-      it('write property should call log2 once', () => {
-        // Todo this case is failing
-        // const rewiredLog2 = rewiredLogging.__get__('log2')
-        // const log2Spy = sinon.spy(rewiredLog2)
-        // rewiredLogger.stream.write('tEMp')
-        // sinon.assert.calledOnce(log2Spy)
-      })
     })
   })
 })
