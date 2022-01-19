@@ -86,17 +86,5 @@ describe('logging.js file', () => {
         assert.isFunction(rewiredLogger.stream.write, 'steam.write is not a function')
       })
     })
-    // this is NOT a unit test:
-    //
-    // it('should log currect datetime', async () => {
-    //   const passportLogFilePath = path.join(__dirname, '../server/utils/logs/passport.log')
-    //   console.log(passportLogFilePath)
-    //   const logData = await fs.readFile(passportLogFilePath, 'binary')
-    //   const newDate = new Date()
-    //   // YYYY-MM-DD HH
-    //   const currentDateTimeTillHour = `${newDate.getFullYear()}-${('0' + (newDate.getMonth() + 1)).slice(-2)}-${newDate.getDate()} ${newDate.getHours()}`
-    //   // assert(logData.includes(currentDateTimeTillHour))
-    //   assert.include(logData, currentDateTimeTillHour)
-    // })
   })
 })
