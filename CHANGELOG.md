@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.7.0](https://github.com/GluuFederation/gluu-passport/compare/v4.6.1...v4.7.0) (2021-11-15)
+
+
+### Features
+
+* **config:** call parseInt with env value ([a9718a3](https://github.com/GluuFederation/gluu-passport/commit/a9718a348f495ee717b6872078b0915c0e28a504))
+* **config:** load rateLimitWindowMs from env ([f9ad430](https://github.com/GluuFederation/gluu-passport/commit/f9ad43089f90866ff51448e886dcf4390c514d36))
+
+
+### Bug Fixes
+
+* **lockfile:** use correct version ([e1a7dc9](https://github.com/GluuFederation/gluu-passport/commit/e1a7dc92bbd34617b24bdb5ee64e39586e402626))
+* **loggin.js:** add winston patch to fix date problem ([#365](https://github.com/GluuFederation/gluu-passport/issues/365)) ([f8d2206](https://github.com/GluuFederation/gluu-passport/commit/f8d22066692a82b4f2defb45186615a78725821b)), closes [#363](https://github.com/GluuFederation/gluu-passport/issues/363)
+* **production:** allow rate limit settings to be loaded from env ([2001ce4](https://github.com/GluuFederation/gluu-passport/commit/2001ce41ef73299a207bec345f7eeb4428b04491))
+
 ### [4.6.1](https://github.com/GluuFederation/gluu-passport/compare/v4.6.0...v4.6.1) (2021-09-13)
 
 
