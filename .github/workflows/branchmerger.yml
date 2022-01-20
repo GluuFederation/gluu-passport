@@ -1,18 +1,17 @@
-# REACTIVATE WHEN NEXT VERSION BRANCH NAME IS DEFINED
-# name: Merge master to other branches
-# on:
-#   push:
-#     branches:
-#       - 'master'
-# jobs:
-#   sync-branch:
-#     runs-on: ubuntu-latest
-#     steps:
-#         - uses: actions/checkout@master
-#         - name: Merge master -> version_4.3.0
-#           uses: devmasx/merge-branch@v1.3.0
-#           with:
-#               type: now
-#               head_to_merge: ${{ github.ref }}
-#               target_branch: version_4.3.0
-#               github_token: ${{ github.token }}
+name: Merge master to other branches
+on:
+  push:
+    branches:
+      - 'master'
+jobs:
+  sync-branch:
+    runs-on: ubuntu-latest
+    steps:
+        - uses: actions/checkout@master
+        - name: Merge master -> version_4.3.2
+          uses: devmasx/merge-branch@v1.3.0
+          with:
+              type: now
+              head_to_merge: ${{ github.ref }}
+              target_branch: version_4.3.2
+              github_token: ${{ github.token }}
