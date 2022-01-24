@@ -1,10 +1,12 @@
+import chai from 'chai'
+import rewire from 'rewire'
+import sinon from 'sinon'
+import { rateLimiter } from '../server/utils/rate-limiter'
+import flash from 'connect-flash'
+import { session } from '../server/utils/session'
 
-const chai = require('chai')
-const assert = chai.assert
-const rewire = require('rewire')
 const appFactoryRewire = rewire('../server/app-factory.js')
-const sinon = require('sinon')
-const { rateLimiter } = require('../server/utils/rate-limiter')
+const assert = chai.assert
 
 /**
  * Helper: Returns the argument call number with matching args
@@ -57,7 +59,6 @@ describe('connect-flash middleware', () => {
   })
 
   it('should be called once as app.use arg', () => {
-    const flash = require('connect-flash')
     const appUseSpy = spyOnAppUse()
 
     assertCalledWithFunctionAsArg(appUseSpy, flash())
@@ -107,8 +108,6 @@ describe('rateLimiter middleware', () => {
 
 describe('session middleware', () => {
   const rewiredSession = appFactoryRewire.__get__('session')
-  const { session } = require('../server/utils/session')
-
   it('should exist', () => {
     assert.exists(rewiredSession)
   })
