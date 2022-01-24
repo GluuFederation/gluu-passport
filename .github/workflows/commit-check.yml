@@ -32,7 +32,7 @@ jobs:
           node-version: 14
       - run: |
           npm install --save-dev @commitlint/{config-conventional,cli}
-          echo "module.exports = {extends: ['@commitlint/config-conventional']};" > commitlint.config.js
+          echo "module.exports = {extends: ['@commitlint/config-conventional']};" > commitlint.config.cjs
 
         # If this workflow was triggered by a push then resolve the commit message from HEAD
       - name: "[Push] Check Commit Standard"
