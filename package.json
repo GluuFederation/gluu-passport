@@ -2,6 +2,7 @@
   "name": "passport",
   "version": "5.3.1",
   "private": true,
+  "type": "module",
   "nyc": {
     "all": true,
     "include": [
