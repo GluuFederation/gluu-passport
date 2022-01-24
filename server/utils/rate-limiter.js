@@ -1,5 +1,5 @@
-const rateLimit = require('express-rate-limit')
-const config = require('config')
+import rateLimit from 'express-rate-limit'
+import config from 'config'
 
 const windowMs = config.get('rateLimitWindowMs')
 const max = config.get('rateLimitMaxRequestAllow')
@@ -11,6 +11,4 @@ const rateLimiter = rateLimit({
   headers: true
 })
 
-module.exports = {
-  rateLimiter
-}
+export default rateLimiter

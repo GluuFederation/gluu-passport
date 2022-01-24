@@ -1,7 +1,7 @@
 import chai from 'chai'
 import rewire from 'rewire'
 import sinon from 'sinon'
-import { rateLimiter } from '../server/utils/rate-limiter'
+import rateLimiter from '../server/utils/rate-limiter.js'
 import flash from 'connect-flash'
 import { session } from '../server/utils/session'
 
