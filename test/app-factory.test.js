@@ -3,7 +3,7 @@ import rewire from 'rewire'
 import sinon from 'sinon'
 import rateLimiter from '../server/utils/rate-limiter.js'
 import flash from 'connect-flash'
-import { session } from '../server/utils/session.js'
+import session from '../server/utils/session.js'
 
 const appFactoryRewire = rewire('../server/app-factory.js')
 const assert = chai.assert

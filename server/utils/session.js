@@ -1,7 +1,7 @@
 import expressSession from 'express-session'
 import MemoryStore from 'memorystore'
 import config from 'config'
-import { randomSecret } from '../utils/misc'
+import { randomSecret } from '../utils/misc.js'
 MemoryStore(expressSession)
 
 const expressSessionConfig = {
