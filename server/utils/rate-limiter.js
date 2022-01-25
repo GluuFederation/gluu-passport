@@ -4,11 +4,9 @@ import config from 'config'
 const windowMs = config.get('rateLimitWindowMs')
 const max = config.get('rateLimitMaxRequestAllow')
 
-const rateLimiter = rateLimit({
+export default rateLimit({
   windowMs,
   max,
   message: `You have exceeded the ${max} requests in ${windowMs} milliseconds limit!`,
   headers: true
 })
-
-export default rateLimiter
