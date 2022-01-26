@@ -1,8 +1,8 @@
 import expressSession from 'express-session'
-import MemoryStore from 'memorystore'
+import createMemoryStore from 'memorystore'
 import config from 'config'
 import { randomSecret } from '../utils/misc.js'
-MemoryStore(expressSession)
+const MemoryStore = createMemoryStore(expressSession)
 
 const expressSessionConfig = {
   cookie: {
