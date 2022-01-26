@@ -1,9 +1,9 @@
-const config = require('config')
-const R = require('ramda')
-const sha1 = require('sha1')
-const jwt = require('jsonwebtoken')
-const crypto = require('crypto')
-const fs = require('fs')
+import config from 'config'
+import R from 'ramda'
+import sha1 from 'sha1'
+import jwt from 'jsonwebtoken'
+import crypto from 'crypto'
+import fs from 'fs'
 
 const randomSecret = () => {
   const buf = crypto.randomBytes(256)
