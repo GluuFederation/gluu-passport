@@ -1,14 +1,16 @@
-const router = require('express').Router()
-const passport = require('passport')
-const { v4: uuidv4 } = require('uuid')
-const fs = require('fs')
-const idpInitiated = require('./idp-initiated')
-const providersModule = require('./providers')
-const webutil = require('./utils/web-utils')
-const misc = require('./utils/misc')
-const logger = require('./utils/logging')
-const path = require('path')
-const { handleStrategyError } = require('./utils/error-handler')
+import express from 'express'
+import passport from 'passport'
+import { v4 as uuidv4 } from 'uuid'
+import fs from 'fs'
+import idpInitiated from './idp-initiated'
+import providersModule from './providers'
+import webutil from './utils/web-utils'
+import misc from './utils/misc'
+import logger from './utils/logging'
+import path from 'path'
+import { handleStrategyError } from './utils/error-handler'
+
+const router = express.Router()
 
 router.get('/health-check', function (req, res) {
   return res.send({ message: 'Cool!!!', sessionCookie: req.session.cookie })
@@ -206,4 +208,4 @@ function callbackResponse (req, res) {
   )
 }
 
-module.exports = router
+export default router

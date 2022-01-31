@@ -154,9 +154,9 @@ function log2 (level, msg) {
   sendMQMessage(R.apply(util.format, args))
 }
 
-module.exports = {
-  logger: logger,
-  configure: configure,
-  log2: log2,
-  sendMQMessage: sendMQMessage
+export {
+  logger,
+  configure,
+  log2,
+  sendMQMessage
 }
