@@ -1,4 +1,4 @@
-import logger from '../utils/logging.js'
+import * as logger from '../utils/logging.js'
 
 const globalErrorHandler = (err, req, res, next) => {
   logger.log2('error', `Error: ${err}`)
@@ -24,7 +24,7 @@ class StrategyError extends Error {
   }
 }
 
-export default {
+export {
   globalErrorHandler,
   handleStrategyError,
   StrategyError
