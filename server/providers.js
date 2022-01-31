@@ -4,7 +4,7 @@ import spMetadata from './sp-meta.js'
 import misc from './utils/misc.js'
 import logger from './utils/logging.js'
 import extraPassportParams from './extra-passport-params.js'
-import cacheProvider from './cache-provider.js'
+import * as cacheProvider from './cache-provider.js'
 import { getClient } from './utils/openid-client-helper.js'
 
 let prevConfigHash = 0

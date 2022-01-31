@@ -1,7 +1,8 @@
-const redis = require('redis')
-const Memcached = require('memcached')
-const Promise = require('bluebird')
-const logger = require('./utils/logging')
+import redis from 'redis'
+import Memcached from 'memcached'
+import Promise from 'bluebird'
+import * as logger from './utils/logging.js'
+
 const OPERATION_NO_CONN = 'Attempt to operate on cache provider but connection has not been established'
 
 const promisify = (context, methodName) => Promise.promisify(context[methodName], { context: context })
@@ -112,6 +113,6 @@ function get (type, options, expiration) {
   }
 }
 
-module.exports = {
-  get: get
+export {
+  get
 }
