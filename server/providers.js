@@ -1,11 +1,11 @@
 import passport from 'passport'
 import R from 'ramda'
-import spMetadata from './sp-meta'
-import misc from './utils/misc'
-import logger from './utils/logging'
-import extraPassportParams from './extra-passport-params'
-import cacheProvider from './cache-provider'
-import { getClient } from './utils/openid-client-helper'
+import spMetadata from './sp-meta.js'
+import misc from './utils/misc.js'
+import logger from './utils/logging.js'
+import extraPassportParams from './extra-passport-params.js'
+import cacheProvider from './cache-provider.js'
+import { getClient } from './utils/openid-client-helper.js'
 
 let prevConfigHash = 0
 
