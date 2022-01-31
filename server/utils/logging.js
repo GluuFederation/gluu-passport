@@ -1,12 +1,12 @@
-const fs = require('fs')
-const winston = require('winston')
-const DailyRotateFile = require('winston-daily-rotate-file')
-const Stomp = require('stomp-client')
-const util = require('util')
-const R = require('ramda')
-const misc = require('./misc')
+import fs from 'fs'
+import winston from 'winston'
+import DailyRotateFile from 'winston-daily-rotate-file'
+import Stomp from 'stomp-client'
+import util from 'util'
+import R from 'ramda'
+import misc from './misc'
+import path from 'path'
 const format = winston.format
-const path = require('path')
 
 const dir = process.env.NODE_LOGGING_DIR || path.join(__dirname, 'logs')
 
