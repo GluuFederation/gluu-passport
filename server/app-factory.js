@@ -8,9 +8,9 @@ import logger from './utils/logging.js'
 import routes from './routes.js'
 import metricsMiddleware from '../server/utils/metrics.js'
 import { globalErrorHandler } from './utils/error-handler.js'
-import { rateLimiter } from './utils/rate-limiter'
-import { session } from './utils/session'
-import './utils/http-global-proxy'
+import rateLimiter from './utils/rate-limiter.js'
+import session from './utils/session.js'
+import './utils/http-global-proxy.js'
 const app = express()
 // Setup http proxy config
 
