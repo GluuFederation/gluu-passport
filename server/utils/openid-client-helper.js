@@ -1,9 +1,9 @@
-const jose = require('jose')
-const { Issuer } = require('openid-client')
-const path = require('path')
-const fs = require('fs')
-const fileUtils = require('../utils/file-utils')
-const { logger } = require('./logging')
+import * as jose from 'jose'
+import { Issuer } from 'openid-client'
+import path from 'path'
+import fs from 'fs'
+import * as fileUtils from '../utils/file-utils.js'
+import { logger } from './logging.js'
 const clientJWKSFilePath = path.join(`${process.cwd()}/server`, 'jwks')
 
 /**
@@ -69,7 +69,7 @@ async function getClient (provider) {
   return client
 }
 
-module.exports = {
+export {
   getClient,
   generateJWKS
 }

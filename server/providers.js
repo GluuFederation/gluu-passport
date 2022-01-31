@@ -3,7 +3,7 @@ import R from 'ramda'
 import spMetadata from './sp-meta.js'
 import misc from './utils/misc.js'
 import logger from './utils/logging.js'
-import extraPassportParams from './extra-passport-params.js'
+import * as extraPassportParams from './extra-passport-params.js'
 import * as cacheProvider from './cache-provider.js'
 import { getClient } from './utils/openid-client-helper.js'
 
