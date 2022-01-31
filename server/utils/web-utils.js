@@ -9,6 +9,6 @@ function handleError (req, res, msg) {
   }
 }
 
-module.exports = {
-  handleError: handleError
+export {
+  handleError
 }

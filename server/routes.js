@@ -4,11 +4,11 @@ import { v4 as uuidv4 } from 'uuid'
 import fs from 'fs'
 import idpInitiated from './idp-initiated.js'
 import providersModule from './providers.js'
-import webutil from './utils/web-utils'
-import misc from './utils/misc'
-import logger from './utils/logging'
+import webutil from './utils/web-utils.js'
+import misc from './utils/misc.js'
+import logger from './utils/logging.js'
 import path from 'path'
-import { handleStrategyError } from './utils/error-handler'
+import { handleStrategyError } from './utils/error-handler.js'
 
 const router = express.Router()
 
