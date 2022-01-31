@@ -1,11 +1,11 @@
-const passport = require('passport')
-const R = require('ramda')
-const spMetadata = require('./sp-meta')
-const misc = require('./utils/misc')
-const logger = require('./utils/logging')
-const extraPassportParams = require('./extra-passport-params')
-const cacheProvider = require('./cache-provider')
-const { getClient } = require('./utils/openid-client-helper')
+import passport from 'passport'
+import R from 'ramda'
+import spMetadata from './sp-meta'
+import misc from './utils/misc'
+import logger from './utils/logging'
+import extraPassportParams from './extra-passport-params'
+import cacheProvider from './cache-provider'
+import { getClient } from './utils/openid-client-helper'
 
 let prevConfigHash = 0
 
@@ -272,7 +272,7 @@ function setup (providers) {
   }
 }
 
-module.exports = {
-  setup: setup,
-  applyMapping: applyMapping
+export {
+  setup,
+  applyMapping
 }

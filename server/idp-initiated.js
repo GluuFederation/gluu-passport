@@ -139,4 +139,6 @@ function process (req, res, next) {
   }
 }
 
-export default process
+export {
+  process
+}
