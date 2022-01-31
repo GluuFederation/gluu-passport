@@ -1,6 +1,6 @@
 import passport from 'passport'
 import R from 'ramda'
-import spMetadata from './sp-meta.js'
+import * as spMetadata from './sp-meta.js'
 import * as misc from './utils/misc.js'
 import * as logger from './utils/logging.js'
 import * as extraPassportParams from './extra-passport-params.js'
