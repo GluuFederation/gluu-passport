@@ -1,9 +1,9 @@
 import R from 'ramda'
 import { v4 as uuidv4 } from 'uuid'
-import providersModule from './providers'
-import webutil from './utils/web-utils'
-import misc from './utils/misc'
-import logger from './utils/logging'
+import providersModule from './providers.js'
+import webutil from './utils/web-utils.js'
+import misc from './utils/misc.js'
+import logger from './utils/logging.js'
 import base64url from 'base64url'
 import querystring from 'querystring'
 
