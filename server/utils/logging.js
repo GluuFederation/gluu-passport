@@ -4,7 +4,7 @@ import DailyRotateFile from 'winston-daily-rotate-file'
 import Stomp from 'stomp-client'
 import util from 'util'
 import R from 'ramda'
-import misc from './misc.js'
+import * as misc from './misc.js'
 import path from 'path'
 const format = winston.format
 
