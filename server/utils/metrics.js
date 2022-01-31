@@ -1,7 +1,7 @@
 // openmetrics middleware
 
-const promBundle = require('express-prom-bundle')
-const promClient = require('prom-client')
+import promBundle from 'express-prom-bundle'
+import promClient from 'prom-client'
 
 promClient.register.clear()
 
@@ -27,4 +27,4 @@ const metricsMiddleware = promBundle({
   ]
 })
 
-module.exports = metricsMiddleware
+export default metricsMiddleware
