@@ -1,16 +1,15 @@
-
-const chai = require('chai')
-const rewire = require('rewire')
-const cacheProviders = rewire('../server/cache-provider.js')
-const testConfig = require('../config/test')
-const redis = require('redis')
-const fakeredis = require('fakeredis')
+import chai from 'chai'
+import config from 'config'
+import redis from 'redis'
+import fakeredis from 'fakeredis'
+import * as cacheProviders from '../server/cache-provider.js'
 
 const assert = chai.assert
+const passportConfigAuthorizedResponse = config.get('passportConfigAuthorizedResponse')
 
 describe('cache provider test', () => {
-  const retryStrategy = cacheProviders.__get__('retryStrategy')
-  const testProvider = testConfig.passportConfigAuthorizedResponse.providers.find(provider => provider.id === 'saml-redis-test')
+  const retryStrategy = cacheProviders.retryStrategy
+  const testProvider = passportConfigAuthorizedResponse.providers.find(provider => provider.id === 'saml-redis-test')
   testProvider.options.retry_strategy = retryStrategy
 
   it('redis is not live so we should get connection error response', () => {
@@ -34,7 +33,7 @@ describe('cache provider test', () => {
   })
 
   it('getRedisProvider should return cache handlers', () => {
-    const getRedisProvider = cacheProviders.__get__('getRedisProvider')
+    const getRedisProvider = cacheProviders.getRedisProvider
     const redisHandlers = getRedisProvider(testProvider.options, 100)
     assert.exists(redisHandlers.save, 'Failed to initialize redis provider save handler')
     assert.exists(redisHandlers.get, 'Failed to initialize redis provider get handler')
