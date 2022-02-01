@@ -33,7 +33,7 @@ router.get('/auth/:provider/callback',
 
 router.post('/auth/:provider/callback',
   validateProvider,
-  require('express').urlencoded({ extended: false }),
+  express.urlencoded({ extended: false }),
   authenticateRequestCallback,
   callbackResponse)
 
