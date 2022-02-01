@@ -5,10 +5,12 @@ import Stomp from 'stomp-client'
 import util from 'util'
 import R from 'ramda'
 import * as misc from './misc.js'
-import path from 'path'
+import * as path from 'path'
+import { fileURLToPath } from 'url'
+
 const format = winston.format
 
-const dir = process.env.NODE_LOGGING_DIR || path.join(__dirname, 'logs')
+const dir = process.env.NODE_LOGGING_DIR || path.join(path.dirname(fileURLToPath(import.meta.url)), 'logs')
 
 const defaultLogOptions = {
   filename: dir + '/passport-%DATE%.log',
