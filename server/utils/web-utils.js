@@ -1,4 +1,4 @@
-const R = require('ramda')
+import R from 'ramda'
 
 function handleError (req, res, msg) {
   if (R.isNil(req)) {

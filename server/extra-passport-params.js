@@ -1,5 +1,5 @@
-const fs = require('fs')
-const R = require('ramda')
+import fs from 'fs'
+import R from 'ramda'
 
 // Extra params supplied per strategy
 // They are not set via oxTrust to keep complexity manageable. These params are not expected to change: admins probably will never have to edit the below
@@ -93,6 +93,6 @@ function get (strategyId, paramName) {
   return R.defaultTo({}, R.prop(paramName, obj))
 }
 
-module.exports = {
-  get: get
+export {
+  get
 }
