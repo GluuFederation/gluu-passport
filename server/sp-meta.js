@@ -1,8 +1,8 @@
-const path = require('path')
-const R = require('ramda')
-const misc = require('./utils/misc')
-const logger = require('./utils/logging')
-const fileUtils = require('./utils/file-utils')
+import path from 'path'
+import R from 'ramda'
+import * as misc from './utils/misc.js'
+import * as logger from './utils/logging.js'
+import * as fileUtils from './utils/file-utils.js'
 
 const writeMeta_ = R.curry(fileUtils.writeDataToFile)
 
@@ -19,6 +19,6 @@ function generate (provider, samlStrategy) {
   chain(opts.decryptionCert).catch(err => logger.log2('error', `An error occurred: ${err}`))
 }
 
-module.exports = {
-  generate: generate
+export {
+  generate
 }
