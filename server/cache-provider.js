@@ -114,5 +114,7 @@ function get (type, options, expiration) {
 }
 
 export {
-  get
+  get,
+  retryStrategy,
+  getRedisProvider
 }
