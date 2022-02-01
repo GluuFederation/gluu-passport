@@ -1,8 +1,7 @@
-
-const logger = require('./logging')
-const misc = require('./misc')
-const fs = require('fs')
-const Promise = require('bluebird')
+import * as logger from './logging.js'
+import * as misc from './misc.js'
+import fs from 'fs'
+import Promise from 'bluebird'
 
 /**
  * Write given data to given file
@@ -44,7 +43,7 @@ const makeDir = (path) => {
   return path
 }
 
-module.exports = {
+export {
   makeDir,
   writeDataToFile
 }
