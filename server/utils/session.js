@@ -18,4 +18,9 @@ const expressSessionConfig = {
   saveUninitialized: false
 }
 
-export default expressSession(expressSessionConfig)
+const session = expressSession(expressSessionConfig)
+
+export {
+  session,
+  expressSessionConfig
+}

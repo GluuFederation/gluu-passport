@@ -1,12 +1,8 @@
-const chai = require('chai')
+import { expressSessionConfig, session } from '../server/utils/session.js'
+import chai from 'chai'
 const assert = chai.assert
-const rewire = require('rewire')
-const sessionRewire = rewire('../server/utils/session')
 
 describe('rate-limiter.js test', () => {
-  const expressSessionConfig = sessionRewire.__get__('expressSessionConfig')
-  const session = sessionRewire.__get__('session')
-
   it('expressSessionConfig should exist', () => {
     assert.exists(expressSessionConfig)
   })
