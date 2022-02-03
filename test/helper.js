@@ -1,11 +1,12 @@
 // Use this file to avoid repeating yourself (DRY!), helper functions.
 
-const InitMock = require('./testdata/init-mock')
-const logger = require('../server/utils/logging')
-const config = require('config')
+import InitMock from './testdata/init-mock.js'
+import * as logger from '../server/utils/logging.js'
+import config from 'config'
+import chai from 'chai'
+import chaiHttp from 'chai-http'
+
 const basicConfig = config.get('passportConfig')
-const chai = require('chai')
-const chaiHttp = require('chai-http')
 chai.use(chaiHttp)
 
 /**
@@ -41,7 +42,7 @@ const setupServer = async function () {
   return chai.request(app).keepOpen()
 }
 
-module.exports = {
+export {
   mockedAppInit,
   configureLogger,
   setupServer
