@@ -11,10 +11,30 @@ let httpServer
 let httpPort = -1
 
 const appInsightsKey = config.get('appInsightsKey')
+/**
+ * Telemetry Processor that records the redirect target of IDP-initiated SAML
+ * logout requests. Helpful to troubleshoot SLO failures.
+  * @param {*} envelope 
+ * @param {*} context 
+ * @returns 
+ */
+const logSLORedirectLocation = (envelope, context) => {
+  if (envelope.data.baseType === "RequestData") {
+    const request = context['http.ServerRequest']
+    const response = context['http.ServerResponse']
+    if (request && request.path.startsWith('/auth/saml') && request.method === 'GET' && request.query.hasOwnProperty('SAMLRequest') 
+        && response && response.statusCode === 302) {
+      envelope.data.baseData.properties['Location'] = response.getHeader('location')
+    }
+  }
+  return true;
+};
 
 if (appInsightsKey) {
 	appInsights.setup(appInsightsKey)
   appInsights.defaultClient.context.tags[appInsights.defaultClient.context.keys.cloudRole] = "Passport"
+  appInsights.defaultClient.addTelemetryProcessor(logSLORedirectLocation)
+
   appInsights.start()
 }
 
