@@ -1,14 +1,13 @@
-const chai = require('chai')
-const { Strategy } = require('openid-client')
-const rewire = require('rewire')
-const rewiredOpenIDClientHelper = rewire('../server/utils/openid-client-helper')
-const InitMock = require('./testdata/init-mock')
-const config = require('config')
-const nock = require('nock')
-const sinon = require('sinon')
-const jose = require('jose')
-const { v4: uuidv4 } = require('uuid')
-const fileUtils = require('../server/utils/file-utils')
+import chai from 'chai'
+import { Strategy } from 'openid-client'
+import config from 'config'
+import nock from 'nock'
+import sinon from 'sinon'
+import * as jose from 'jose'
+import { v4 as uuidv4 } from 'uuid'
+import InitMock from './testdata/init-mock.js'
+import { generateJWKS, getIssuer, getClient } from '../server/utils/openid-client-helper.js'
+import * as fileUtils from '../server/utils/file-utils.js'
 
 const assert = chai.assert
 const passportConfigAuthorizedResponse = config.get('passportConfigAuthorizedResponse')
@@ -17,7 +16,6 @@ describe('Test OpenID Client Helper', () => {
   const testProvider = passportConfigAuthorizedResponse.providers.find(p => p.id === 'oidccedev6privatejwt')
 
   describe('generateJWKS test', () => {
-    const generateJWKS = rewiredOpenIDClientHelper.__get__('generateJWKS')
     const callGenerateJWKS = async () => {
       try {
         await generateJWKS({ id: uuidv4() })
@@ -72,8 +70,6 @@ describe('Test OpenID Client Helper', () => {
   })
 
   describe('getIssuer test', () => {
-    const getIssuer = rewiredOpenIDClientHelper.__get__('getIssuer')
-
     it('should exist', () => {
       assert.exists(getIssuer)
     })
@@ -98,8 +94,6 @@ describe('Test OpenID Client Helper', () => {
   })
 
   describe('getClient test', () => {
-    const getClient = rewiredOpenIDClientHelper.__get__('getClient')
-
     it('should exist', () => {
       assert.exists(getClient)
     })

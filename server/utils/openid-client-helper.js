@@ -59,7 +59,12 @@ async function getClient (provider) {
   if (options.token_endpoint_auth_method && options.token_endpoint_auth_method === 'private_key_jwt') {
     // generate jwks
     await generateJWKS(provider)
-    const jwks = require(path.join(fileUtils.makeDir(clientJWKSFilePath), `${provider.id}.json`))
+    const jwks = JSON.parse(
+      fs.readFileSync(
+        new URL(path.join(fileUtils.makeDir(clientJWKSFilePath), `${provider.id}.json`), import.meta.url)
+      )
+    )
+
     client = new issuer.Client(options, jwks)
   } else {
     client = new issuer.Client(options)
@@ -71,5 +76,6 @@ async function getClient (provider) {
 
 export {
   getClient,
-  generateJWKS
+  generateJWKS,
+  getIssuer
 }
