@@ -1,11 +1,10 @@
+import chai from 'chai'
+import * as metrics from '../server/utils/metrics.js'
 
-const chai = require('chai')
 const assert = chai.assert
-const rewire = require('rewire')
-const metrics = rewire('../server/utils/metrics.js')
 
 describe('metrics.js', () => {
-  const promBundle = metrics.__get__('promBundle')
+  const promBundle = metrics.promBundle
   it('promBundle exists', () => {
     assert.exists(
       promBundle,
@@ -19,7 +18,7 @@ describe('metrics.js', () => {
       'promBundle is not a function!')
   })
 
-  const metricsMiddleware = metrics.__get__('metricsMiddleware')
+  const metricsMiddleware = metrics.metricsMiddleware
   it('metricsMiddleware should  not null / undefined', () => {
     assert.exists(
       metricsMiddleware,

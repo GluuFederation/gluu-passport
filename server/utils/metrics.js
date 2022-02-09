@@ -1,5 +1,4 @@
 // openmetrics middleware
-
 import promBundle from 'express-prom-bundle'
 import promClient from 'prom-client'
 
@@ -27,4 +26,7 @@ const metricsMiddleware = promBundle({
   ]
 })
 
-export default metricsMiddleware
+export {
+  metricsMiddleware,
+  promBundle
+}
