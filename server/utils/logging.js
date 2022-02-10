@@ -160,5 +160,8 @@ export {
   logger,
   configure,
   log2,
-  sendMQMessage
+  sendMQMessage,
+  dir,
+  defaultLogOptions,
+  fileLogOptions
 }
