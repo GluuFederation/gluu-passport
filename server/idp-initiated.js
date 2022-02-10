@@ -140,5 +140,6 @@ function process (req, res, next) {
 }
 
 export {
-  process
+  process,
+  createAuthzRequest
 }
