@@ -1,10 +1,10 @@
-const chai = require('chai')
-const config = require('config')
-const rewire = require('rewire')
+import chai from 'chai'
+import config from 'config'
+import esmock from 'esmock'
 
-const assert = chai.assert
 const HTTP_PROXY = config.get('HTTP_PROXY')
 const HTTPS_PROXY = config.get('HTTPS_PROXY')
+const assert = chai.assert
 const NO_PROXY = config.get('NO_PROXY')
 
 describe('global agent proxy setup', () => {
@@ -17,7 +17,7 @@ describe('global agent proxy setup', () => {
   })
 
   it('node global object should have global agent and proxy setup', async () => {
-    rewire('../server/utils/http-global-proxy')
+    await esmock('../server/utils/http-global-proxy', {})
     assert.exists(global.GLOBAL_AGENT)
   })
 
