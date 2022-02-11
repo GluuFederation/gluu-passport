@@ -1,10 +1,6 @@
-
-const rewire = require('rewire')
-const configDiscoveryRewire = rewire('../server/utils/configDiscovery')
-const chai = require('chai')
-const config = require('config')
-const sinon = require('sinon')
-const uma = require('../server/utils/uma')
+import chai from 'chai'
+import config from 'config'
+import esmock from 'esmock'
 
 const assert = chai.assert
 const passportConfigAuthorizedResponse = config.get('passportConfigAuthorizedResponse')
@@ -20,9 +16,28 @@ const assertData = (data) => {
   assert.isNotEmpty(data.providers)
 }
 
+const mockConfigDiscovery = async () => {
+  return await esmock('../server/utils/configDiscovery', {
+    '../server/utils/uma': {
+      request: async () => {
+        return passportConfigAuthorizedResponse
+      }
+    }
+  })
+}
+
 describe('test ConfigDiscovery', () => {
   describe('test validate', () => {
-    const validate = configDiscoveryRewire.__get__('validate')
+    let configDiscovery, validate
+
+    before(async () => {
+      configDiscovery = await mockConfigDiscovery()
+      validate = configDiscovery.validate
+    })
+
+    after(async () => {
+      esmock.purge()
+    })
 
     it('should be exist', () => {
       assert.exists(validate)
@@ -47,7 +62,16 @@ describe('test ConfigDiscovery', () => {
   })
 
   describe('test retrieve', () => {
-    const retrieve = configDiscoveryRewire.__get__('retrieve')
+    let retrieve, configDiscovery
+
+    before(async () => {
+      configDiscovery = await mockConfigDiscovery()
+      retrieve = configDiscovery.retrieve
+    })
+
+    after(async () => {
+      esmock.purge()
+    })
 
     it('should be exist', () => {
       assert.exists(retrieve)
@@ -58,10 +82,6 @@ describe('test ConfigDiscovery', () => {
     })
 
     it('should return configuration data', async () => {
-      const stubUMARequest = sinon.stub(uma, 'request')
-      stubUMARequest.reset()
-      stubUMARequest.resolves(passportConfigAuthorizedResponse)
-
       const data = await retrieve(passportConfigurationEndpoint)
       assertData(data)
     })
