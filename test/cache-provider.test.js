@@ -9,7 +9,7 @@ const passportConfigAuthorizedResponse = config.get('passportConfigAuthorizedRes
 
 describe('cache provider test', () => {
   const retryStrategy = cacheProviders.retryStrategy
-  const testProvider = passportConfigAuthorizedResponse.providers.find(provider => provider.id === 'saml-redis-test')
+  const testProvider = JSON.parse(JSON.stringify(passportConfigAuthorizedResponse.providers.find(provider => provider.id === 'saml-redis-test')))
   testProvider.options.retry_strategy = retryStrategy
 
   it('redis is not live so we should get connection error response', () => {
