@@ -1,15 +1,18 @@
-
-const chai = require('chai')
+import chai from 'chai'
 const assert = chai.assert
 
 /**
  * Testing configs (env) on /config/*.js (uses node-config module)
  */
 
-const defaultcfg = require('../config/default.js')
-const productioncfg = require('../config/production.js')
+// const productioncfg = require('../config/production.js')
 
 describe('defaultcfg', function () {
+  let defaultcfg
+  before(async () => {
+    defaultcfg = (await import('../config/default.cjs')).default
+  })
+
   it('default.js should have passportFile not null or undefined', () => {
     assert.exists(
       defaultcfg.passportFile, 'passportFile is not null or undefined')
@@ -34,6 +37,11 @@ describe('defaultcfg', function () {
 })
 
 describe('productioncfg', function () {
+  let productioncfg
+  before(async () => {
+    productioncfg = (await import('../config/production.cjs')).default
+  })
+
   it('production.js should have passportFile  not null or undefined', () => {
     assert.exists(
       productioncfg.passportFile, 'passportFile is not null or undefined')
