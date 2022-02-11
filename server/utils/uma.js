@@ -1,11 +1,12 @@
 /* eslint-disable node/handle-callback-err */
-const got = require('got')
-const parsers = require('www-authenticate').parsers
-const R = require('ramda')
-const { v4: uuidv4 } = require('uuid')
-const misc = require('./misc')
-const logger = require('./logging')
+import got from 'got'
+import wwwAuthenticate from 'www-authenticate'
+import R from 'ramda'
+import { v4 as uuidv4 } from 'uuid'
+import * as misc from './misc.js'
+import * as logger from './logging.js'
 
+const parsers = wwwAuthenticate.parsers
 let rpt
 
 /**
@@ -229,6 +230,6 @@ function request (options) {
   return chain(options)
 }
 
-module.exports = {
-  request: request
+export {
+  request
 }
