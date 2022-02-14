@@ -6,10 +6,10 @@ import morgan from 'morgan'
 import flash from 'connect-flash'
 import * as logger from './utils/logging.js'
 import routes from './routes.js'
-import metricsMiddleware from '../server/utils/metrics.js'
+import { metricsMiddleware } from '../server/utils/metrics.js'
 import { globalErrorHandler } from './utils/error-handler.js'
-import rateLimiter from './utils/rate-limiter.js'
-import session from './utils/session.js'
+import { rateLimiter } from './utils/rate-limiter.js'
+import { session } from './utils/session.js'
 import './utils/http-global-proxy.js'
 const app = express()
 // Setup http proxy config
