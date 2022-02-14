@@ -1,11 +1,11 @@
-const config = require('config')
-const logger = require('./utils/logging')
-const misc = require('./utils/misc')
-const confDiscovery = require('./utils/configDiscovery')
-const providers = require('./providers')
-const passportFile = config.get('passportFile')
-const AppFactory = require('./app-factory')
+import config from 'config'
+import * as logger from './utils/logging.js'
+import * as misc from './utils/misc.js'
+import * as confDiscovery from './utils/configDiscovery'
+import * as providers from './providers'
+import { AppFactory } from './app-factory'
 
+const passportFile = config.get('passportFile')
 let httpServer
 let httpPort = -1
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
@@ -67,9 +67,10 @@ function pollConfiguration (configEndpoint) {
   // 1 minute timer
 }
 
-function init () {
+async function init () {
   // Read the minimal params to start
-  const basicConfig = require(passportFile)
+  const basicConfig = (await import(passportFile)).default
+
   // Start logging with basic params
   logger.configure(
     {
@@ -94,6 +95,6 @@ function init () {
   }
 }
 
-module.exports = app
+export default app
 
 init()
