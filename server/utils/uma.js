@@ -231,5 +231,10 @@ function request (options) {
 }
 
 export {
-  request
+  request,
+  getTokenEndpoint,
+  getRPT,
+  doRequest,
+  processUnauthorized,
+  makeClientAssertionJWTToken
 }
