@@ -59,7 +59,7 @@ const mockUMADoRequestWithTicket = async (rptToken = 'valid_token') => {
     got: {
       default: {
         get: async () => {
-          return ticketResponse('valid_ticket', 401)
+          return ticketResponse('valid_ticket')
         },
         post: async () => {
           return { body: { access_token: rptToken } }
@@ -69,15 +69,17 @@ const mockUMADoRequestWithTicket = async (rptToken = 'valid_token') => {
   })
 }
 
+const configResponse = {
+  statusCode: 200,
+  body: JSON.stringify(passportConfigAuthorizedResponse)
+}
+
 const mockUMADoRequestWithConfigResponse = async () => {
   return await esmock('../server/utils/uma.js', {
     got: {
       default: {
         get: async () => {
-          return {
-            statusCode: 200,
-            body: JSON.stringify(passportConfigAuthorizedResponse)
-          }
+          return configResponse
         }
       }
     }
@@ -92,10 +94,28 @@ const mockUMAProcessUnauthorized = async (tokenEndpoint = umaConfigTokenEndpoint
           if (uri.includes('uma2-configuration')) {
             return { body: { token_endpoint: tokenEndpoint } }
           } else {
-            return {
-              statusCode: 200,
-              body: JSON.stringify(passportConfigAuthorizedResponse)
-            }
+            return configResponse
+          }
+        },
+        post: async () => {
+          return { body: { access_token: rptToken } }
+        }
+      }
+    }
+  })
+}
+
+const mockUMARequest = async (tokenEndpoint = umaConfigTokenEndpoint, rptToken = 'valid_rpt') => {
+  return await esmock('../server/utils/uma.js', {
+    got: {
+      default: {
+        get: async (uri, options) => {
+          if (options.headers) {
+            return configResponse
+          } else if (uri.includes('uma2-configuration')) {
+            return { body: { token_endpoint: tokenEndpoint } }
+          } else {
+            return ticketResponse('valid_ticket', 401)
           }
         },
         post: async () => {
@@ -272,42 +292,38 @@ describe('uma.js test', () => {
     })
   })
 
-  // describe('test request', () => {
-  //   const request = uma.__get__('request')
+  describe('test request', () => {
+    let uma, request
 
-  //   it('should exist', () => {
-  //     assert.exists(request)
-  //   })
+    beforeEach(async () => {
+      uma = await mockUMARequest()
+      request = uma.request
+    })
 
-  //   it('should be function', () => {
-  //     assert.isFunction(request)
-  //   })
+    afterEach(() => {
+      esmock.purge(uma)
+    })
 
-  //   it('should return configurations', async () => {
-  //     const gotGet = stubTicketRequest()
+    it('should exist', () => {
+      assert.exists(request)
+    })
 
-  //     // mock get token endpoint
-  //     gotGet.onCall(1).resolves(umaConfigGotResponse)
+    it('should be function', () => {
+      assert.isFunction(request)
+    })
 
-  //     // mock rpt request
-  //     const gotGetRPTToken = stubRPTTokenRequest()
+    it('should return configurations', async () => {
+      const requestResponse = await request({
+        uri: 'http://test.com',
+        throwHttpErrors: false
+      })
 
-  //     // mock get config request
-  //     gotGet.onCall(2).resolves(passportConfigAuthorizedGotResponse)
-
-  //     const requestResponse = await request({
-  //       uri: passportConfigurationEndpoint,
-  //       throwHttpErrors: false
-  //     })
-
-  //     assert.isNotNull(requestResponse.conf)
-  //     assert.isNotNull(requestResponse.idpInitiated)
-  //     assert.isNotNull(requestResponse.providers)
-  //     assert.isNotEmpty(requestResponse.providers)
-  //     gotGetRPTToken.restore()
-  //     gotGet.restore()
-  //   })
-  // })
+      assert.isNotNull(requestResponse.conf)
+      assert.isNotNull(requestResponse.idpInitiated)
+      assert.isNotNull(requestResponse.providers)
+      assert.isNotEmpty(requestResponse.providers)
+    })
+  })
 
   // describe('test getClientAssertionJWTToken', () => {
   //   const makeClientAssertionJWTToken = uma.__get__('makeClientAssertionJWTToken')
