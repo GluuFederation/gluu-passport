@@ -1,6 +1,7 @@
 import config from 'config'
 import chai from 'chai'
 import esmock from 'esmock'
+import jwt from 'jsonwebtoken'
 
 const assert = chai.assert
 const passportConfigAuthorizedResponse = config.get('passportConfigAuthorizedResponse')
@@ -325,29 +326,38 @@ describe('uma.js test', () => {
     })
   })
 
-  // describe('test getClientAssertionJWTToken', () => {
-  //   const makeClientAssertionJWTToken = uma.__get__('makeClientAssertionJWTToken')
+  describe('test getClientAssertionJWTToken', () => {
+    let makeClientAssertionJWTToken, uma
 
-  //   it('should exists', () => {
-  //     assert.exists(makeClientAssertionJWTToken)
-  //   })
+    beforeEach(async () => {
+      uma = await mockUMA()
+      makeClientAssertionJWTToken = uma.makeClientAssertionJWTToken
+    })
 
-  //   it('should be function', () => {
-  //     assert.isFunction(makeClientAssertionJWTToken)
-  //   })
+    afterEach(() => {
+      esmock.purge(uma)
+    })
 
-  //   let decodedToken = null
-  //   it('should return jwt token', () => {
-  //     const token = makeClientAssertionJWTToken('temp_clientId', 'https://temp_tokenEndpoint.com')
-  //     assert.isNotNull(token)
-  //     decodedToken = jwt.decode(token)
-  //     assert.isNotNull(decodedToken)
-  //   })
+    it('should exists', () => {
+      assert.exists(makeClientAssertionJWTToken)
+    })
 
-  //   it('decoded token should have integer exp time', () => {
-  //     const exp = decodedToken.exp
-  //     assert.isNotNull(exp)
-  //     assert.isTrue(Number.isInteger(exp))
-  //   })
-  // })
+    it('should be function', () => {
+      assert.isFunction(makeClientAssertionJWTToken)
+    })
+
+    let decodedToken = null
+    it('should return jwt token', () => {
+      const token = makeClientAssertionJWTToken('temp_clientId', 'https://temp_tokenEndpoint.com')
+      assert.isNotNull(token)
+      decodedToken = jwt.decode(token)
+      assert.isNotNull(decodedToken)
+    })
+
+    it('decoded token should have integer exp time', () => {
+      const exp = decodedToken.exp
+      assert.isNotNull(exp)
+      assert.isTrue(Number.isInteger(exp))
+    })
+  })
 })
