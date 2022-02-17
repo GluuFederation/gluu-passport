@@ -7,36 +7,30 @@ const passportConfigAuthorizedResponse = config.get('passportConfigAuthorizedRes
 const umaConfigURL = passportConfigAuthorizedResponse.conf.serverURI + '/.well-known/uma2-configuration'
 const umaConfigTokenEndpoint = passportConfigAuthorizedResponse.conf.serverURI + '/oxauth/restv1/token'
 const passportConfig = config.get('passportConfig')
+
 global.basicConfig = passportConfig
 
-const mockUMAGetTokenEndpoint = async () => {
+const ticketResponse = (mockTicket = 'valid_ticket') => ({
+  body: '',
+  statusCode: 401,
+  headers: {
+    server: 'Apache/2.4.29 (Ubuntu)',
+    'x-xss-protection': '1; mode=block',
+    'x-content-type-options': 'nosniff',
+    'strict-transport-security': 'max-age=31536000; includeSubDomains',
+    'www-authenticate': `UMA realm="Authentication Required", host_id=chris.gluuthree.org, as_uri=https://chris.gluuthree.org/.well-known/uma2-configuration, ticket=${mockTicket}`,
+    'content-length': '0',
+    connection: 'close'
+  }
+})
+
+const mockUMA = async (tokenEndpoint = umaConfigTokenEndpoint, rptToken = 'valid_token') => {
   return await esmock('../server/utils/uma.js', {
     got: {
       default: {
         get: async () => {
-          return { body: { token_endpoint: umaConfigTokenEndpoint } }
-        }
-      }
-    }
-  })
-}
-
-const mockUMAGetTokenEndpointWithErrorResponse = async (errorMessage) => {
-  return await esmock('../server/utils/uma.js', {
-    got: {
-      default: {
-        get: async () => {
-          throw new Error(errorMessage)
-        }
-      }
-    }
-  })
-}
-
-const mockUMAGetRPT = async (rptToken) => {
-  return await esmock('../server/utils/uma.js', {
-    got: {
-      default: {
+          return { body: { token_endpoint: tokenEndpoint } }
+        },
         post: async () => {
           return { body: { access_token: rptToken } }
         }
@@ -45,12 +39,67 @@ const mockUMAGetRPT = async (rptToken) => {
   })
 }
 
-const mockUMAGetRPTWithError = async (errorMessage) => {
+const mockUMAWithErrorResponse = async (errorMessage) => {
   return await esmock('../server/utils/uma.js', {
     got: {
       default: {
+        get: async () => {
+          throw new Error(errorMessage)
+        },
         post: async () => {
           throw new Error(errorMessage)
+        }
+      }
+    }
+  })
+}
+
+const mockUMADoRequestWithTicket = async (rptToken = 'valid_token') => {
+  return await esmock('../server/utils/uma.js', {
+    got: {
+      default: {
+        get: async () => {
+          return ticketResponse('valid_ticket', 401)
+        },
+        post: async () => {
+          return { body: { access_token: rptToken } }
+        }
+      }
+    }
+  })
+}
+
+const mockUMADoRequestWithConfigResponse = async () => {
+  return await esmock('../server/utils/uma.js', {
+    got: {
+      default: {
+        get: async () => {
+          return {
+            statusCode: 200,
+            body: JSON.stringify(passportConfigAuthorizedResponse)
+          }
+        }
+      }
+    }
+  })
+}
+
+const mockUMAProcessUnauthorized = async (tokenEndpoint = umaConfigTokenEndpoint, rptToken = 'valid_rpt') => {
+  return await esmock('../server/utils/uma.js', {
+    got: {
+      default: {
+        get: async (uri) => {
+          if (uri.includes('uma2-configuration')) {
+            return { body: { token_endpoint: tokenEndpoint } }
+          } else {
+            return {
+              statusCode: 200,
+              body: JSON.stringify(passportConfigAuthorizedResponse)
+            }
+          }
+        },
+        post: async () => {
+          return { body: { access_token: rptToken } }
         }
       }
     }
@@ -62,7 +111,7 @@ describe('uma.js test', () => {
     let getTokenEndpoint, uma
 
     beforeEach(async () => {
-      uma = await mockUMAGetTokenEndpoint()
+      uma = await mockUMA()
       getTokenEndpoint = uma.getTokenEndpoint
     })
 
@@ -86,7 +135,7 @@ describe('uma.js test', () => {
     it('should be return error when request fail', async () => {
       esmock.purge(uma)
       const errorMessage = 'Failed to get token endpoint'
-      uma = await mockUMAGetTokenEndpointWithErrorResponse(errorMessage)
+      uma = await mockUMAWithErrorResponse(errorMessage)
       getTokenEndpoint = uma.getTokenEndpoint
 
       try {
@@ -99,7 +148,7 @@ describe('uma.js test', () => {
     it('should be return error when token_endpoint is missing in response', async () => {
       esmock.purge(uma)
       const errorMessage = 'getTokenEndpoint. No token endpoint was found'
-      uma = await mockUMAGetTokenEndpointWithErrorResponse(errorMessage)
+      uma = await mockUMAWithErrorResponse(errorMessage)
       getTokenEndpoint = uma.getTokenEndpoint
 
       try {
@@ -111,11 +160,10 @@ describe('uma.js test', () => {
   })
 
   describe('test getRPT', () => {
-    let getRPT, uma, mockedRPTToken
+    let getRPT, uma
 
     beforeEach(async () => {
-      mockedRPTToken = 'valid_rpt_token'
-      uma = await mockUMAGetRPT(mockedRPTToken)
+      uma = await mockUMA()
       getRPT = uma.getRPT
     })
 
@@ -131,17 +179,17 @@ describe('uma.js test', () => {
       assert.isFunction(getRPT)
     })
 
-    it('should get RPT token', async () => {
+    it('should get valid RPT token', async () => {
       const ticket = 'ticket'
       const rptToken = await getRPT(ticket, umaConfigTokenEndpoint)
-      assert.equal(rptToken.access_token, mockedRPTToken)
+      assert.equal(rptToken.access_token, 'valid_token')
     })
 
     it('should return error when failed request fail', async () => {
       const errorMessage = 'Failed to get RPT Token'
 
       esmock.purge(uma)
-      uma = await mockUMAGetRPTWithError(errorMessage)
+      uma = await mockUMAWithErrorResponse(errorMessage)
 
       const ticket = 'ticket'
       try {
@@ -152,98 +200,77 @@ describe('uma.js test', () => {
     })
   })
 
-  // describe('test doRequest', () => {
-  //   const doRequest = uma.__get__('doRequest')
+  describe('test doRequest', () => {
+    let doRequest, uma, mockTicket
 
-  //   it('should exist', () => {
-  //     assert.exists(doRequest)
-  //   })
+    beforeEach(async () => {
+      mockTicket = 'valid_ticket'
+      uma = await mockUMADoRequestWithTicket(mockTicket)
+      doRequest = uma.doRequest
+    })
 
-  //   it('should be function', () => {
-  //     assert.isFunction(doRequest)
-  //   })
+    afterEach(() => {
+      esmock.purge(uma)
+    })
 
-  //   it('should be request to config endpoint and get ticker', async () => {
-  //     const gotGet = stubTicketRequest()
+    it('should exist', () => {
+      assert.exists(doRequest)
+    })
 
-  //     const requestParams = {
-  //       uri: passportConfigurationEndpoint,
-  //       throwHttpErrors: false
-  //     }
-  //     const ticketRepsponse = await doRequest(requestParams)
-  //     assert(gotGet.calledWith(requestParams.uri, {
-  //       throwHttpErrors: false
-  //     }))
-  //     assert.equal(ticketRepsponse.ticket, mockTicket)
-  //     gotGet.restore()
-  //   })
+    it('should be function', () => {
+      assert.isFunction(doRequest)
+    })
 
-  //   it('should return configurations', async () => {
-  //     const rpt = {
-  //       access_token: 'tEmPtEmPtEmPtEmPtEmPtEmP',
-  //       pct: 'PmEtPmEtPmEtPmEtPmEtPmEt'
-  //     }
-  //     uma.__set__('rpt', rpt)
+    it('should be request to config endpoint and get ticket', async () => {
+      const ticketRepsponse = await doRequest({ uri: 'http://test', test: 'test' })
+      assert.equal(ticketRepsponse.ticket, mockTicket)
+    })
 
-  //     const gotGet = sinon.stub(got, 'get')
-  //     gotGet.reset()
-  //     gotGet.resolves(passportConfigAuthorizedGotResponse)
-  //     const doRequestParams = {
-  //       uri: passportConfigurationEndpoint,
-  //       throwHttpErrors: false
-  //     }
-  //     const configRepsponse = await doRequest(doRequestParams)
-  //     assert(gotGet.calledWith(doRequestParams.uri, {
-  //       throwHttpErrors: false,
-  //       headers: {
-  //         authorization: `Bearer ${rpt.access_token}`,
-  //         pct: rpt.pct
-  //       }
-  //     }))
-  //     assert.isNotNull(configRepsponse.conf)
-  //     assert.isNotNull(configRepsponse.idpInitiated)
-  //     assert.isNotNull(configRepsponse.providers)
-  //     assert.isNotEmpty(configRepsponse.providers)
-  //     gotGet.restore()
-  //   })
-  // })
+    it('should return configurations', async () => {
+      esmock.purge(uma)
+      uma = await mockUMADoRequestWithConfigResponse()
+      doRequest = uma.doRequest
 
-  // describe('test processUnauthorized', () => {
-  //   const processUnauthorized = uma.__get__('processUnauthorized')
+      const configRepsponse = await doRequest({ uri: 'http://test', test: 'test' })
+      assert.isNotNull(configRepsponse.conf)
+      assert.isNotNull(configRepsponse.idpInitiated)
+      assert.isNotNull(configRepsponse.providers)
+      assert.isNotEmpty(configRepsponse.providers)
+    })
+  })
 
-  //   it('should exist', () => {
-  //     assert.exists(processUnauthorized)
-  //   })
+  describe('test processUnauthorized', () => {
+    let uma, processUnauthorized
 
-  //   it('should be function', () => {
-  //     assert.isFunction(processUnauthorized)
-  //   })
+    beforeEach(async () => {
+      uma = await mockUMAProcessUnauthorized()
+      processUnauthorized = uma.processUnauthorized
+    })
 
-  //   it('should return configurations', async () => {
-  //     // mock get token endpoint
-  //     const gotGet = sinon.stub(got, 'get')
-  //     gotGet.reset()
-  //     gotGet.onCall(0).resolves(umaConfigGotResponse)
+    afterEach(() => {
+      esmock.purge(uma)
+    })
 
-  //     // mock rpt request
-  //     const gotGetRPTToken = stubRPTTokenRequest()
+    it('should exist', () => {
+      assert.exists(processUnauthorized)
+    })
 
-  //     // mock get config request
-  //     gotGet.onCall(1).resolves(passportConfigAuthorizedGotResponse)
+    it('should be function', () => {
+      assert.isFunction(processUnauthorized)
+    })
 
-  //     const processUnauthorizedResponse = await processUnauthorized(mockTicket, umaConfigURL, {
-  //       uri: passportConfigurationEndpoint,
-  //       throwHttpErrors: false
-  //     })
-  //     assert.isNotNull(processUnauthorizedResponse.conf)
-  //     assert.isNotNull(processUnauthorizedResponse.idpInitiated)
-  //     assert.isNotNull(processUnauthorizedResponse.providers)
-  //     assert.isNotEmpty(processUnauthorizedResponse.providers)
+    it('should return configurations', async () => {
+      const processUnauthorizedResponse = await processUnauthorized('valid_ticket', umaConfigURL, {
+        uri: 'http://test.com',
+        throwHttpErrors: false
+      })
 
-  //     gotGet.restore()
-  //     gotGetRPTToken.restore()
-  //   })
-  // })
+      assert.isNotNull(processUnauthorizedResponse.conf)
+      assert.isNotNull(processUnauthorizedResponse.idpInitiated)
+      assert.isNotNull(processUnauthorizedResponse.providers)
+      assert.isNotEmpty(processUnauthorizedResponse.providers)
+    })
+  })
 
   // describe('test request', () => {
   //   const request = uma.__get__('request')
