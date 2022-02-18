@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid'
 const assert = chai.assert
 // const passportConfigAuthorizedResponse = config.get('passportConfigAuthorizedResponse')
 
-const mockOIDCHelper = async (makeDirSpy, joseGenerateKeyPairSpy, exportJWKSpy, calculateJwkThumbprintSpy, writeDataToFileSpy) => {
+const mockOIDCHelperGenerateJWKS = async (makeDirSpy, joseGenerateKeyPairSpy, exportJWKSpy, calculateJwkThumbprintSpy, writeDataToFileSpy) => {
   return await esmock('../server/utils/openid-client-helper.js', {
     '../server/utils/file-utils.js': {
       makeDir: () => {
@@ -36,6 +36,29 @@ const mockOIDCHelper = async (makeDirSpy, joseGenerateKeyPairSpy, exportJWKSpy, 
   })
 }
 
+const mockOIDCHelperGetIssuer = async () => {
+  return await esmock('../server/utils/openid-client-helper.js', {
+    'openid-client': {
+      Issuer: {
+        discover: () => {}
+      }
+    }
+  })
+}
+
+const mockOIDCHelperGetIssuerWithoutDiscovery = async () => {
+  return await esmock('../server/utils/openid-client-helper.js', {
+    'openid-client': {
+      Issuer: {
+        default: () => {},
+        discover: () => {
+          throw new Error('Not connecting')
+        }
+      }
+    }
+  })
+}
+
 describe('Test OpenID Client Helper', () => {
   // const testProvider = passportConfigAuthorizedResponse.providers.find(p => p.id === 'oidccedev6privatejwt')
 
@@ -48,7 +71,7 @@ describe('Test OpenID Client Helper', () => {
       exportJWKSpy = sinon.spy()
       calculateJwkThumbprintSpy = sinon.spy()
       writeDataToFileSpy = sinon.spy()
-      oidcHelper = await mockOIDCHelper(makeDirSpy, joseGenerateKeyPairSpy, exportJWKSpy, calculateJwkThumbprintSpy, writeDataToFileSpy)
+      oidcHelper = await mockOIDCHelperGenerateJWKS(makeDirSpy, joseGenerateKeyPairSpy, exportJWKSpy, calculateJwkThumbprintSpy, writeDataToFileSpy)
       generateJWKS = oidcHelper.generateJWKS
     })
 
@@ -93,29 +116,40 @@ describe('Test OpenID Client Helper', () => {
     })
   })
 
-  // describe('getIssuer test', () => {
-  //   it('should exist', () => {
-  //     assert.exists(getIssuer)
-  //   })
+  describe('getIssuer test', () => {
+    let oidcHelper, getIssuer
 
-  //   it('should be function', () => {
-  //     assert.isFunction(getIssuer, 'getIssuer is not a function')
-  //   })
+    before(async () => {
+      oidcHelper = await mockOIDCHelperGetIssuer()
+      getIssuer = oidcHelper.getIssuer
+    })
 
-  //   it('should return the Issuer object when no discovery endpoint available', async () => {
-  //     const issuer = await getIssuer(testProvider)
-  //     assert.exists(issuer, 'failed to setup issuer object')
-  //   })
+    after(() => {
+      esmock.purge(oidcHelper)
+    })
 
-  //   it('should return the Issuer object when discovery endpoint available', async () => {
-  //     const initMock = new InitMock()
-  //     initMock.discoveryURL(testProvider.options.issuer)
+    it('should exist', () => {
+      assert.exists(getIssuer)
+    })
 
-  //     const issuer = await getIssuer(testProvider)
-  //     assert.exists(issuer, 'failed to setup issuer object')
-  //     nock.cleanAll()
-  //   })
-  // })
+    it('should be function', () => {
+      assert.isFunction(getIssuer, 'getIssuer is not a function')
+    })
+
+    it('should return the Issuer object when no discovery endpoint available', async () => {
+      const issuer = await getIssuer({})
+      assert.exists(issuer, 'failed to setup issuer object')
+    })
+
+    it('should return the Issuer object when discovery endpoint available', async () => {
+      esmock.purge(oidcHelper)
+      oidcHelper = await mockOIDCHelperGetIssuerWithoutDiscovery()
+      getIssuer = oidcHelper.getIssuer
+
+      const issuer = await getIssuer({})
+      assert.exists(issuer, 'failed to setup issuer object')
+    })
+  })
 
   // describe('getClient test', () => {
   //   it('should exist', () => {
