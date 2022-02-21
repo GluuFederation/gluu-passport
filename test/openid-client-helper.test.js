@@ -1,11 +1,14 @@
 import chai from 'chai'
-// import config from 'config'
+import config from 'config'
 import sinon from 'sinon'
 import esmock from 'esmock'
 import { v4 as uuidv4 } from 'uuid'
+import { Strategy } from 'openid-client'
+import nock from 'nock'
+import InitMock from './testdata/init-mock.js'
 
 const assert = chai.assert
-// const passportConfigAuthorizedResponse = config.get('passportConfigAuthorizedResponse')
+const passportConfigAuthorizedResponse = config.get('passportConfigAuthorizedResponse')
 
 const mockOIDCHelperGenerateJWKS = async (makeDirSpy, joseGenerateKeyPairSpy, exportJWKSpy, calculateJwkThumbprintSpy, writeDataToFileSpy) => {
   return await esmock('../server/utils/openid-client-helper.js', {
@@ -30,7 +33,7 @@ const mockOIDCHelperGenerateJWKS = async (makeDirSpy, joseGenerateKeyPairSpy, ex
       },
       calculateJwkThumbprint: async () => {
         calculateJwkThumbprintSpy()
-        return 'kdirandom'
+        return 'kid_random'
       }
     }
   })
@@ -60,8 +63,6 @@ const mockOIDCHelperGetIssuerWithoutDiscovery = async () => {
 }
 
 describe('Test OpenID Client Helper', () => {
-  // const testProvider = passportConfigAuthorizedResponse.providers.find(p => p.id === 'oidccedev6privatejwt')
-
   describe('generateJWKS test', () => {
     let generateJWKS, oidcHelper, makeDirSpy, joseGenerateKeyPairSpy, exportJWKSpy, calculateJwkThumbprintSpy, writeDataToFileSpy
 
@@ -151,38 +152,50 @@ describe('Test OpenID Client Helper', () => {
     })
   })
 
-  // describe('getClient test', () => {
-  //   it('should exist', () => {
-  //     assert.exists(getClient)
-  //   })
+  describe('getClient test', () => {
+    let oidcHelper, getClient
+    const testProvider = passportConfigAuthorizedResponse.providers.find(p => p.id === 'oidccedev6privatejwt')
 
-  //   it('should be function', () => {
-  //     assert.isFunction(getClient, 'getClient is not a function')
-  //   })
+    before(async () => {
+      oidcHelper = await mockOIDCHelperGetIssuer()
+      getClient = oidcHelper.getClient
+    })
 
-  //   it('should return the client object to initialize openid-client strategy when no discovery endpoint available', async () => {
-  //     const client = await getClient(testProvider)
-  //     assert.exists(client, 'failed to make client for openid-client strategy')
-  //     const strategy = new Strategy({ client }, () => {})
-  //     assert.exists(strategy, 'Failed to create strategy')
-  //   })
+    after(() => {
+      esmock.purge(oidcHelper)
+    })
 
-  //   it('should return the client object to initialize openid-client strategy when discovery endpoint available', async () => {
-  //     const initMock = new InitMock()
-  //     initMock.discoveryURL(testProvider.options.issuer)
+    it('should exist', () => {
+      assert.exists(getClient)
+    })
 
-  //     const client = await getClient(testProvider)
-  //     assert.exists(client, 'failed to make client for openid-client strategy')
-  //     const strategy = new Strategy({ client }, () => {})
-  //     assert.exists(strategy, 'Failed to create strategy')
-  //     nock.cleanAll()
-  //   })
+    it('should be function', () => {
+      assert.isFunction(getClient, 'getClient is not a function')
+    })
 
-  //   it('we have now already client initialize so we should get client from state', async () => {
-  //     const client = await getClient(testProvider)
-  //     assert.exists(client, 'failed to get client for openid-client strategy')
-  //     const strategy = new Strategy({ client }, () => {})
-  //     assert.exists(strategy, 'Failed to create strategy')
-  //   })
-  // })
+    it('should return the client object to initialize openid-client strategy when no discovery endpoint available', async () => {
+      const client = await getClient(testProvider)
+      assert.exists(client, 'failed to make client for openid-client strategy')
+      const strategy = new Strategy({ client }, () => {})
+      assert.exists(strategy, 'Failed to create strategy')
+    })
+
+    it('should return the client object to initialize openid-client strategy when discovery endpoint available', async () => {
+      const initMock = new InitMock()
+      initMock.discoveryURL(testProvider.options.issuer)
+
+      const client = await getClient(testProvider)
+      assert.exists(client, 'failed to make client for openid-client strategy')
+      const strategy = new Strategy({ client }, () => {})
+      assert.exists(strategy, 'Failed to create strategy')
+      nock.cleanAll()
+    })
+
+    it('we have now already client initialize so we should get client from state', async () => {
+      const client = await getClient(testProvider)
+      assert.exists(client, 'failed to get client for openid-client strategy')
+      const strategy = new Strategy({ client }, () => {})
+      assert.exists(strategy, 'Failed to create strategy')
+    })
+  })
 })
