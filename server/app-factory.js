@@ -12,7 +12,6 @@ import { rateLimiter } from './utils/rate-limiter.js'
 import { session } from './utils/session.js'
 import './utils/http-global-proxy.js'
 const app = express()
-// Setup http proxy config
 
 class AppFactory {
   createApp () {

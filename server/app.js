@@ -1,9 +1,10 @@
 import config from 'config'
+import fs from 'fs'
 import * as logger from './utils/logging.js'
 import * as misc from './utils/misc.js'
-import * as confDiscovery from './utils/configDiscovery'
-import * as providers from './providers'
-import { AppFactory } from './app-factory'
+import * as confDiscovery from './utils/configDiscovery.js'
+import * as providers from './providers.js'
+import { AppFactory } from './app-factory.js'
 
 const passportFile = config.get('passportFile')
 let httpServer
@@ -69,7 +70,11 @@ function pollConfiguration (configEndpoint) {
 
 async function init () {
   // Read the minimal params to start
-  const basicConfig = (await import(passportFile)).default
+  const basicConfig = JSON.parse(
+    fs.readFileSync(
+      new URL(passportFile, import.meta.url)
+    )
+  )
 
   // Start logging with basic params
   logger.configure(
@@ -77,7 +82,6 @@ async function init () {
       level: basicConfig.logLevel,
       consoleLogOnly: basicConfig.consoleLogOnly
     })
-
   const props = [
     'clientId',
     'keyPath',
