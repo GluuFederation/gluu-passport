@@ -17,7 +17,7 @@
     "start": "NODE_ENV=production node server/app.js",
     "test": "npm run test:unit && npm run test:integration && npm run test:behaviour",
     "test:unit": "NODE_ENV=test ALLOW_CONFIG_MUTATIONS=true mocha --loader=esmock --exit --no-warnings test/*.test.js --timeout 10000",
-    "test:integration": "NODE_ENV=test mocha --config .mocharc-integration.json --exit --no-warnings test/*.spec.js",
+    "test:integration": "NODE_ENV=test mocha --loader=esmock --config .mocharc-integration.json --exit --no-warnings test/*.spec.js",
     "test:behaviour": "NODE_ENV=test cucumber-js --exit test/features",
     "cover": "npm run cover:unit && npm run cover:integration && npm run cover:report",
     "cover:unit": "c8 --silent npm run test:unit",
