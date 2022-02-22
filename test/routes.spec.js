@@ -1,11 +1,11 @@
-const chai = require('chai')
-const assert = chai.assert
-const got = require('got')
-const sinon = require('sinon')
-const webUtils = require('../server/utils/web-utils')
-const InitMock = require('./testdata/init-mock')
-const config = require('config')
+import chai from 'chai'
+import got from 'got'
+import sinon from 'sinon'
+import config from 'config'
+import * as webUtils from '../server/utils/web-utils.js'
+import InitMock from './testdata/init-mock.js'
 
+const assert = chai.assert
 const initMock = new InitMock()
 const passportConfig = config.get('passportConfig')
 
