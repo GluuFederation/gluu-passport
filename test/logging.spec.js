@@ -1,8 +1,9 @@
-const chai = require('chai')
+import chai from 'chai'
+import path from 'path'
+import fs from 'fs'
+import logger from '../server/utils/logging.js'
+
 const assert = chai.assert
-const path = require('path')
-const fs = require('fs').promises
-const logger = require('../server/utils/logging.js')
 
 const convertOneDigitToTwo = (number) => {
   return ('0' + (number)).slice(-2)
