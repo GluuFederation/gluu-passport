@@ -2,7 +2,6 @@ import chai from 'chai'
 import got from 'got'
 import sinon from 'sinon'
 import config from 'config'
-import * as webUtils from '../server/utils/web-utils.js'
 import InitMock from './testdata/init-mock.js'
 
 const assert = chai.assert
@@ -27,17 +26,7 @@ describe('routes.js', () => {
       )
       assert.notInclude(response.body, unexistantIdp)
     })
-    it('providers get routes should not throw error with provider name', async () => {
-      const webUtilsSpy = sinon.spy(webUtils, 'handleError')
-      const provider = 'idontexist'
-      const token = 'whateveRt0k3n'
-      await got(
-        `http://127.0.0.1:8090/passport/auth/${provider}/${token}`,
-        { throwHttpErrors: false }
-      )
-      sinon.assert.calledOnce(webUtilsSpy)
-      assert.notInclude(webUtilsSpy.getCall(0).lastArg, provider)
-    })
+
     it('user deny access, passport should redirect to /error endpoint', async () => {
       const provider = 'apple'
       const options = {

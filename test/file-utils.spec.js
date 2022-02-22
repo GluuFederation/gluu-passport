@@ -2,6 +2,9 @@ import chai from 'chai'
 import path from 'path'
 import fs from 'fs'
 import * as fileUtils from '../server/utils/file-utils.js'
+import { fileURLToPath } from 'url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const assert = chai.assert
 
