@@ -1,7 +1,7 @@
 import chai from 'chai'
 import path from 'path'
 import fs from 'fs'
-import logger from '../server/utils/logging.js'
+import * as logger from '../server/utils/logging.js'
 
 const assert = chai.assert
 
