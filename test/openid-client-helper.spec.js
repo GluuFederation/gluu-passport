@@ -1,7 +1,6 @@
-const chai = require('chai')
-const rewire = require('rewire')
-const rewiredOpenIDClientHelper = rewire('../server/utils/openid-client-helper')
-const config = require('config')
+import chai from 'chai'
+import config from 'config'
+import * as rewiredOpenIDClientHelper from '../server/utils/openid-client-helper.js'
 
 const assert = chai.assert
 const passportConfigAuthorizedResponse = config.get('passportConfigAuthorizedResponse')
@@ -13,7 +12,7 @@ describe('Integration Test OpenID Client Helper', () => {
   let jwks
 
   describe('generateJWKS test', () => {
-    const generateJWKS = rewiredOpenIDClientHelper.__get__('generateJWKS')
+    const generateJWKS = rewiredOpenIDClientHelper.generateJWKS
 
     it('should generate jwks for provider in jwks folder', async () => {
       await generateJWKS(testProvider)
