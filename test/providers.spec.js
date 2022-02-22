@@ -1,6 +1,6 @@
-const chai = require('chai')
+import chai from 'chai'
+import got from 'got'
 const assert = chai.assert
-const got = require('got')
 
 const assertResponse = (response) => {
   assert.equal(response.statusCode, 302)
