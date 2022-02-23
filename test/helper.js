@@ -33,13 +33,16 @@ const configureLogger = () => {
 /**
  * Setup and start server for cucumber test
  */
-const setupServer = async function () {
-  const app = require('../server/app')
-  await app.on('appStarted', () => {
-    console.log('app started...')
-  })
-  await app.rateLimiter.resetKey('::ffff:127.0.0.1')
-  return chai.request(app).keepOpen()
+const setupServer = function () {
+  return import('../server/app.js')
+    .then(async (module) => {
+      const server = module.default
+      await server.on('appStarted', function () {
+        console.log('app started event listened...')
+      })
+      await server.rateLimiter.resetKey('::ffff:127.0.0.1')
+      return chai.request(server).keepOpen()
+    })
 }
 
 export {
