@@ -18,7 +18,13 @@ let rpt
 
 function getTokenEndpoint (umaConfigURL) {
   logger.log2('verbose', 'getTokenEndpoint called for ' + umaConfigURL)
-  return got.get(umaConfigURL, { responseType: 'json' })
+
+  const options = {
+    https: { rejectUnauthorized: false },
+    responseType: 'json'
+  }
+
+  return got.get(umaConfigURL, options)
     .then(response => {
       const body = response.body
       logger.log2(
@@ -38,6 +44,7 @@ function getTokenEndpoint (umaConfigURL) {
       }
     })
     .catch(err => {
+      console.log(err)
       logger.log2('error', 'getTokenEndpoint. Failed to get token endpoint')
       logger.log2('error', err)
       throw new Error(err.message)
@@ -70,6 +77,7 @@ function getRPT (ticket, tokenEndpoint) {
   const token = makeClientAssertionJWTToken(clientId, tokenEndpoint)
   const options = {
     responseType: 'json',
+    https: { rejectUnauthorized: false },
     form: {
       grant_type: 'urn:ietf:params:oauth:grant-type:uma-ticket',
       client_assertion_type:
@@ -117,6 +125,7 @@ function doRequest (requestOptions) {
     }
     options.headers = R.mergeRight(options.headers, headers)
   }
+  options.https = { rejectUnauthorized: false }
 
   logger.log2(
     'debug', `doRequest. options = ${JSON.stringify(
@@ -169,6 +178,11 @@ function doRequest (requestOptions) {
           )
         }
       }
+    })
+    .catch((err) => {
+      logger.log2('error', `doRequest. Failed to get config ${uri}`)
+      logger.log2('error', err)
+      throw new Error(err.message)
     })
 }
 
