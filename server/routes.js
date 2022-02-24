@@ -8,7 +8,10 @@ import * as webutil from './utils/web-utils.js'
 import * as misc from './utils/misc.js'
 import * as logger from './utils/logging.js'
 import path from 'path'
+import { fileURLToPath } from 'url'
 import { handleStrategyError } from './utils/error-handler.js'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const router = express.Router()
 
