@@ -39,7 +39,6 @@ function recreateHttpServer (serverURI, port) {
       console.log(`Server listening on ${serverURI}:${port}`)
       app.emit('appStarted') // event emitter for tests
     })
-    module.exports = httpServer
   }
 }
 
@@ -56,7 +55,6 @@ function reconfigure (cfg) {
 function pollConfiguration (configEndpoint) {
   misc.pipePromise(confDiscovery.retrieve, reconfigure)(configEndpoint)
     .catch(e => {
-      logger.log2('error', e.toString())
       logger.log2('debug', e.stack)
       logger.log2(
         'warn', 'An attempt to get configuration data ' +
