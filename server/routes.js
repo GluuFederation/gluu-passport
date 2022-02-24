@@ -150,7 +150,7 @@ function validateToken (req, res, next) {
   }
 }
 
-function callbackResponse (req, res) {
+async function callbackResponse (req, res) {
   let postUrl
   let user = req.user
   const provider = user.providerKey
@@ -161,12 +161,12 @@ function callbackResponse (req, res) {
     postUrl = global.config.postProfileEndpoint
   }
 
-  user = providersModule.applyMapping(user, provider)
+  user = await providersModule.applyMapping(user, provider)
   if (!user) {
     webutil.handleError(req, res, 'User profile is empty')
     return
   }
-
+  console.log(user)
   const sub = user.uid
   logger.log2('info', `User ${sub} authenticated with provider ${provider}`)
 
