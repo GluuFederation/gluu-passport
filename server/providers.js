@@ -127,7 +127,6 @@ async function setupStrategy (provider) {
   } else {
     passport.use(id, new Strategy(providerOptions, verify))
   }
-  logger.log2('debug', `Testing data is\n${JSON.stringify(passportStrategies, null, 4)}`)
 }
 
 function parseProp (value) {
