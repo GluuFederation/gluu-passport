@@ -166,7 +166,7 @@ async function callbackResponse (req, res) {
     webutil.handleError(req, res, 'User profile is empty')
     return
   }
-  console.log(user)
+
   const sub = user.uid
   logger.log2('info', `User ${sub} authenticated with provider ${provider}`)
 

@@ -44,7 +44,6 @@ function getTokenEndpoint (umaConfigURL) {
       }
     })
     .catch(err => {
-      console.log(err)
       logger.log2('error', 'getTokenEndpoint. Failed to get token endpoint')
       logger.log2('error', err)
       throw new Error(err.message)

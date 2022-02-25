@@ -15,7 +15,6 @@ describe('app middleware', () => {
     const appFactory = new mockedAppFactory.AppFactory()
     app = appFactory.createApp()
     middlewares = app._router.stack.map((middleware) => middleware.name)
-    console.log(middlewares)
   })
 
   after(() => {
