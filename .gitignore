@@ -44,3 +44,6 @@ jspm_packages
 .idea
 server/idp-metadata
 server/jwks
+
+#codecov
+coverage.lcov
