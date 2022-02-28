@@ -39,4 +39,36 @@ describe('cache provider test', () => {
     assert.exists(redisHandlers.get, 'Failed to initialize redis provider get handler')
     assert.exists(redisHandlers.remove, 'Failed to initialize redis provider remove handler')
   })
+
+  describe('test retryStrategy', () => {
+    it('should return correct error message when ECONNREFUSED', () => {
+      const options = {
+        error: {
+          code: 'ECONNREFUSED'
+        }
+      }
+      assert.equal(cacheProviders.retryStrategy(options).message, 'The redis server refused the connection')
+    })
+
+    it('should return correct error message when total_retry_time > 1000 * 60 * 60', () => {
+      const options = {
+        total_retry_time: 1000 * 60 * 61
+      }
+      assert.equal(cacheProviders.retryStrategy(options).message, 'Redis connection retry time exhausted')
+    })
+
+    it('should return undefined when attempt > 10', () => {
+      const options = {
+        attempt: 11
+      }
+      assert.equal(cacheProviders.retryStrategy(options), undefined)
+    })
+
+    it('should return correct miliseconds', () => {
+      const options = {
+        attempt: 5
+      }
+      assert.equal(cacheProviders.retryStrategy(options), Math.min(options.attempt * 100, 3000))
+    })
+  })
 })
