@@ -14,17 +14,17 @@ const mockCacheProvider = async () => {
 }
 
 describe('cache provider test', () => {
-  let redisCacheProvider, retryStrategy, testProvider
+  let cacheProvider, retryStrategy, testProvider
 
   before(async () => {
-    redisCacheProvider = await mockCacheProvider()
-    retryStrategy = redisCacheProvider.retryStrategy
+    cacheProvider = await mockCacheProvider()
+    retryStrategy = cacheProvider.retryStrategy
 
     testProvider = JSON.parse(JSON.stringify(passportConfigAuthorizedResponse.providers.find(provider => provider.id === 'saml-redis-test')))
     testProvider.options.retry_strategy = retryStrategy
   })
 
-  after(() => esmock.purge(redisCacheProvider))
+  after(() => esmock.purge(cacheProvider))
 
   describe('test createClient', () => {
     it('redis is not live so we should get connection error response', () => {
@@ -55,28 +55,28 @@ describe('cache provider test', () => {
           code: 'ECONNREFUSED'
         }
       }
-      assert.equal(redisCacheProvider.retryStrategy(options).message, 'The redis server refused the connection')
+      assert.equal(cacheProvider.retryStrategy(options).message, 'The redis server refused the connection')
     })
 
     it('should return correct error message when total_retry_time > 1000 * 60 * 60', () => {
       const options = {
         total_retry_time: 1000 * 60 * 61
       }
-      assert.equal(redisCacheProvider.retryStrategy(options).message, 'Redis connection retry time exhausted')
+      assert.equal(cacheProvider.retryStrategy(options).message, 'Redis connection retry time exhausted')
     })
 
     it('should return undefined when attempt > 10', () => {
       const options = {
         attempt: 11
       }
-      assert.equal(redisCacheProvider.retryStrategy(options), undefined)
+      assert.equal(cacheProvider.retryStrategy(options), undefined)
     })
 
     it('should return correct miliseconds', () => {
       const options = {
         attempt: 5
       }
-      assert.equal(redisCacheProvider.retryStrategy(options), Math.min(options.attempt * 100, 3000))
+      assert.equal(cacheProvider.retryStrategy(options), Math.min(options.attempt * 100, 3000))
     })
   })
 
@@ -84,7 +84,7 @@ describe('cache provider test', () => {
     let redisHandlers
 
     before(() => {
-      redisHandlers = redisCacheProvider.getRedisProvider({ retry_strategy: retryStrategy }, 3600000)
+      redisHandlers = cacheProvider.getRedisProvider({ retry_strategy: retryStrategy }, 3600000)
     })
 
     it('getRedisProvider should return cache handlers', () => {
@@ -114,6 +114,47 @@ describe('cache provider test', () => {
     it('should remove correct values', async () => {
       // eslint-disable-next-line node/handle-callback-err
       redisHandlers.remove('test_key', function (err, key) {
+        assert.exists(key)
+        assert.equal(key, 'test_key')
+        assert.isNull(err)
+      })
+    })
+  })
+
+  describe('test getMemcachedProvider', () => {
+    let memCacheHandlers
+
+    before(() => {
+      memCacheHandlers = cacheProvider.getMemcachedProvider({ server_locations: 'localhost:11211' }, 3600000)
+    })
+
+    it('getRedisProvider should return cache handlers', () => {
+      assert.exists(memCacheHandlers.save, 'Failed to initialize redis provider save handler')
+      assert.exists(memCacheHandlers.get, 'Failed to initialize redis provider get handler')
+      assert.exists(memCacheHandlers.remove, 'Failed to initialize redis provider remove handler')
+    })
+
+    it('should set correct values', async () => {
+      // eslint-disable-next-line node/handle-callback-err
+      memCacheHandlers.save('test_key', 'test_value', function (err, value) {
+        assert.exists(value)
+        assert.equal(value, 'test_value')
+        assert.isNull(err)
+      })
+    })
+
+    it('should get correct values', async () => {
+      // eslint-disable-next-line node/handle-callback-err
+      memCacheHandlers.get('test_key', function (err, value) {
+        assert.exists(value)
+        assert.equal(value, 'test_value')
+        assert.isNull(err)
+      })
+    })
+
+    it('should remove correct values', async () => {
+      // eslint-disable-next-line node/handle-callback-err
+      memCacheHandlers.remove('test_key', function (err, key) {
         assert.exists(key)
         assert.equal(key, 'test_key')
         assert.isNull(err)

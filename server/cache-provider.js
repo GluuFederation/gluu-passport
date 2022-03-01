@@ -116,5 +116,6 @@ function get (type, options, expiration) {
 export {
   get,
   retryStrategy,
-  getRedisProvider
+  getRedisProvider,
+  getMemcachedProvider
 }
