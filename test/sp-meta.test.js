@@ -29,11 +29,11 @@ describe('Test SP Meta Helper', () => {
       assert.isFunction(generate, 'generateJWKS is not a function')
     })
 
-    it('should generate metafile for provider in idp-metadata folder', async () => {
+    it('should generate metafile for provider in idp-metadata folder', () => {
       const PassportSAMLStrategy = passportSAML.Strategy
       const oPassportSAMLStrategy = new PassportSAMLStrategy(testSAMLProvider.options, () => { /* */ })
 
-      await generate(testSAMLProvider, oPassportSAMLStrategy)
+      generate(testSAMLProvider, oPassportSAMLStrategy)
       assert.exists(metaFile, `${metaFile} file not found`)
     })
   })
