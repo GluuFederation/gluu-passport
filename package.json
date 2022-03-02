@@ -24,7 +24,7 @@
     "cover:integration": "c8 --no-clean npm run test:integration",
     "cover:report": "c8 report --reporter=text-lcov > coverage.lcov",
     "dev": "NODE_ENV=development node server/app.js",
-    "lint": "eslint 'server/**/*.js' 'test/**/*.js' 'config/**/*.js'",
+    "lint": "eslint 'server/**/*.js' 'test/**/*.js' 'config/**/*.cjs'",
     "generate-coverage": "NODE_ENV=test c8 report --reporter=text-lcov > coverage.lcov",
     "prepare": "husky install"
   },
