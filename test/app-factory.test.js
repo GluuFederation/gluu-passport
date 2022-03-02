@@ -4,7 +4,7 @@ import esmock from 'esmock'
 const assert = chai.assert
 
 const mockAppFactory = async () => {
-  return await esmock('../server/app-factory.js', {})
+  return esmock('../server/app-factory.js', {})
 }
 
 describe('app middleware', () => {
