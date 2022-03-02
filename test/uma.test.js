@@ -243,7 +243,7 @@ describe('uma.js test', () => {
     })
 
     it('should be request to config endpoint and get ticket', async () => {
-      const ticketRepsponse = await doRequest({ uri: 'http://test', test: 'test' })
+      const ticketRepsponse = await doRequest({ uri: 'https://test', test: 'test' })
       assert.equal(ticketRepsponse.ticket, mockTicket)
     })
 
@@ -252,7 +252,7 @@ describe('uma.js test', () => {
       uma = await mockUMADoRequestWithConfigResponse()
       doRequest = uma.doRequest
 
-      const configRepsponse = await doRequest({ uri: 'http://test', test: 'test' })
+      const configRepsponse = await doRequest({ uri: 'https://test', test: 'test' })
       assert.isNotNull(configRepsponse.conf)
       assert.isNotNull(configRepsponse.idpInitiated)
       assert.isNotNull(configRepsponse.providers)
@@ -282,7 +282,7 @@ describe('uma.js test', () => {
 
     it('should return configurations', async () => {
       const processUnauthorizedResponse = await processUnauthorized('valid_ticket', umaConfigURL, {
-        uri: 'http://test.com',
+        uri: 'https://test.com',
         throwHttpErrors: false
       })
 
@@ -315,7 +315,7 @@ describe('uma.js test', () => {
 
     it('should return configurations', async () => {
       const requestResponse = await request({
-        uri: 'http://test.com',
+        uri: 'https://test.com',
         throwHttpErrors: false
       })
 
