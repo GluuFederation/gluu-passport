@@ -8,7 +8,7 @@ const assert = chai.assert
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const mockFileUtils = async (fsOpenSpy = sinon.spy(), fsWriteSpy = sinon.spy()) => {
-  return await esmock('../server/utils/file-utils.js', {
+  return esmock('../server/utils/file-utils.js', {
     fs: {
       open (file, mode, callback) {
         fsOpenSpy(file, mode)
