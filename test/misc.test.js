@@ -3,14 +3,18 @@ import esmock from 'esmock'
 
 const assert = chai.assert
 
+const mockMiscModule = async () => {
+  return esmock('../server/utils/misc.js', {
+    crypto: {
+      randomBytes: (no) => 'randomBuffer'
+    }
+  })
+}
+
 describe('misc.randomSecret', () => {
   let mockMisc
   before(async () => {
-    mockMisc = await esmock('../server/utils/misc.js', {
-      crypto: {
-        randomBytes: (no) => 'randomBuffer'
-      }
-    })
+    mockMisc = await mockMiscModule()
   })
 
   after(() => {
@@ -34,11 +38,7 @@ describe('misc.randomSecret', () => {
 describe('misc.arrify', () => {
   let mockMisc
   before(async () => {
-    mockMisc = await esmock('../server/utils/misc.js', {
-      crypto: {
-        randomBytes: (no) => 'randomBuffer'
-      }
-    })
+    mockMisc = await mockMiscModule()
   })
 
   after(() => {
