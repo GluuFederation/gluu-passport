@@ -5,8 +5,6 @@ const assert = chai.assert
  * Testing configs (env) on /config/*.js (uses node-config module)
  */
 
-// const productioncfg = require('../config/production.js')
-
 describe('defaultcfg', function () {
   let defaultcfg
   before(async () => {
