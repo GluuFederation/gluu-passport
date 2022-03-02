@@ -13,6 +13,18 @@ const mockCacheProvider = async () => {
   })
 }
 
+const testValue = (err, value) => {
+  assert.exists(value)
+  assert.equal(value, 'test_value')
+  assert.isNull(err)
+}
+
+const testKey = (err, key) => {
+  assert.exists(key)
+  assert.equal(key, 'test_key')
+  assert.isNull(err)
+}
+
 describe('cache provider test', () => {
   let cacheProvider, retryStrategy, testProvider
 
@@ -95,29 +107,17 @@ describe('cache provider test', () => {
 
     it('should set correct values', async () => {
       // eslint-disable-next-line node/handle-callback-err
-      redisHandlers.save('test_key', 'test_value', function (err, value) {
-        assert.exists(value)
-        assert.equal(value, 'test_value')
-        assert.isNull(err)
-      })
+      redisHandlers.save('test_key', 'test_value', testValue)
     })
 
     it('should get correct values', async () => {
       // eslint-disable-next-line node/handle-callback-err
-      redisHandlers.get('test_key', function (err, value) {
-        assert.exists(value)
-        assert.equal(value, 'test_value')
-        assert.isNull(err)
-      })
+      redisHandlers.get('test_key', testValue)
     })
 
     it('should remove correct values', async () => {
       // eslint-disable-next-line node/handle-callback-err
-      redisHandlers.remove('test_key', function (err, key) {
-        assert.exists(key)
-        assert.equal(key, 'test_key')
-        assert.isNull(err)
-      })
+      redisHandlers.remove('test_key', testKey)
     })
   })
 
@@ -136,29 +136,17 @@ describe('cache provider test', () => {
 
     it('should set correct values', async () => {
       // eslint-disable-next-line node/handle-callback-err
-      memCacheHandlers.save('test_key', 'test_value', function (err, value) {
-        assert.exists(value)
-        assert.equal(value, 'test_value')
-        assert.isNull(err)
-      })
+      memCacheHandlers.save('test_key', 'test_value', testValue)
     })
 
     it('should get correct values', async () => {
       // eslint-disable-next-line node/handle-callback-err
-      memCacheHandlers.get('test_key', function (err, value) {
-        assert.exists(value)
-        assert.equal(value, 'test_value')
-        assert.isNull(err)
-      })
+      memCacheHandlers.get('test_key', testValue)
     })
 
     it('should remove correct values', async () => {
       // eslint-disable-next-line node/handle-callback-err
-      memCacheHandlers.remove('test_key', function (err, key) {
-        assert.exists(key)
-        assert.equal(key, 'test_key')
-        assert.isNull(err)
-      })
+      memCacheHandlers.remove('test_key', testKey)
     })
   })
 })
