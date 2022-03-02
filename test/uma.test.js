@@ -116,7 +116,7 @@ const mockUMARequest = async (tokenEndpoint = umaConfigTokenEndpoint, rptToken =
           } else if (uri.includes('uma2-configuration')) {
             return { body: { token_endpoint: tokenEndpoint } }
           } else {
-            return ticketResponse('valid_ticket', 401)
+            return ticketResponse('valid_ticket')
           }
         },
         post: async () => {
