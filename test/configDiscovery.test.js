@@ -17,7 +17,7 @@ const assertData = (data) => {
 }
 
 const mockConfigDiscovery = async () => {
-  return await esmock('../server/utils/configDiscovery', {
+  return esmock('../server/utils/configDiscovery', {
     '../server/utils/uma': {
       request: async () => {
         return passportConfigAuthorizedResponse
