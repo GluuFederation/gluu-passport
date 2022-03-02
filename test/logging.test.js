@@ -11,7 +11,7 @@ const mockLogging = async () => {
 }
 
 const mockLoggingWinSton = async () => {
-  return await esmock('../server/utils/logging.js', {
+  return esmock('../server/utils/logging.js', {
     winston: {
       createLogger: () => ({ log2: null }),
       format: {
