@@ -7,7 +7,7 @@ const assert = chai.assert
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const mockLogging = async () => {
-  return await esmock('../server/utils/logging.js', {})
+  return esmock('../server/utils/logging.js', {})
 }
 
 const mockLoggingWinSton = async () => {
