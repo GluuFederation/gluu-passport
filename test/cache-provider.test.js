@@ -8,7 +8,7 @@ const assert = chai.assert
 const passportConfigAuthorizedResponse = config.get('passportConfigAuthorizedResponse')
 
 const mockCacheProvider = async () => {
-  return await esmock('../server/cache-provider.js', {
+  return esmock('../server/cache-provider.js', {
     redis: fakeredis
   })
 }
