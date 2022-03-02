@@ -7,6 +7,10 @@ const mockAppFactory = async () => {
   return esmock('../server/app-factory.js', {})
 }
 
+const testModuleAdded = (middlewares, module) => {
+  assert.isTrue(middlewares.includes(module))
+}
+
 describe('app middleware', () => {
   let mockedAppFactory, app, middlewares
 
@@ -22,30 +26,30 @@ describe('app middleware', () => {
   })
 
   it('should be add logger middleware in app', () => {
-    assert.isTrue(middlewares.includes('logger'))
+    testModuleAdded(middlewares, 'logger')
   })
 
   it('should be add session middleware in app', () => {
-    assert.isTrue(middlewares.includes('session'))
+    testModuleAdded(middlewares, 'session')
   })
 
   it('should be add rateLimit middleware in app', () => {
-    assert.isTrue(middlewares.includes('rateLimit'))
+    testModuleAdded(middlewares, 'rateLimit')
   })
 
   it('should be add jsonParser middleware in app', () => {
-    assert.isTrue(middlewares.includes('jsonParser'))
+    testModuleAdded(middlewares, 'jsonParser')
   })
 
   it('should be add cookieParser middleware in app', () => {
-    assert.isTrue(middlewares.includes('cookieParser'))
+    testModuleAdded(middlewares, 'cookieParser')
   })
 
   it('should be add urlencodedParser middleware in app', () => {
-    assert.isTrue(middlewares.includes('urlencodedParser'))
+    testModuleAdded(middlewares, 'urlencodedParser')
   })
 
   it('should be add globalErrorHandler middleware in app', () => {
-    assert.isTrue(middlewares.includes('globalErrorHandler'))
+    testModuleAdded(middlewares, 'globalErrorHandler')
   })
 })
