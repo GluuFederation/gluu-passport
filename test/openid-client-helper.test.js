@@ -11,7 +11,7 @@ const assert = chai.assert
 const passportConfigAuthorizedResponse = config.get('passportConfigAuthorizedResponse')
 
 const mockOIDCHelperGenerateJWKS = async (makeDirSpy, joseGenerateKeyPairSpy, exportJWKSpy, calculateJwkThumbprintSpy, writeDataToFileSpy) => {
-  return await esmock('../server/utils/openid-client-helper.js', {
+  return esmock('../server/utils/openid-client-helper.js', {
     '../server/utils/file-utils.js': {
       makeDir: () => {
         makeDirSpy()
@@ -40,20 +40,20 @@ const mockOIDCHelperGenerateJWKS = async (makeDirSpy, joseGenerateKeyPairSpy, ex
 }
 
 const mockOIDCHelperGetIssuer = async () => {
-  return await esmock('../server/utils/openid-client-helper.js', {
+  return esmock('../server/utils/openid-client-helper.js', {
     'openid-client': {
       Issuer: {
-        discover: () => {}
+        discover: () => { /* This is intentional blank */ }
       }
     }
   })
 }
 
 const mockOIDCHelperGetIssuerWithoutDiscovery = async () => {
-  return await esmock('../server/utils/openid-client-helper.js', {
+  return esmock('../server/utils/openid-client-helper.js', {
     'openid-client': {
       Issuer: {
-        default: () => {},
+        default: () => { /* This is intentional blank */ },
         discover: () => {
           throw new Error('Not connecting')
         }
