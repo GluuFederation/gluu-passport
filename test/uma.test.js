@@ -26,7 +26,7 @@ const ticketResponse = (mockTicket = 'valid_ticket') => ({
 })
 
 const mockUMA = async (tokenEndpoint = umaConfigTokenEndpoint, rptToken = 'valid_token') => {
-  return await esmock('../server/utils/uma.js', {
+  return esmock('../server/utils/uma.js', {
     got: {
       default: {
         get: async () => {
@@ -41,7 +41,7 @@ const mockUMA = async (tokenEndpoint = umaConfigTokenEndpoint, rptToken = 'valid
 }
 
 const mockUMAWithErrorResponse = async (errorMessage) => {
-  return await esmock('../server/utils/uma.js', {
+  return esmock('../server/utils/uma.js', {
     got: {
       default: {
         get: async () => {
@@ -56,7 +56,7 @@ const mockUMAWithErrorResponse = async (errorMessage) => {
 }
 
 const mockUMADoRequestWithTicket = async (rptToken = 'valid_token') => {
-  return await esmock('../server/utils/uma.js', {
+  return esmock('../server/utils/uma.js', {
     got: {
       default: {
         get: async () => {
@@ -76,7 +76,7 @@ const configResponse = {
 }
 
 const mockUMADoRequestWithConfigResponse = async () => {
-  return await esmock('../server/utils/uma.js', {
+  return esmock('../server/utils/uma.js', {
     got: {
       default: {
         get: async () => {
@@ -88,7 +88,7 @@ const mockUMADoRequestWithConfigResponse = async () => {
 }
 
 const mockUMAProcessUnauthorized = async (tokenEndpoint = umaConfigTokenEndpoint, rptToken = 'valid_rpt') => {
-  return await esmock('../server/utils/uma.js', {
+  return esmock('../server/utils/uma.js', {
     got: {
       default: {
         get: async (uri) => {
@@ -107,7 +107,7 @@ const mockUMAProcessUnauthorized = async (tokenEndpoint = umaConfigTokenEndpoint
 }
 
 const mockUMARequest = async (tokenEndpoint = umaConfigTokenEndpoint, rptToken = 'valid_rpt') => {
-  return await esmock('../server/utils/uma.js', {
+  return esmock('../server/utils/uma.js', {
     got: {
       default: {
         get: async (uri, options) => {
