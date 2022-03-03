@@ -1,12 +1,15 @@
-const chai = require('chai')
-const rewire = require('rewire')
-const providers = rewire('../server/providers.js')
-const config = require('config')
-const PassportSAMLStrategy = require('passport-saml').Strategy
-const helper = require('./helper')
-const fs = require('fs').promises
-const path = require('path')
+import chai from 'chai'
+import * as providers from '../server/providers.js'
+import config from 'config'
+import passportSAML from 'passport-saml'
+import * as helper from './helper.js'
+import fs from 'fs'
+import { fileURLToPath } from 'url'
+import * as path from 'path'
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const fsPromises = fs.promises
+const PassportSAMLStrategy = passportSAML.Strategy
 const assert = chai.assert
 const passportConfigAuthorizedResponse = config.get('passportConfigAuthorizedResponse')
 
@@ -17,23 +20,23 @@ describe('providers.js', () => {
       helper.configureLogger()
       const passportFullConfig = config.get('passportConfigAuthorizedResponse')
       const iiconfigStub = passportFullConfig.idpInitiated
-      providers.__set__('iiconfig', iiconfigStub)
+      global.iiconfig = iiconfigStub
     })
 
-    const passportStrategies = providers.__get__('passportStrategies')
-    const setupStrategy = providers.__get__('setupStrategy')
+    const setupStrategy = providers.setupStrategy
     const testProvider = {
       ...passportConfigAuthorizedResponse.providers[0],
       verifyCallbackArity: 0
     }
 
     it('passport strategies array should be empty first time', () => {
+      const passportStrategies = providers.passportStrategies
       assert.deepEqual(passportStrategies, [])
     })
 
-    it('new strategy should be added in passport strategies', () => {
-      setupStrategy(testProvider)
-
+    it('new strategy should be added in passport strategies', async () => {
+      await setupStrategy(testProvider)
+      const passportStrategies = providers.passportStrategies
       assert.lengthOf(passportStrategies, 1)
       assert.isFunction(
         passportStrategies[0].Strategy,
@@ -43,6 +46,7 @@ describe('providers.js', () => {
 
     it('added strategy should be a function', () => {
       setupStrategy(testProvider)
+      const passportStrategies = providers.passportStrategies
       assert.isFunction(
         passportStrategies[0].Strategy,
         'Strategy is not a function!'
@@ -51,6 +55,7 @@ describe('providers.js', () => {
 
     it('existing loaded strategy should be found and load again', () => {
       setupStrategy(testProvider)
+      const passportStrategies = providers.passportStrategies
 
       assert.lengthOf(passportStrategies, 1)
       assert.isFunction(
@@ -75,7 +80,7 @@ describe('providers.js', () => {
   })
 
   describe('applyMapping', () => {
-    const applyMappingRewire = providers.__get__('applyMapping')
+    const applyMappingRewire = providers.applyMapping
     const fakeProfile = {
       sub: 'loganXMen',
       email: 'logan@gmail.com',
@@ -87,9 +92,9 @@ describe('providers.js', () => {
       assert.isFunction(applyMappingRewire)
     })
 
-    it('should return mapped data as per mapping file config', () => {
+    it('should return mapped data as per mapping file config', async () => {
       global.providers = passportConfigAuthorizedResponse.providers
-      const mappedProfileResult = applyMappingRewire(fakeProfile, 'oidccedev6privatejwt')
+      const mappedProfileResult = await applyMappingRewire(fakeProfile, 'oidccedev6privatejwt')
       const fakeMappedProfile = {
         uid: fakeProfile.sub,
         mail: fakeProfile.email,
@@ -104,7 +109,7 @@ describe('providers.js', () => {
 
     it('should log user profile data in log file', async () => {
       const passportLogFilePath = path.join(__dirname, '../server/utils/logs/passport.log')
-      const data = await fs.readFile(passportLogFilePath, 'binary')
+      const data = await fsPromises.readFile(passportLogFilePath, 'binary')
       assert(data.includes('Raw profile is'))
       assert(data.includes(fakeProfile.email))
       assert(data.includes(fakeProfile.name))

@@ -1,16 +1,11 @@
+import chai from 'chai'
+import { windowMs, rateLimiter, max } from '../server/utils/rate-limiter.js'
+import config from 'config'
+import rateLimit from 'express-rate-limit'
 
-const chai = require('chai')
 const assert = chai.assert
-const rewire = require('rewire')
-const rateLimiterRewire = rewire('../server/utils/rate-limiter')
-const config = require('config')
-const rateLimit = require('express-rate-limit')
 
 describe('rate-limiter.js test', () => {
-  const windowMs = rateLimiterRewire.__get__('windowMs')
-  const max = rateLimiterRewire.__get__('max')
-  const rateLimiter = rateLimiterRewire.__get__('rateLimiter')
-
   it('windowMs should exist', () => {
     assert.exists(windowMs)
   })

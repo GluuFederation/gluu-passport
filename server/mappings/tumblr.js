@@ -1,4 +1,4 @@
-module.exports = profile => {
+export default function (profile) {
   return {
     uid: profile.username,
     // It is not certain if these ones work. tumblr node does not explicitly populate this fields

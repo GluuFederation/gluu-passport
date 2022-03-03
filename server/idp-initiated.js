@@ -1,11 +1,11 @@
-const R = require('ramda')
-const { v4: uuidv4 } = require('uuid')
-const providersModule = require('./providers')
-const webutil = require('./utils/web-utils')
-const misc = require('./utils/misc')
-const logger = require('./utils/logging')
-const base64url = require('base64url')
-const querystring = require('querystring')
+import R from 'ramda'
+import { v4 as uuidv4 } from 'uuid'
+import * as providersModule from './providers.js'
+import * as webutil from './utils/web-utils.js'
+import * as misc from './utils/misc.js'
+import * as logger from './utils/logging.js'
+import base64url from 'base64url'
+import querystring from 'querystring'
 
 function createAuthzRequest (user, iiconfig, provider) {
   logger.log2('debug', 'idp-initiated.createAuthzRequest: entered function ')
@@ -139,6 +139,7 @@ function process (req, res, next) {
   }
 }
 
-module.exports = {
-  process: process
+export {
+  process,
+  createAuthzRequest
 }

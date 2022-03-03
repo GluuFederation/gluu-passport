@@ -1,8 +1,7 @@
-
-const chai = require('chai')
-const sinon = require('sinon')
-const got = require('got')
-const config = require('config')
+import chai from 'chai'
+import sinon from 'sinon'
+import got from 'got'
+import config from 'config'
 // const { globalErrorHandler } = require('../server/utils/error-handler.js')
 
 const assert = chai.assert

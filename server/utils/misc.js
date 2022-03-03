@@ -1,9 +1,9 @@
-const config = require('config')
-const R = require('ramda')
-const sha1 = require('sha1')
-const jwt = require('jsonwebtoken')
-const crypto = require('crypto')
-const fs = require('fs')
+import config from 'config'
+import R from 'ramda'
+import sha1 from 'sha1'
+import jwt from 'jsonwebtoken'
+import crypto from 'crypto'
+import fs from 'fs'
 
 const randomSecret = () => {
   const buf = crypto.randomBytes(256)
@@ -132,17 +132,17 @@ function encrypt (obj) {
   return encrypted
 }
 
-module.exports = {
-  isObject: isObject,
-  hash: hash,
-  pathsHaveData: pathsHaveData,
-  hasData: hasData,
-  pipePromise: pipePromise,
-  curry2AndFlip: curry2AndFlip,
-  arrify: arrify,
-  getRpJWT: getRpJWT,
-  getJWT: getJWT,
-  verifyJWT: verifyJWT,
-  encrypt: encrypt,
-  randomSecret: randomSecret
+export {
+  isObject,
+  hash,
+  pathsHaveData,
+  hasData,
+  pipePromise,
+  curry2AndFlip,
+  arrify,
+  getRpJWT,
+  getJWT,
+  verifyJWT,
+  encrypt,
+  randomSecret
 }

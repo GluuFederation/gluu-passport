@@ -1,4 +1,4 @@
-module.exports = profile => {
+export default function (profile) {
   return {
     uid: profile['urn:oid:0.9.2342.19200300.100.1.1'],
     // memberOf: profile["urn:1.3.6.1.4.1.48710.1.3.121"],

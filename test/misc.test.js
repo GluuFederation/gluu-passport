@@ -1,33 +1,50 @@
-
-const chai = require('chai')
-const misc = require('../server/utils/misc')
-const rewire = require('rewire')
-const rewiredMisc = rewire('../server/utils/misc.js')
-const sinon = require('sinon')
+import chai from 'chai'
+import esmock from 'esmock'
 
 const assert = chai.assert
 
+const mockMiscModule = async () => {
+  return esmock('../server/utils/misc.js', {
+    crypto: {
+      randomBytes: (no) => 'randomBuffer'
+    }
+  })
+}
+
 describe('misc.randomSecret', () => {
+  let mockMisc
+  before(async () => {
+    mockMisc = await mockMiscModule()
+  })
+
+  after(() => {
+    esmock.purge(mockMisc)
+  })
+
   it('should exist', () => {
-    assert.exists(misc.randomSecret)
+    assert.exists(mockMisc.randomSecret)
   })
 
   it('should be function', () => {
-    assert.isFunction(misc.randomSecret)
+    assert.isFunction(mockMisc.randomSecret)
   })
 
   it('should call crypto once', () => {
-    const crypto = rewiredMisc.__get__('crypto')
-    const randomBytesSpy = sinon.spy(crypto, 'randomBytes')
-    const randomSecret = rewiredMisc.__get__('randomSecret')
-
-    randomSecret()
-
-    sinon.assert.calledOnce(randomBytesSpy)
+    const randomSecret = mockMisc.randomSecret()
+    assert.equal(randomSecret, 'randomBuffer')
   })
 })
 
 describe('misc.arrify', () => {
+  let mockMisc
+  before(async () => {
+    mockMisc = await mockMiscModule()
+  })
+
+  after(() => {
+    esmock.purge(mockMisc)
+  })
+
   /* This functions aims at transforming every key value
    of an object in the following way:
 
@@ -44,7 +61,7 @@ describe('misc.arrify', () => {
 
   it('arrify should transform { "mail" : ""} in { mail : [] } ', () => {
     assert.deepEqual(
-      misc.arrify({ mail: '' }),
+      mockMisc.arrify({ mail: '' }),
       { mail: [] }
     )
   })
@@ -52,7 +69,7 @@ describe('misc.arrify', () => {
   it('arrify should transform { "username" : "johndoe" }' +
   ' in { "username" : ["johndoe"] }', () => {
     assert.deepEqual(
-      misc.arrify({ username: 'johndoe' }),
+      mockMisc.arrify({ username: 'johndoe' }),
       { username: ['johndoe'] }
     )
   })
@@ -61,7 +78,7 @@ describe('misc.arrify', () => {
   '{ "mail" : [ "business@mail.com" , "personal@mail.com"] }' +
   ' in { "mail" : [ "business@mail.com" , "personal@mail.com"] }', () => {
     assert.deepEqual(
-      misc.arrify({
+      mockMisc.arrify({
         mail:
       ['business@mail.com', 'personal@mail.com']
       }),
@@ -72,7 +89,7 @@ describe('misc.arrify', () => {
   it(' { "job" : [{"company":"gluu"}, {"role":"devops"}] } ' +
   'in { "job" : ["{"company":"gluu"}", "{"role":"devops"}"] }', () => {
     assert.deepEqual(
-      misc.arrify(
+      mockMisc.arrify(
         { job: [{ company: 'gluu' }, { role: 'devops' }] }
       ),
       { job: ['{"company":"gluu"}', '{"role":"devops"}'] }
@@ -82,28 +99,28 @@ describe('misc.arrify', () => {
   it(' { "mail" : { "gmail" : "johndoe@gmail.com" } } ' +
   'in { "mail" : ["{"gmail" : "johndoe@gmail.com"}"] }', () => {
     assert.deepEqual(
-      misc.arrify({ mail: { gmail: 'johndoe@gmail.com' } }),
+      mockMisc.arrify({ mail: { gmail: 'johndoe@gmail.com' } }),
       { mail: ['{"gmail":"johndoe@gmail.com"}'] }
     )
   })
 
   it(' { profiles : [] } --> { profiles : [] }', () => {
     assert.deepEqual(
-      misc.arrify({ profiles: [] }),
+      mockMisc.arrify({ profiles: [] }),
       { profiles: [] }
     )
   })
 
   it(' { profiles : undefined } --> { profiles : [] }', () => {
     assert.deepEqual(
-      misc.arrify({ profiles: undefined }),
+      mockMisc.arrify({ profiles: undefined }),
       { profiles: [] }
     )
   })
 
   it(' { profiles : null } --> { profiles : [] }', () => {
     assert.deepEqual(
-      misc.arrify({ profiles: null }),
+      mockMisc.arrify({ profiles: null }),
       { profiles: [] }
     )
   })
@@ -112,7 +129,7 @@ describe('misc.arrify', () => {
   it(' { key: function() { return 0; }, key2: "hi" } --> { key2: ["hi"] }',
     () => {
       assert.deepEqual(
-        misc.arrify({ key: function () { return 0 }, key2: 'hi' }),
+        mockMisc.arrify({ key: function () { return 0 }, key2: 'hi' }),
         { key2: ['hi'] }
       )
     })

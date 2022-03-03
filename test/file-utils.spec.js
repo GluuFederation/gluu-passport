@@ -1,6 +1,10 @@
-const chai = require('chai')
-const fileUtils = require('../server/utils/file-utils')
-const path = require('path')
+import chai from 'chai'
+import path from 'path'
+import fs from 'fs'
+import * as fileUtils from '../server/utils/file-utils.js'
+import { fileURLToPath } from 'url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const assert = chai.assert
 
@@ -11,7 +15,11 @@ describe('fileUtils.writeDataToFile', () => {
     await fileUtils.writeDataToFile(fileName, JSON.stringify({ ktype: 'RS256' }))
 
     assert.exists(fileName)
-    const jwksFile = require(fileName)
+    const jwksFile = JSON.parse(
+      fs.readFileSync(
+        new URL(fileName, import.meta.url)
+      )
+    )
     assert.equal(jwksFile.ktype, 'RS256')
   })
 })

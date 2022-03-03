@@ -1,11 +1,12 @@
 /* eslint-disable node/handle-callback-err */
-const got = require('got')
-const parsers = require('www-authenticate').parsers
-const R = require('ramda')
-const { v4: uuidv4 } = require('uuid')
-const misc = require('./misc')
-const logger = require('./logging')
+import got from 'got'
+import wwwAuthenticate from 'www-authenticate'
+import R from 'ramda'
+import { v4 as uuidv4 } from 'uuid'
+import * as misc from './misc.js'
+import * as logger from './logging.js'
 
+const parsers = wwwAuthenticate.parsers
 let rpt
 
 /**
@@ -17,7 +18,13 @@ let rpt
 
 function getTokenEndpoint (umaConfigURL) {
   logger.log2('verbose', 'getTokenEndpoint called for ' + umaConfigURL)
-  return got.get(umaConfigURL, { responseType: 'json' })
+
+  const options = {
+    https: { rejectUnauthorized: false },
+    responseType: 'json'
+  }
+
+  return got.get(umaConfigURL, options)
     .then(response => {
       const body = response.body
       logger.log2(
@@ -69,6 +76,7 @@ function getRPT (ticket, tokenEndpoint) {
   const token = makeClientAssertionJWTToken(clientId, tokenEndpoint)
   const options = {
     responseType: 'json',
+    https: { rejectUnauthorized: false },
     form: {
       grant_type: 'urn:ietf:params:oauth:grant-type:uma-ticket',
       client_assertion_type:
@@ -116,6 +124,7 @@ function doRequest (requestOptions) {
     }
     options.headers = R.mergeRight(options.headers, headers)
   }
+  options.https = { rejectUnauthorized: false }
 
   logger.log2(
     'debug', `doRequest. options = ${JSON.stringify(
@@ -168,6 +177,11 @@ function doRequest (requestOptions) {
           )
         }
       }
+    })
+    .catch((err) => {
+      logger.log2('error', `doRequest. Failed to get config ${uri}`)
+      logger.log2('error', err)
+      throw new Error(err.message)
     })
 }
 
@@ -229,6 +243,11 @@ function request (options) {
   return chain(options)
 }
 
-module.exports = {
-  request: request
+export {
+  request,
+  getTokenEndpoint,
+  getRPT,
+  doRequest,
+  processUnauthorized,
+  makeClientAssertionJWTToken
 }

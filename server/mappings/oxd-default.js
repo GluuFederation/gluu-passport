@@ -1,4 +1,4 @@
-module.exports = profile => {
+export default function (profile) {
   return {
     uid: profile.user_name || profile.sub,
     mail: profile.email,

@@ -1,7 +1,8 @@
-const expressSession = require('express-session')
-const MemoryStore = require('memorystore')(expressSession)
-const config = require('config')
-const { randomSecret } = require('../utils/misc')
+import expressSession from 'express-session'
+import createMemoryStore from 'memorystore'
+import config from 'config'
+import { randomSecret } from '../utils/misc.js'
+const MemoryStore = createMemoryStore(expressSession)
 
 const expressSessionConfig = {
   cookie: {
@@ -19,6 +20,7 @@ const expressSessionConfig = {
 
 const session = expressSession(expressSessionConfig)
 
-module.exports = {
-  session
+export {
+  session,
+  expressSessionConfig
 }

@@ -1,6 +1,6 @@
-const misc = require('./misc')
-const logger = require('./logging')
-const uma = require('./uma')
+import * as misc from './misc.js'
+import * as logger from './logging.js'
+import * as uma from './uma.js'
 
 /**
  * Validates and parses data fetched from config endpoint
@@ -36,6 +36,7 @@ function retrieve (cfgEndpoint) {
   return chain(options)
 }
 
-module.exports = {
-  retrieve: retrieve
+export {
+  retrieve,
+  validate
 }

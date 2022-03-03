@@ -1,6 +1,6 @@
 // Mocks for values used in app.init() flow
-const config = require('config')
-const nock = require('nock')
+import config from 'config'
+import nock from 'nock'
 
 /**
  * Mocks for app.init() flow.
@@ -353,4 +353,4 @@ class InitMock {
   }
 }
 
-module.exports = InitMock
+export default InitMock

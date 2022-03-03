@@ -1,6 +1,6 @@
-const { Given, When, Then, BeforeStep, AfterStep } = require('@cucumber/cucumber')
-const chai = require('chai')
-const { setupServer } = require('../../helper')
+import { Given, When, Then, BeforeStep, AfterStep } from '@cucumber/cucumber'
+import chai from 'chai'
+import { setupServer } from '../../helper.js'
 
 const assert = chai.assert
 let requester

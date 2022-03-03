@@ -1,7 +1,7 @@
-const chai = require('chai')
-const rewire = require('rewire')
-const rewiredOpenIDClientHelper = rewire('../server/utils/openid-client-helper')
-const config = require('config')
+import chai from 'chai'
+import config from 'config'
+import fs from 'fs'
+import * as rewiredOpenIDClientHelper from '../server/utils/openid-client-helper.js'
 
 const assert = chai.assert
 const passportConfigAuthorizedResponse = config.get('passportConfigAuthorizedResponse')
@@ -13,15 +13,19 @@ describe('Integration Test OpenID Client Helper', () => {
   let jwks
 
   describe('generateJWKS test', () => {
-    const generateJWKS = rewiredOpenIDClientHelper.__get__('generateJWKS')
+    const generateJWKS = rewiredOpenIDClientHelper.generateJWKS
 
     it('should generate jwks for provider in jwks folder', async () => {
       await generateJWKS(testProvider)
       assert.exists(jwksFilePath, `${jwksFilePath} file not found`)
     })
 
-    it('jwks should have keys', () => {
-      jwks = require(jwksFilePath)
+    it('jwks should have keys', async () => {
+      jwks = JSON.parse(
+        fs.readFileSync(
+          new URL(jwksFilePath, import.meta.url)
+        )
+      )
       assert.isArray(jwks.keys, 'keys not found in jwks')
     })
 
@@ -42,7 +46,11 @@ describe('Integration Test OpenID Client Helper', () => {
 
     it('make sure generateJWKS not regenerating jwks again and rewrite existing jwks data', async () => {
       await generateJWKS(testProvider)
-      jwks = require(jwksFilePath)
+      jwks = JSON.parse(
+        fs.readFileSync(
+          new URL(jwksFilePath, import.meta.url)
+        )
+      )
       assert.equal(kid, jwks.keys[0].kid, `${kid} is not matching with ${jwks.keys[0].kid}`)
     })
   })

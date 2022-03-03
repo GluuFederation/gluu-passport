@@ -1,18 +1,19 @@
-const passport = require('passport')
-const R = require('ramda')
-const spMetadata = require('./sp-meta')
-const misc = require('./utils/misc')
-const logger = require('./utils/logging')
-const extraPassportParams = require('./extra-passport-params')
-const cacheProvider = require('./cache-provider')
-const { getClient } = require('./utils/openid-client-helper')
+import passport from 'passport'
+import R from 'ramda'
+import fs from 'fs'
+import * as spMetadata from './sp-meta.js'
+import * as misc from './utils/misc.js'
+import * as logger from './utils/logging.js'
+import * as extraPassportParams from './extra-passport-params.js'
+import * as cacheProvider from './cache-provider.js'
+import { getClient } from './utils/openid-client-helper.js'
 
 let prevConfigHash = 0
 
 // These are the (node) strategies loaded so far: [{id: "...", Strategy: ...}, ... ]
 const passportStrategies = []
 
-function applyMapping (profile, provider) {
+async function applyMapping (profile, provider) {
   let mappedProfile
   try {
     const mapping = global.providers.find(
@@ -24,7 +25,8 @@ function applyMapping (profile, provider) {
     logger.log2('debug', `Raw profile is ${JSON.stringify(profile)}`)
     logger.log2('info', `Applying mapping '${mapping}' to profile`)
 
-    mappedProfile = require('./mappings/' + mapping)(profile, additionalParams)
+    const mappedFile = await import(`./mappings/${mapping}.js`)
+    mappedProfile = mappedFile.default(profile, additionalParams)
     logger.log2('debug', `Resulting profile data is\n${JSON.stringify(mappedProfile, null, 4)}`)
   } catch (err) {
     logger.log2('error', `An error occurred: ${err}`)
@@ -66,7 +68,7 @@ async function setupStrategy (provider) {
     Strategy = Strategy.Strategy
   } else {
     logger.log2('info', `Loading node strategy module ${strategyModule}`)
-    Strategy = require(strategyModule)
+    Strategy = await import(strategyModule)
 
     if (provider.type === 'oauth' && Strategy.OAuth2Strategy) {
       Strategy = Strategy.OAuth2Strategy
@@ -214,7 +216,7 @@ function fillMissingData (providers) {
       // Smells like apple...
       try {
         // @TODO: we have to make the UI fields multiline so they can paste the contents and avoid this
-        options.key = require('fs').readFileSync(options.key, 'utf8')
+        options.key = fs.readFileSync(options.key, 'utf8')
       } catch (e) {
         logger.log2('warn', `There was a problem reading file ${options.key}. Ensure the file exists and is readable`)
         logger.log2('error', e.stack)
@@ -272,7 +274,9 @@ function setup (providers) {
   }
 }
 
-module.exports = {
-  setup: setup,
-  applyMapping: applyMapping
+export {
+  setup,
+  applyMapping,
+  passportStrategies,
+  setupStrategy
 }

@@ -1,11 +1,12 @@
 // Use this file to avoid repeating yourself (DRY!), helper functions.
 
-const InitMock = require('./testdata/init-mock')
-const logger = require('../server/utils/logging')
-const config = require('config')
+import InitMock from './testdata/init-mock.js'
+import * as logger from '../server/utils/logging.js'
+import config from 'config'
+import chai from 'chai'
+import chaiHttp from 'chai-http'
+
 const basicConfig = config.get('passportConfig')
-const chai = require('chai')
-const chaiHttp = require('chai-http')
 chai.use(chaiHttp)
 
 /**
@@ -32,16 +33,19 @@ const configureLogger = () => {
 /**
  * Setup and start server for cucumber test
  */
-const setupServer = async function () {
-  const app = require('../server/app')
-  await app.on('appStarted', () => {
-    console.log('app started...')
-  })
-  await app.rateLimiter.resetKey('::ffff:127.0.0.1')
-  return chai.request(app).keepOpen()
+const setupServer = function () {
+  return import('../server/app.js')
+    .then(async (module) => {
+      const server = module.default
+      await server.on('appStarted', function () {
+        console.log('app started event listened...')
+      })
+      await server.rateLimiter.resetKey('::ffff:127.0.0.1') // NOSONAR
+      return chai.request(server).keepOpen()
+    })
 }
 
-module.exports = {
+export {
   mockedAppInit,
   configureLogger,
   setupServer

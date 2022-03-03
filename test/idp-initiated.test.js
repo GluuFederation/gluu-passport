@@ -1,12 +1,10 @@
-
-const chai = require('chai')
-const rewire = require('rewire')
-const idpInitiated = rewire('../server/idp-initiated.js')
+import chai from 'chai'
+import base64url from 'base64url'
+import jwt from 'jsonwebtoken'
+import config from 'config'
+import * as helper from './helper.js'
+import * as idpInitiated from '../server/idp-initiated.js'
 const assert = chai.assert
-const base64url = require('base64url')
-const jwt = require('jsonwebtoken')
-const config = require('config')
-const helper = require('./helper')
 
 /* This is how passportFile looks like
 {
@@ -63,13 +61,13 @@ describe('idp-initiated.createAuthzRequest', () => {
   }
 
   // "importing" not exported function
-  const createAuthzRequest = idpInitiated.__get__('createAuthzRequest')
+  const createAuthzRequest = idpInitiated.createAuthzRequest
 
   before(() => {
     // set stubs
     helper.configureLogger()
-    idpInitiated.__set__('basicConfig', config.get('passportConfig'))
-    idpInitiated.__set__('config', config.get('passportConfigAuthorizedResponse'))
+    global.basicConfig = config.get('passportConfig')
+    global.config = config.get('passportConfigAuthorizedResponse')
   })
 
   afterEach(() => {

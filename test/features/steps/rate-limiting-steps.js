@@ -1,11 +1,10 @@
-const { Given, When, Then, AfterStep, BeforeStep } = require('@cucumber/cucumber')
-const chai = require('chai')
-const config = require('config')
-const { setupServer } = require('../../helper')
+import { Given, When, Then, AfterStep, BeforeStep } from '@cucumber/cucumber'
+import chai from 'chai'
+import config from 'config'
+import { setupServer } from '../../helper.js'
 
 const assert = chai.assert
-let requester
-require('events').defaultMaxListeners = 100
+let requester, lastResponse
 
 BeforeStep(async () => {
   requester = await setupServer()
@@ -23,11 +22,11 @@ Given('configured rate limit is 100 requests in 86400000 ms', async () => {
 
 When('{string} is requested {int} times in less then 86400000 ms by the same client', async (endpoint, requestsCount) => {
   for (let i = 1; i <= requestsCount; i++) {
-    this.lastResponse = await requester.get(`/passport${endpoint}`)
+    lastResponse = await requester.get(`/passport${endpoint}`)
   }
 })
 
 Then('last request response should have status code {int}', async (responseStatusCode) => {
-  assert.equal(this.lastResponse.statusCode, responseStatusCode,
+  assert.equal(lastResponse.statusCode, responseStatusCode,
     `response.statusCode is NOT ${responseStatusCode}`)
 })

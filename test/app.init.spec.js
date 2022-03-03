@@ -1,8 +1,8 @@
-const chai = require('chai')
-const config = require('config')
-const chaiHttp = require('chai-http')
-const InitMock = require('./testdata/init-mock')
-const chaiFiles = require('chai-files')
+import chai from 'chai'
+import config from 'config'
+import chaiHttp from 'chai-http'
+import chaiFiles from 'chai-files'
+import InitMock from './testdata/init-mock.js'
 
 const passportConfig = config.get('passportConfig')
 

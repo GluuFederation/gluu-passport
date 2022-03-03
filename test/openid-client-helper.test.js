@@ -1,23 +1,86 @@
-const chai = require('chai')
-const { Strategy } = require('openid-client')
-const rewire = require('rewire')
-const rewiredOpenIDClientHelper = rewire('../server/utils/openid-client-helper')
-const InitMock = require('./testdata/init-mock')
-const config = require('config')
-const nock = require('nock')
-const sinon = require('sinon')
-const jose = require('jose')
-const { v4: uuidv4 } = require('uuid')
-const fileUtils = require('../server/utils/file-utils')
+import chai from 'chai'
+import config from 'config'
+import sinon from 'sinon'
+import esmock from 'esmock'
+import { v4 as uuidv4 } from 'uuid'
+import { Strategy } from 'openid-client'
+import nock from 'nock'
+import InitMock from './testdata/init-mock.js'
 
 const assert = chai.assert
 const passportConfigAuthorizedResponse = config.get('passportConfigAuthorizedResponse')
 
-describe('Test OpenID Client Helper', () => {
-  const testProvider = passportConfigAuthorizedResponse.providers.find(p => p.id === 'oidccedev6privatejwt')
+const mockOIDCHelperGenerateJWKS = async (makeDirSpy, joseGenerateKeyPairSpy, exportJWKSpy, calculateJwkThumbprintSpy, writeDataToFileSpy) => {
+  return esmock('../server/utils/openid-client-helper.js', {
+    '../server/utils/file-utils.js': {
+      makeDir: () => {
+        makeDirSpy()
+        return '../server/jwks'
+      },
+      writeDataToFile: async () => {
+        writeDataToFileSpy()
+        return undefined
+      }
+    },
+    jose: {
+      generateKeyPair: async () => {
+        joseGenerateKeyPairSpy()
+        return { privateKey: 'xyz', publicKey: 'abc' }
+      },
+      exportJWK: async () => {
+        exportJWKSpy()
+        return {}
+      },
+      calculateJwkThumbprint: async () => {
+        calculateJwkThumbprintSpy()
+        return 'kid_random'
+      }
+    }
+  })
+}
 
+const mockOIDCHelperGetIssuer = async () => {
+  return esmock('../server/utils/openid-client-helper.js', {
+    'openid-client': {
+      Issuer: {
+        discover: () => { /* This is intentional blank */ }
+      }
+    }
+  })
+}
+
+const mockOIDCHelperGetIssuerWithoutDiscovery = async () => {
+  return esmock('../server/utils/openid-client-helper.js', {
+    'openid-client': {
+      Issuer: {
+        default: () => { /* This is intentional blank */ },
+        discover: () => {
+          throw new Error('Not connecting')
+        }
+      }
+    }
+  })
+}
+
+describe('Test OpenID Client Helper', () => {
   describe('generateJWKS test', () => {
-    const generateJWKS = rewiredOpenIDClientHelper.__get__('generateJWKS')
+    let generateJWKS, oidcHelper, makeDirSpy, joseGenerateKeyPairSpy, exportJWKSpy, calculateJwkThumbprintSpy, writeDataToFileSpy
+
+    before(async () => {
+      makeDirSpy = sinon.spy()
+      joseGenerateKeyPairSpy = sinon.spy()
+      exportJWKSpy = sinon.spy()
+      calculateJwkThumbprintSpy = sinon.spy()
+      writeDataToFileSpy = sinon.spy()
+      oidcHelper = await mockOIDCHelperGenerateJWKS(makeDirSpy, joseGenerateKeyPairSpy, exportJWKSpy, calculateJwkThumbprintSpy, writeDataToFileSpy)
+      generateJWKS = oidcHelper.generateJWKS
+    })
+
+    after(() => {
+      esmock.purge(oidcHelper)
+      sinon.restore()
+    })
+
     const callGenerateJWKS = async () => {
       try {
         await generateJWKS({ id: uuidv4() })
@@ -33,46 +96,38 @@ describe('Test OpenID Client Helper', () => {
     })
 
     it('should call fileUtils.makeDir once', async () => {
-      const makeDirSpy = sinon.spy(fileUtils, 'makeDir')
       await callGenerateJWKS()
       assert.isTrue(makeDirSpy.calledOnce)
-      sinon.restore()
     })
 
     it('should call generateKeyPair once', async () => {
-      const generateKeyPairSpy = sinon.spy()
-      sinon.stub(jose, 'generateKeyPair').value(generateKeyPairSpy)
-      await callGenerateJWKS()
-      assert.isTrue(generateKeyPairSpy.calledOnce)
-      sinon.restore()
+      assert.isTrue(joseGenerateKeyPairSpy.calledOnce)
     })
 
     it('should call exportJWK twice', async () => {
-      const exportJWKSpy = sinon.spy()
-      sinon.stub(jose, 'exportJWK').value(exportJWKSpy)
-      await callGenerateJWKS()
       assert.isTrue(exportJWKSpy.calledTwice)
-      sinon.restore()
     })
 
     it('should call calculateJwkThumbprint once', async () => {
-      const calculateJwkThumbprintSpy = sinon.spy()
-      sinon.stub(jose, 'calculateJwkThumbprint').value(calculateJwkThumbprintSpy)
-      await callGenerateJWKS()
       assert.isTrue(calculateJwkThumbprintSpy.calledOnce)
-      sinon.restore()
     })
 
     it('should call fileUtils.writeDataToFile once', async () => {
-      const writeDataToFileSpy = sinon.spy(fileUtils, 'writeDataToFile')
-      await callGenerateJWKS()
       assert.isTrue(writeDataToFileSpy.calledOnce)
-      sinon.restore()
     })
   })
 
   describe('getIssuer test', () => {
-    const getIssuer = rewiredOpenIDClientHelper.__get__('getIssuer')
+    let oidcHelper, getIssuer
+
+    before(async () => {
+      oidcHelper = await mockOIDCHelperGetIssuer()
+      getIssuer = oidcHelper.getIssuer
+    })
+
+    after(() => {
+      esmock.purge(oidcHelper)
+    })
 
     it('should exist', () => {
       assert.exists(getIssuer)
@@ -83,22 +138,32 @@ describe('Test OpenID Client Helper', () => {
     })
 
     it('should return the Issuer object when no discovery endpoint available', async () => {
-      const issuer = await getIssuer(testProvider)
+      const issuer = await getIssuer({})
       assert.exists(issuer, 'failed to setup issuer object')
     })
 
     it('should return the Issuer object when discovery endpoint available', async () => {
-      const initMock = new InitMock()
-      initMock.discoveryURL(testProvider.options.issuer)
+      esmock.purge(oidcHelper)
+      oidcHelper = await mockOIDCHelperGetIssuerWithoutDiscovery()
+      getIssuer = oidcHelper.getIssuer
 
-      const issuer = await getIssuer(testProvider)
+      const issuer = await getIssuer({})
       assert.exists(issuer, 'failed to setup issuer object')
-      nock.cleanAll()
     })
   })
 
   describe('getClient test', () => {
-    const getClient = rewiredOpenIDClientHelper.__get__('getClient')
+    let oidcHelper, getClient
+    const testProvider = passportConfigAuthorizedResponse.providers.find(p => p.id === 'oidccedev6privatejwt')
+
+    before(async () => {
+      oidcHelper = await mockOIDCHelperGetIssuer()
+      getClient = oidcHelper.getClient
+    })
+
+    after(() => {
+      esmock.purge(oidcHelper)
+    })
 
     it('should exist', () => {
       assert.exists(getClient)

@@ -1,7 +1,7 @@
-const config = require('config')
+import config from 'config'
+import ga from 'global-agent'
 
 if (config.has('HTTP_PROXY')) {
-  const ga = require('global-agent')
   ga.bootstrap()
   global.GLOBAL_AGENT.HTTP_PROXY = config.get('HTTP_PROXY')
   global.GLOBAL_AGENT.HTTPS_PROXY = config.get('HTTPS_PROXY')

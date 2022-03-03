@@ -1,7 +1,7 @@
-const chai = require('chai')
-const config = require('config')
-const http = require('http')
-const https = require('https')
+import chai from 'chai'
+import config from 'config'
+import http from 'http'
+import https from 'https'
 
 const assert = chai.assert
 const HTTP_PROXY = config.get('HTTP_PROXY')

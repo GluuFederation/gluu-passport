@@ -1,11 +1,12 @@
-const config = require('config')
-const logger = require('./utils/logging')
-const misc = require('./utils/misc')
-const confDiscovery = require('./utils/configDiscovery')
-const providers = require('./providers')
-const passportFile = config.get('passportFile')
-const AppFactory = require('./app-factory')
+import config from 'config'
+import fs from 'fs'
+import * as logger from './utils/logging.js'
+import * as misc from './utils/misc.js'
+import * as confDiscovery from './utils/configDiscovery.js'
+import * as providers from './providers.js'
+import { AppFactory } from './app-factory.js'
 
+const passportFile = config.get('passportFile')
 let httpServer
 let httpPort = -1
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
@@ -38,7 +39,6 @@ function recreateHttpServer (serverURI, port) {
       console.log(`Server listening on ${serverURI}:${port}`)
       app.emit('appStarted') // event emitter for tests
     })
-    module.exports = httpServer
   }
 }
 
@@ -55,7 +55,6 @@ function reconfigure (cfg) {
 function pollConfiguration (configEndpoint) {
   misc.pipePromise(confDiscovery.retrieve, reconfigure)(configEndpoint)
     .catch(e => {
-      logger.log2('error', e.toString())
       logger.log2('debug', e.stack)
       logger.log2(
         'warn', 'An attempt to get configuration data ' +
@@ -67,16 +66,20 @@ function pollConfiguration (configEndpoint) {
   // 1 minute timer
 }
 
-function init () {
+async function init () {
   // Read the minimal params to start
-  const basicConfig = require(passportFile)
+  const basicConfig = JSON.parse(
+    fs.readFileSync(
+      new URL(passportFile, import.meta.url)
+    )
+  )
+
   // Start logging with basic params
   logger.configure(
     {
       level: basicConfig.logLevel,
       consoleLogOnly: basicConfig.consoleLogOnly
     })
-
   const props = [
     'clientId',
     'keyPath',
@@ -94,6 +97,6 @@ function init () {
   }
 }
 
-module.exports = app
+export default app
 
 init()

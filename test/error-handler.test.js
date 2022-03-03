@@ -1,8 +1,7 @@
-
-const chai = require('chai')
-const sinon = require('sinon')
-const { globalErrorHandler, handleStrategyError, StrategyError } = require('../server/utils/error-handler.js')
-const config = require('config')
+import chai from 'chai'
+import sinon from 'sinon'
+import { globalErrorHandler, handleStrategyError, StrategyError } from '../server/utils/error-handler.js'
+import config from 'config'
 
 const assert = chai.assert
 const expect = chai.expect
@@ -21,8 +20,11 @@ describe('error-handler.js test', () => {
       redirect: sinon.spy()
     }
 
-    globalErrorHandler({ stack: 'fake' }, {}, res, {})
     const failureRedirectUrl = config.get('passportConfig.failureRedirectUrl')
+    global.basicConfig = { failureRedirectUrl }
+
+    globalErrorHandler({ stack: 'fake' }, {}, res, {})
+
     expect(res.redirect.calledOnce).to.be.true
     expect(res.redirect.firstCall.args[0]).to.equal(
       `${failureRedirectUrl}?failure=An error occurred`

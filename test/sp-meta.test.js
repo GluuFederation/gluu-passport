@@ -1,16 +1,13 @@
-const chai = require('chai')
-const rewire = require('rewire')
-const PassportSAMLStrategy = require('passport-saml').Strategy
-const rewireSPMeta = rewire('../server/sp-meta')
-const config = require('config')
+import chai from 'chai'
+import passportSAML from 'passport-saml'
+import { writeMeta_, generate } from '../server/sp-meta.js'
+import config from 'config'
 
 const assert = chai.assert
 const passportConfigAuthorizedResponse = config.get('passportConfigAuthorizedResponse')
 
 describe('Test SP Meta Helper', () => {
   describe('writeMeta_ test', () => {
-    const writeMeta_ = rewireSPMeta.__get__('writeMeta_')
-
     it('should exist', () => {
       assert.exists(writeMeta_)
     })
@@ -21,7 +18,6 @@ describe('Test SP Meta Helper', () => {
   })
 
   describe('generate meta test', () => {
-    const generate = rewireSPMeta.__get__('generate')
     const testSAMLProvider = passportConfigAuthorizedResponse.providers.find(p => p.id === 'saml-only-1')
     const metaFile = `../server/idp-metadata/${testSAMLProvider.id}.xmll`
 
@@ -33,10 +29,11 @@ describe('Test SP Meta Helper', () => {
       assert.isFunction(generate, 'generateJWKS is not a function')
     })
 
-    it('should generate metafile for provider in idp-metadata folder', async () => {
+    it('should generate metafile for provider in idp-metadata folder', () => {
+      const PassportSAMLStrategy = passportSAML.Strategy
       const oPassportSAMLStrategy = new PassportSAMLStrategy(testSAMLProvider.options, () => { /* */ })
 
-      await generate(testSAMLProvider, oPassportSAMLStrategy)
+      generate(testSAMLProvider, oPassportSAMLStrategy)
       assert.exists(metaFile, `${metaFile} file not found`)
     })
   })

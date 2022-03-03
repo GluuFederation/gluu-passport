@@ -1,14 +1,19 @@
-const router = require('express').Router()
-const passport = require('passport')
-const { v4: uuidv4 } = require('uuid')
-const fs = require('fs')
-const idpInitiated = require('./idp-initiated')
-const providersModule = require('./providers')
-const webutil = require('./utils/web-utils')
-const misc = require('./utils/misc')
-const logger = require('./utils/logging')
-const path = require('path')
-const { handleStrategyError } = require('./utils/error-handler')
+import express from 'express'
+import passport from 'passport'
+import { v4 as uuidv4 } from 'uuid'
+import fs from 'fs'
+import * as idpInitiated from './idp-initiated.js'
+import * as providersModule from './providers.js'
+import * as webutil from './utils/web-utils.js'
+import * as misc from './utils/misc.js'
+import * as logger from './utils/logging.js'
+import path from 'path'
+import { fileURLToPath } from 'url'
+import { handleStrategyError } from './utils/error-handler.js'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
+const router = express.Router()
 
 router.get('/health-check', function (req, res) {
   return res.send({ message: 'Cool!!!', sessionCookie: req.session.cookie })
@@ -31,7 +36,7 @@ router.get('/auth/:provider/callback',
 
 router.post('/auth/:provider/callback',
   validateProvider,
-  require('express').urlencoded({ extended: false }),
+  express.urlencoded({ extended: false }),
   authenticateRequestCallback,
   callbackResponse)
 
@@ -145,7 +150,7 @@ function validateToken (req, res, next) {
   }
 }
 
-function callbackResponse (req, res) {
+async function callbackResponse (req, res) {
   let postUrl
   let user = req.user
   const provider = user.providerKey
@@ -156,7 +161,7 @@ function callbackResponse (req, res) {
     postUrl = global.config.postProfileEndpoint
   }
 
-  user = providersModule.applyMapping(user, provider)
+  user = await providersModule.applyMapping(user, provider)
   if (!user) {
     webutil.handleError(req, res, 'User profile is empty')
     return
@@ -206,4 +211,4 @@ function callbackResponse (req, res) {
   )
 }
 
-module.exports = router
+export default router
