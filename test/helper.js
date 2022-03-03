@@ -40,7 +40,7 @@ const setupServer = function () {
       await server.on('appStarted', function () {
         console.log('app started event listened...')
       })
-      await server.rateLimiter.resetKey('::ffff:127.0.0.1')
+      await server.rateLimiter.resetKey('::ffff:127.0.0.1') // NOSONAR
       return chai.request(server).keepOpen()
     })
 }

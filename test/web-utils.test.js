@@ -60,14 +60,14 @@ describe('web utils', () => {
     const res = mockResIfReqNotNull
 
     const spyRedirect = sinon.spy(res, 'redirect')
-    handleError({ failureUrl: 'http://test/com' }, res, 'error')
+    handleError({ failureUrl: 'https://test/com' }, res, 'error')
     assert.isTrue(spyRedirect.calledOnce)
   })
 
   it('should call res.redirect with correct url once when req is not null', () => {
     const res = mockResIfReqNotNull
 
-    const failureUrl = 'http://test.com'
+    const failureUrl = 'https://test.com'
     const error = 'custom error'
     const fullUrl = `${failureUrl}?failure=${error}`
 
