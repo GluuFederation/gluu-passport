@@ -338,13 +338,10 @@ function callbackResponse (req, res) {
 }
 
 function processLogout(req, res) {
-	function validateCallback(err, profile, loggedOut) {
-		logger.log2('debug', 'logout callback ' + JSON.stringify(err) + ' ' + JSON.stringify(profile) + ' ' + loggedOut)
+  const validateCallback = ({ profile, loggedOut }) => {
+		logger.log2('debug', 'logout callback ' + JSON.stringify(profile) + ' ' + loggedOut)
 
-		if (err) {
-			logger.log2('error', err.stack) // Partial or failed Logout
-			res.send(JSON.stringify(err))
-		} else if (profile) { // received a Logout Request
+		if (profile) { // received a Logout Request
       appInsights.defaultClient.trackEvent({name: "IDP-Initiated Logout Request", properties: profile})
 
       req.samlLogoutRequest = profile
@@ -384,7 +381,13 @@ function processLogout(req, res) {
 	const strategy = passport._strategy(provider)
   
   var originalQuery = url.parse(req.url).query
-  strategy._saml.validateRedirect(req.query, originalQuery, validateCallback)
+  strategy._saml
+  .validateRedirectAsync(req.query, originalQuery)
+  .then(validateCallback)
+  .catch((err) => {
+    logger.log2('error', err.stack) // Partial or failed Logout
+    res.send(JSON.stringify(err))
+  });
 }
 
 function parseParams (req, res, next) {
