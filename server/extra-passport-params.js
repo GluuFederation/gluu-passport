@@ -17,6 +17,7 @@ const params = R.once(() => [
       decryptionPvk: fs.readFileSync(global.config.spTLSKey, 'utf-8'),
       decryptionCert: fs.readFileSync(global.config.spTLSCert, 'utf-8'),
       privateKey: fs.readFileSync(process.env.PRIVATE_KEY || '/etc/certs/passport-sp.key', 'utf-8'),
+      cacheProvider: new (require("../node_modules/@sic/passport-saml/lib/node-saml/inmemory-cache-provider")).CacheProvider({keyExpirationPeriodMs: this.requestIdExpirationPeriodMs}),
       getSamlOptions: function(request, done) {
         return done(null, (request.locals != null ? request.locals.authParams : {}));
       }
