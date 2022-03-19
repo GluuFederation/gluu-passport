@@ -61,7 +61,7 @@ function recreateHttpServer (serverURI, port) {
         'info', 'Server stopped accepting connections')
       )
     }
-    httpServer = app.listen(port, () => {
+    httpServer = app.listen(port, '127.0.0.1', () => {
       logger.log2('info', `Server listening on ${serverURI}:${port}`)
       console.log(`Server listening on ${serverURI}:${port}`)
       app.emit('appStarted') // event emitter for tests
