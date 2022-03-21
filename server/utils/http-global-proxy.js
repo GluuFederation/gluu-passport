@@ -1,9 +1,13 @@
-const config = require('config')
+const configure = (HTTP_PROXY, HTTPS_PROXY, NO_PROXY) => {
+  if (HTTP_PROXY) {
+    const ga = require('global-agent')
+    ga.bootstrap()
+    global.GLOBAL_AGENT.HTTP_PROXY = HTTP_PROXY
+    global.GLOBAL_AGENT.HTTPS_PROXY = HTTPS_PROXY
+    global.GLOBAL_AGENT.NO_PROXY = NO_PROXY
+  }
+}
 
-if (config.has('HTTP_PROXY')) {
-  const ga = require('global-agent')
-  ga.bootstrap()
-  global.GLOBAL_AGENT.HTTP_PROXY = config.get('HTTP_PROXY')
-  global.GLOBAL_AGENT.HTTPS_PROXY = config.get('HTTPS_PROXY')
-  global.GLOBAL_AGENT.NO_PROXY = config.get('NO_PROXY')
+module.exports = {
+  configure
 }
