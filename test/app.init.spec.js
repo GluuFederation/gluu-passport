@@ -192,7 +192,8 @@ describe('app.init() - Initialization', () => {
         'spTLSCert',
         'spTLSKey',
         'rateLimit',
-        'session'
+        'session',
+        'proxy'
       )
     })
 
