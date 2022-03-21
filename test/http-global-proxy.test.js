@@ -9,8 +9,16 @@ const proxy = passportConfigAuthorizedResponse.conf.proxy
 const { HTTP_PROXY, HTTPS_PROXY, NO_PROXY } = proxy
 
 describe('global agent proxy setup', () => {
+  let configure
   before(() => {
     global.GLOBAL_AGENT = null
+  })
+
+  it('configure method should exist', async () => {
+    const httpProxy = rewire('../server/utils/http-global-proxy')
+    configure = httpProxy.__get__('configure')
+    assert.exists(configure)
+    assert.isFunction(configure)
   })
 
   it('node global object should not have proxy config', async () => {
@@ -19,7 +27,7 @@ describe('global agent proxy setup', () => {
 
   it('node global object should have global agent and proxy setup', async () => {
     const httpProxy = rewire('../server/utils/http-global-proxy')
-    const configure = httpProxy.__get__('configure')
+    configure = httpProxy.__get__('configure')
     configure(HTTP_PROXY, HTTPS_PROXY, NO_PROXY)
     assert.exists(global.GLOBAL_AGENT)
   })
