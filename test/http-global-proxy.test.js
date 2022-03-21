@@ -3,9 +3,10 @@ const config = require('config')
 const rewire = require('rewire')
 
 const assert = chai.assert
-const HTTP_PROXY = config.get('HTTP_PROXY')
-const HTTPS_PROXY = config.get('HTTPS_PROXY')
-const NO_PROXY = config.get('NO_PROXY')
+
+const passportConfigAuthorizedResponse = config.get('passportConfigAuthorizedResponse')
+const proxy = passportConfigAuthorizedResponse.conf.proxy
+const { HTTP_PROXY, HTTPS_PROXY, NO_PROXY } = proxy
 
 describe('global agent proxy setup', () => {
   before(() => {
@@ -17,7 +18,9 @@ describe('global agent proxy setup', () => {
   })
 
   it('node global object should have global agent and proxy setup', async () => {
-    rewire('../server/utils/http-global-proxy')
+    const httpProxy = rewire('../server/utils/http-global-proxy')
+    const configure = httpProxy.__get__('configure')
+    configure(HTTP_PROXY, HTTPS_PROXY, NO_PROXY)
     assert.exists(global.GLOBAL_AGENT)
   })
 
