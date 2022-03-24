@@ -199,7 +199,7 @@ async function authenticateRequest (req, res, next) {
                                             
   const providerConfData = global.providers.find(cfg => cfg.id === provider_id)
 
-  if (providerConfData.type === "openidconnect") {
+  if (providerConfData.type === "openid-client") {
     const strategy = passport._strategy(provider_id)
     const client = strategy._client
     req.passportAuthenticateParams.nonce = uuidv4()
