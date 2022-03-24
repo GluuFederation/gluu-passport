@@ -106,37 +106,22 @@ router.get('/auth/meta/idp/:idp',
   })
 
 // SP-initiated logout
-router.get('/logout/request', (req, res, next) => {
-  if (!(req.user && req.user.providerKey)) {
-    res.status(400).send('No Session')
-  } else {
-    const provider = req.user.providerKey
-    var strategy = passport._strategy(provider)
+router.get('/logout/request/:authParams', parseParams, (req, res, next) => {
+  req.user = req.locals.authParams
+  var strategy = passport._strategy(req.user.provider)
 
-    // MFA exception: second retry using session provider which should be set in callbackResponse 
-    if (strategy.name != 'saml') {
-      strategy = passport._strategy(req.session.provider)
-    }
-          
-    if (strategy.name === 'saml' && strategy._saml.options.logoutUrl && !req.user.logoutRequest) {
-      const relayState = req.query && req.query.post_logout_redirect_uri
-      if (relayState) {
-        req.query.RelayState = relayState
-      }
-      // Restore the SAML Subject for the logout request
-      req.user = req.session.samlSubject
-      logger.log2('debug', 'SAML Logout of subject ' + JSON.stringify(req.user))
-      appInsights.defaultClient.trackEvent({name: "SP-initiated Logout Request",
-                                            properties: {...{provider: req.params.provider}, ...req.user}})
-      strategy.logout(req, (err, uri) => {
-        req.logout()
-        delete req.session
-        delete req.user
-        res.redirect(uri)
-      })
-    } else {
-      res.send("Success")
-    }
+  if (strategy.name === 'saml' && strategy._saml.options.logoutUrl) {
+    logger.log2('debug', 'SAML Logout of subject ' + JSON.stringify(req.user))
+    appInsights.defaultClient.trackEvent({name: "SP-initiated Logout Request",
+                                          properties: {...{provider: req.params.provider}, ...req.user}})
+    strategy.logout(req, (err, uri) => {
+      req.logout()
+      delete req.session
+      delete req.user
+      res.redirect(uri)
+    })
+  } else {
+    res.send("Success")
   }
 });
 
