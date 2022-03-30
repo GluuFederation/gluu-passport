@@ -8,10 +8,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
         - uses: actions/checkout@master
-        - name: Merge master -> version_4.3.2
+        - name: Merge master -> version_4.4.0
           uses: devmasx/merge-branch@v1.3.0
           with:
               type: now
               head_to_merge: ${{ github.ref }}
-              target_branch: version_4.3.2
+              target_branch: version_4.4.0
               github_token: ${{ github.token }}
