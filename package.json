@@ -80,7 +80,6 @@
     "chai-files": "^1.4.0",
     "chai-http": "^4.3.0",
     "codecov": "^3.8.3",
-    "cz-conventional-changelog": "^3.3.0",
     "eslint": "^7.31.0",
     "eslint-config-standard": "^16.0.2",
     "eslint-plugin-chai-friendly": "^0.7.1",
@@ -107,10 +106,5 @@
   "bugs": {
     "url": "https://github.com/GluuFederation/gluu-passport/issues"
   },
-  "homepage": "https://github.com/GluuFederation/gluu-passport#readme",
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
-  }
+  "homepage": "https://github.com/GluuFederation/gluu-passport#readme"
 }
