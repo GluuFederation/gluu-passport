@@ -338,7 +338,7 @@ function processLogout(req, res) {
                                         {throwHttpErrors: false,
                                          headers: {cookie: 'session_id=' + req.cookies.session_id}})
         const jsonPromise = responsePromise.json()
-        const [httpResponse, statusResponse] = await Promise.all([responsePromise, jsonPromise]);
+        const [httpResponse, statusResponse] = await Promise.all([responsePromise, jsonPromise])
         expiry = parseInt(statusResponse.custom_state)
         if (httpResponse.statusCode != 200 || statusResponse.state != 'authenticated'
              || isNaN(expiry) || expiry - Date.now() < 5000) { // Dont't risk it if session is about to expire
@@ -346,7 +346,6 @@ function processLogout(req, res) {
          }
       }
 
-      logger.log2('info', 'Reason: ' + req.samlLogoutRequest.reason)
       if (req.samlLogoutRequest.reason) { // Respond immediately
 				strategy._saml.getLogoutResponseUrl(req, req.query.RelayState, {}, (err, url) => {
 					if (err) {
