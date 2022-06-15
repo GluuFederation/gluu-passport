@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.3.2](https://github.com/GluuFederation/gluu-passport/compare/v5.2.0...v5.3.2) (2022-06-15)
+
+
+### Features
+
+* **httpProxy:** add support to global http proxy ([#333](https://github.com/GluuFederation/gluu-passport/issues/333)) ([121a629](https://github.com/GluuFederation/gluu-passport/commit/121a629189e36d7b500ea10d82459d6906cda030))
+
+
+### Bug Fixes
+
+* change log level to `debug` as `silly` is not used ([#348](https://github.com/GluuFederation/gluu-passport/issues/348)) ([228ae5f](https://github.com/GluuFederation/gluu-passport/commit/228ae5fdf75a498be2c193565e0f0c91b7d4da1c))
+* **loggin.js:** add winston patch to fix date problem ([#364](https://github.com/GluuFederation/gluu-passport/issues/364)) ([fdf14ca](https://github.com/GluuFederation/gluu-passport/commit/fdf14ca7389f10383ecf2428a01feb20cb3c0096))
+* **package-lock.json:** update node-xtraverse due to vulnerability in xmldom ([#327](https://github.com/GluuFederation/gluu-passport/issues/327)) ([903ebb4](https://github.com/GluuFederation/gluu-passport/commit/903ebb4b9e5900496c883d5e5e1f72fb39992a32))
+* remove decimal points from Client assertion JWT exp time ([#315](https://github.com/GluuFederation/gluu-passport/issues/315)) ([6ba5b9b](https://github.com/GluuFederation/gluu-passport/commit/6ba5b9bc687e1cdd7cc17fb22053e659f961282b)), closes [#313](https://github.com/GluuFederation/gluu-passport/issues/313)
+* **security:** update deps for passport-oauth2 ([#420](https://github.com/GluuFederation/gluu-passport/issues/420)) ([d61566e](https://github.com/GluuFederation/gluu-passport/commit/d61566e50902f4dbe237a345dd3f402a17de681e))
+* **sp-meta.spec.js:** fix saml test case ([b3cb6b2](https://github.com/GluuFederation/gluu-passport/commit/b3cb6b26bdf9cbf44fe255fd20a62c89e009f4e8))
+
+
+### Miscellaneous Chores
+
+* release 5.3.2 ([#447](https://github.com/GluuFederation/gluu-passport/issues/447)) ([141e683](https://github.com/GluuFederation/gluu-passport/commit/141e683fd17d348932d99ebf3d28c8cf86e3628e))
+
 ### [5.3.1](https://github.com/GluuFederation/gluu-passport/compare/v5.3.0...v5.3.1) (2021-10-06)
 
 
