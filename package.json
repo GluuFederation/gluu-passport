@@ -1,6 +1,6 @@
 {
   "name": "passport",
-  "version": "5.3.1",
+  "version": "5.3.2",
   "private": true,
   "nyc": {
     "all": true,
@@ -10,7 +10,7 @@
     ]
   },
   "engines": {
-    "node": ">=12.19.0 <=16.13.0"
+    "node": ">=12.19.0 <=16"
   },
   "scripts": {
     "start": "NODE_ENV=production node server/app.js",
@@ -43,7 +43,7 @@
     "express-session": "^1.17.2",
     "global-agent": "^3.0.0",
     "got": "^11.8.1",
-    "jose": "^4.3.7",
+    "jose": "^4.8.1",
     "jsonwebtoken": "^8.4.0",
     "memcached": "^2.2.2",
     "memorystore": "^1.6.6",
