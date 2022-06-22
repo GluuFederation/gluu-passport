@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.4.0](https://github.com/GluuFederation/gluu-passport/compare/v5.3.2...v5.4.0) (2022-06-22)
+
+
+### Features
+
+* **production.js:** rate limit config from env ([#452](https://github.com/GluuFederation/gluu-passport/issues/452)) ([067b1a7](https://github.com/GluuFederation/gluu-passport/commit/067b1a7c9781a57fee5d520773f5b58a08429531))
+
 ## [5.3.2](https://github.com/GluuFederation/gluu-passport/compare/v5.2.0...v5.3.2) (2022-06-15)
 
 
