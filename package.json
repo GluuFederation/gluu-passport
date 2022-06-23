@@ -40,7 +40,7 @@
     "express": "^4.16.4",
     "express-prom-bundle": "^6.3.6",
     "express-rate-limit": "^5.2.3",
-    "express-session": "^1.17.2",
+    "express-session": "^1.17.3",
     "global-agent": "^3.0.0",
     "got": "^11.8.1",
     "jose": "^4.8.1",
