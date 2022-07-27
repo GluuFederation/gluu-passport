@@ -50,7 +50,7 @@
     "memorystore": "^1.6.6",
     "morgan": "^1.9.1",
     "openid-client": "^4.9.1",
-    "passport": "^0.6.0",
+    "passport": "^0.4.0",
     "passport-dropbox-oauth2": "^1.1.0",
     "passport-facebook": "^3.0.0",
     "passport-github": "^1.1.0",
