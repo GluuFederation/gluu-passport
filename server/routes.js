@@ -130,27 +130,21 @@ router.get('/logout/request/:authParams', parseParams, (req, res, next) => {
 // Propagate SP Logout Response
 router.get('/logout/response/:status?', (req, res, next) => {
   const status = req.params.status || 'Success'
-  if (!(req.user && req.user.providerKey)) {
+  if (!(req.user && req.user.logoutRequest && req.user.logoutRequest.provider)) {
     res.status(400).send('No Session')
   } else {
-    const provider = req.user.providerKey
-    var strategy = passport._strategy(provider)
-
-    if (req.user.logoutRequest) {
-      req.samlLogoutRequest = req.user.logoutRequest
-      req.samlLogoutRequest.status = 'urn:oasis:names:tc:SAML:2.0:status:' + status
-      strategy._saml.getLogoutResponseUrl(req, req.user.relayState, {}, (err, url) => {
-        if (err) {
-          webutil.handleError(req, res, err.message)
-        } else {
-          req.samlLogoutRequest.reason = 'Session terminated'
-          appInsights.defaultClient.trackEvent({name: "IDP-Initiated Logout Response", properties: req.samlLogoutRequest})
-          res.redirect(url)
-        }
+    const strategy = passport._strategy(req.user.logoutRequest.provider)
+    req.samlLogoutRequest = req.user.logoutRequest
+    req.samlLogoutRequest.status = 'urn:oasis:names:tc:SAML:2.0:status:' + status
+    strategy._saml.getLogoutResponseUrl(req, req.user.relayState, {}, (err, url) => {
+      if (err) {
+        webutil.handleError(req, res, err.message)
+      } else {
+        req.samlLogoutRequest.reason = 'Session terminated'
+        appInsights.defaultClient.trackEvent({name: "IDP-Initiated Logout Response", properties: req.samlLogoutRequest})
+        res.redirect(url)
+      }
       })
-    } else {
-      res.status(400).send("No logout request to respond to!")
-    }
   }
 });
 
@@ -357,6 +351,7 @@ function processLogout(req, res) {
 				})
 			} else { // Propogate logout to oxAuth
 				req.user.logoutRequest = profile
+        req.user.logoutRequest.provider = provider
         req.user.relayState = req.query.RelayState
 				const redirectUri = encodeURIComponent('https://' + req.hostname + '/passport/logout/response')
 				res.redirect('/oxauth/restv1/end_session?post_logout_redirect_uri=' + redirectUri)
