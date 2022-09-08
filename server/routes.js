@@ -131,13 +131,14 @@ router.get('/logout/request/:authParams', parseParams, (req, res, next) => {
 router.get('/logout/response/:status?', (req, res, next) => {
   const status = req.params.status || 'Success'
   if (!(req.user && req.user.logoutRequest && req.user.logoutRequest.provider)) {
-    res.status(400).send('No Session')
+    res.redirect(global.basicConfig.logoutFailureUrl)
   } else {
     const strategy = passport._strategy(req.user.logoutRequest.provider)
     req.samlLogoutRequest = req.user.logoutRequest
     req.samlLogoutRequest.status = 'urn:oasis:names:tc:SAML:2.0:status:' + status
     strategy._saml.getLogoutResponseUrl(req, req.user.relayState, {}, (err, url) => {
       if (err) {
+        req.failureUrl = global.basicConfig.logoutFailureUrl
         webutil.handleError(req, res, err.message)
       } else {
         req.samlLogoutRequest.reason = 'Session terminated'
