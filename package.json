@@ -30,7 +30,7 @@
     "@nicokaiser/passport-apple": "^0.2.1",
     "@sic/passport-saml": "^3.2.4",
     "@sokratis/passport-linkedin-oauth2": "^2.1.0",
-    "applicationinsights": "^2.3.3",
+    "applicationinsights": "^2.3.4",
     "base64url": "^3.0.1",
     "bluebird": "^3.5.3",
     "body-parser": "^1.19.1",
