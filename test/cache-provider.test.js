@@ -5,24 +5,38 @@ const cacheProviders = rewire('../server/cache-provider.js')
 const testConfig = require('../config/test')
 const redis = require('redis')
 const fakeredis = require('fakeredis')
-
+chai.use(require('chai-as-promised'))
 const assert = chai.assert
+const expect = chai.expect
+const sinon = require('sinon')
 
 describe('cache provider test', () => {
   const retryStrategy = cacheProviders.__get__('retryStrategy')
   const testProvider = testConfig.passportConfigAuthorizedResponse.providers.find(provider => provider.id === 'saml-redis-test')
   testProvider.options.retry_strategy = retryStrategy
 
-  it('redis is not live so we should get connection error response', () => {
-    const client = redis.createClient(testProvider.options)
+  it('redis is not live so we should get connection error response', async () => {
+    const socket = {
+      reconnectStrategy: (attempts) => {
+        if (attempts > 0) {
+          return new Error('ok')
+        }
+        return 100
+      }
+    }
 
+    const client = redis.createClient(({ socket }))
     client.on('ready', () => {
-      assert.fail('redis connection should not work')
+      assert.fail('redis connection should not be ready')
     })
+
     client.on('error', actualError => {
-      const expectedError = new Error('Redis connection in broken state: retry aborted.')
-      assert.equal(actualError.message, expectedError.message)
+      assert.equal(actualError.code, 'ECONNREFUSED')
     })
+
+    sinon.stub(client, 'connect').callsFake(client.emit('error', { code: 'ECONNREFUSED' })).rejects()
+
+    await expect(client.connect()).to.be.rejectedWith(Error)
   })
 
   it('redis is live so we should get connection', () => {
