@@ -1,7 +1,8 @@
 function get (type, options, expiration) {
   return {
     saveAsync: '',
-    getAsync: ''
+    getAsync: '',
+    removeAsync: ''
   }
 }
 

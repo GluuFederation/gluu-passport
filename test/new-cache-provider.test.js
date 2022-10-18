@@ -11,5 +11,9 @@ describe('cache-provider', () => {
       const provider = cacheProvider.get('redis', {}, 60)
       assert.exists(provider.getAsync)
     })
+    it('should have removeAsync', () => {
+      const provider = cacheProvider.get('redis', {}, 60)
+      assert.exists(provider.removeAsync)
+    })
   })
 })
