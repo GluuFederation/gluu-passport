@@ -1,5 +1,7 @@
-const { assert } = require('chai')
+const chai = require('chai')
 const cacheProvider = require('../server/utils/new-cache-provider')
+const assert = chai.assert
+chai.use(require('chai-as-promised'))
 
 describe('cache-provider', () => {
   describe('get', () => {
@@ -21,17 +23,29 @@ describe('cache-provider', () => {
         const provider = cacheProvider.get('redis', {}, 60)
         assert.typeOf(provider.saveAsync, 'function')
       })
+      it('should be async', async () => {
+        const provider = cacheProvider.get('redis', {}, 60)
+        assert.isFulfilled(provider.saveAsync())
+      })
     })
     describe('getAsync', () => {
       it('should be a function', () => {
         const provider = cacheProvider.get('redis', {}, 60)
         assert.typeOf(provider.getAsync, 'function')
       })
+      it('should be async', async () => {
+        const provider = cacheProvider.get('redis', {}, 60)
+        assert.isFulfilled(provider.getAsync())
+      })
     })
     describe('removeAsync', () => {
       it('should be a function', () => {
         const provider = cacheProvider.get('redis', {}, 60)
         assert.typeOf(provider.removeAsync, 'function')
+      })
+      it('should be async', async () => {
+        const provider = cacheProvider.get('redis', {}, 60)
+        assert.isFulfilled(provider.removeAsync())
       })
     })
   })
