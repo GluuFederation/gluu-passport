@@ -2,11 +2,13 @@
 const sinon = require('sinon')
 const { assert } = require('chai')
 const redis = require('redis')
+// const { redisCacheProviderAdapter } = require('../server/utils/redis-cache-provider')
 
 describe('redis-cache-provider', () => {
   let sandbox
   let createClientStub
   let connectSpy
+  let redisCacheProviderAdapter
   beforeEach(async () => {
     sandbox = sinon.createSandbox()
     connectSpy = sandbox.spy()
@@ -16,6 +18,7 @@ describe('redis-cache-provider', () => {
         // connect: async () => { }
       }
     })
+    redisCacheProviderAdapter = require('../server/utils/redis-cache-provider').redisCacheProviderAdapter
   })
   afterEach(async () => {
     sandbox.restore()
@@ -25,13 +28,25 @@ describe('redis-cache-provider', () => {
       any: 'any',
       options: 'options'
     }
-    const { redisCacheProviderAdapter } = require('../server/utils/redis-cache-provider')
+    // const { redisCacheProviderAdapter } = require('../server/utils/redis-cache-provider')
     await redisCacheProviderAdapter(anyOptions, 100)
     assert.isTrue(createClientStub.calledWith(anyOptions))
   })
   it('should call connect', async () => {
-    const { redisCacheProviderAdapter } = require('../server/utils/redis-cache-provider')
+    // const { redisCacheProviderAdapter } = require('../server/utils/redis-cache-provider')
     await redisCacheProviderAdapter({}, 100)
     assert.equal(connectSpy.callCount, 1)
+  })
+  it('should return get', async () => {
+    const client = await redisCacheProviderAdapter(undefined, 1600)
+    assert.exists(client.get)
+  })
+  it('should return set', async () => {
+    const client = await redisCacheProviderAdapter(undefined, 1600)
+    assert.exists(client.get)
+  })
+  it('should return del', async () => {
+    const client = await redisCacheProviderAdapter(undefined, 1600)
+    assert.exists(client.get)
   })
 })
