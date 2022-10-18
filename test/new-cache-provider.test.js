@@ -7,5 +7,9 @@ describe('cache-provider', () => {
       const provider = cacheProvider.get('redis', {}, 60)
       assert.exists(provider.saveAsync)
     })
+    it('should have getAsync', () => {
+      const provider = cacheProvider.get('redis', {}, 60)
+      assert.exists(provider.getAsync)
+    })
   })
 })
