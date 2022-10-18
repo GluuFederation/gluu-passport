@@ -4,7 +4,7 @@ async function redisCacheProviderAdapter (options, expiration) {
   const client = createClient(options)
   await client.connect()
   return {
-    get: client.get,
+    get: async (key) => { await client.get(key) },
     set: client.set,
     del: client.del
   }

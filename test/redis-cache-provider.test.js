@@ -49,4 +49,15 @@ describe('redis-cache-provider', () => {
     const client = await redisCacheProviderAdapter(undefined, 1600)
     assert.exists(client.get)
   })
+  it('should return null when client return null string', async () => {
+    sandbox.restore()
+    sandbox.stub(redis, 'createClient').callsFake(() => {
+      return {
+        connect: connectSpy,
+        get: async () => { return null }
+      }
+    })
+    const client = await redisCacheProviderAdapter(undefined, 1600)
+    console.log(client.get('any'))
+  })
 })
