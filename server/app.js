@@ -27,13 +27,27 @@ const logSLORedirectLocation = (envelope, context) => {
       envelope.data.baseData.properties['Location'] = response.getHeader('location')
     }
   }
-  return true;
+  return true
 };
+/**
+ * Telemetry Processor that filters out verbose log entries
+   * @param {*} envelope 
+ * @param {*} context 
+ * @returns 
+ */
+ const filterVerbose = (envelope, context) => {
+  if (envelope.data.baseType === "MessageData"
+      && envelope.data.baseData.severityLevel < 1) {
+        return false
+      }
+  return true
+}
 
 if (appInsightsKey) {
-	appInsights.setup(appInsightsKey)
+  appInsights.setup(appInsightsKey)
   appInsights.defaultClient.context.tags[appInsights.defaultClient.context.keys.cloudRole] = "Passport"
   appInsights.defaultClient.addTelemetryProcessor(logSLORedirectLocation)
+  appInsights.defaultClient.addTelemetryProcessor(filterVerbose)
 
   appInsights.start()
 }
