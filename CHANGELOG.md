@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.4.1](https://github.com/GluuFederation/gluu-passport/compare/v5.4.0...v5.4.1) (2022-12-05)
+
+
+### Bug Fixes
+
+* **security:** bump passport-saml from 3.2.1 to 3.2.4 ([ac8b62b](https://github.com/GluuFederation/gluu-passport/commit/ac8b62b0402870e263ad4e5d79076c48e2003b38))
+
 ## [5.4.0](https://github.com/GluuFederation/gluu-passport/compare/v5.3.2...v5.4.0) (2022-06-22)
 
 
