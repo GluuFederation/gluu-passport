@@ -273,6 +273,6 @@ function setup (providers) {
 }
 
 module.exports = {
-  setup: setup,
-  applyMapping: applyMapping
+  setup,
+  applyMapping
 }

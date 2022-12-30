@@ -172,7 +172,7 @@ function callbackResponse (req, res) {
   const now = new Date().getTime()
   const jwt = misc.getRpJWT({
     iss: postUrl,
-    sub: sub,
+    sub,
     aud: global.basicConfig.clientId,
     jti: uuidv4(),
     exp: now / 1000 + 30,
