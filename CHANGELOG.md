@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.4.2](https://github.com/GluuFederation/gluu-passport/compare/v5.4.1...v5.4.2) (2022-12-30)
+
+
+### Bug Fixes
+
+* **security:** bump config to 3.3.8 ([b25c0ba](https://github.com/GluuFederation/gluu-passport/commit/b25c0ba16976d8c89427dd34883686bf0204e8c1))
+* **security:** bump got to 11.8.6 ([d38356d](https://github.com/GluuFederation/gluu-passport/commit/d38356dbd77b9e74074679e4d4aea0a40542229c))
+* **security:** bump jose to 4.11.1 ([04f5fd4](https://github.com/GluuFederation/gluu-passport/commit/04f5fd40bee25920469799d7d27e09a7a0be9cb6))
+* **security:** bump jsonwebtoken from 8.5.1 to 9.0.0 ([#511](https://github.com/GluuFederation/gluu-passport/issues/511)) ([a505439](https://github.com/GluuFederation/gluu-passport/commit/a505439a0709dbd073a619ecbd3aff38a84850da))
+* **security:** bump moment from 2.29.3 to 2.29.4 ([#483](https://github.com/GluuFederation/gluu-passport/issues/483)) ([77298eb](https://github.com/GluuFederation/gluu-passport/commit/77298eb1df4e916b44eb6135c64ca0e28add3ef9))
+* **security:** bump passport to 0.6.0 ([5cd14ec](https://github.com/GluuFederation/gluu-passport/commit/5cd14ecd6a0d9d7b3d87ab44308f9555aa4df4fa))
+* **security:** bump passport-apple to v2 ([04a00cf](https://github.com/GluuFederation/gluu-passport/commit/04a00cfc60112fe13d5018f3632d655b76a19af6))
+* **security:** bump winston ([5a65ca5](https://github.com/GluuFederation/gluu-passport/commit/5a65ca5e88dbed8a42127ae6b271ab5162898bae))
+* **security:** update passport twitter xmldom dep ([2257e69](https://github.com/GluuFederation/gluu-passport/commit/2257e69c2e2aae4226b282b6164c6d786f31d04c))
+
 ## [5.4.1](https://github.com/GluuFederation/gluu-passport/compare/v5.4.0...v5.4.1) (2022-12-05)
 
 
