@@ -149,7 +149,7 @@ const passportConfigAuthorizedResponse = {
       scope: '["name", "email"]',
       teamID: 'xxxxxxxx',
       keyID: 'xxxxxxx',
-      // eslint-disable-next-line node/no-path-concat
+      // eslint-disable-next-line n/no-path-concat
       key: `${__dirname}/../test/testdata/apple-auth.p8`
     }
   }, {

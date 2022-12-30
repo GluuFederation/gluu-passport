@@ -140,5 +140,5 @@ function process (req, res, next) {
 }
 
 module.exports = {
-  process: process
+  process
 }
