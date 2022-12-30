@@ -55,7 +55,6 @@
     "passport-facebook": "^3.0.0",
     "passport-github": "^1.1.0",
     "passport-google-oauth2": "^0.2.0",
-    "passport-oxd": "^4.1.0",
     "passport-saml": "^3.2.4",
     "passport-twitter": "git+https://github.com/GluuFederation/passport-twitter.git",
     "passport-windowslive": "^1.0.2",
