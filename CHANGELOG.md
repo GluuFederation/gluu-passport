@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.0.0](https://github.com/GluuFederation/gluu-passport/compare/v5.4.2...v6.0.0) (2022-12-30)
+
+
+### ⚠ BREAKING CHANGES
+
+* drop support to node 12 ([#520](https://github.com/GluuFederation/gluu-passport/issues/520))
+* remove deprecated passport-oxd
+* remove unmantained passport-tumblr ([#517](https://github.com/GluuFederation/gluu-passport/issues/517))
+
+### Bug Fixes
+
+* drop support to node 12 ([#520](https://github.com/GluuFederation/gluu-passport/issues/520)) ([99dbb66](https://github.com/GluuFederation/gluu-passport/commit/99dbb66d9c403ed274a272468bff83565d9ec540))
+* remove deprecated passport-oxd ([7625be6](https://github.com/GluuFederation/gluu-passport/commit/7625be60435b3a0115ebefb71a307220441a9ff3)), closes [#516](https://github.com/GluuFederation/gluu-passport/issues/516)
+* remove unmantained passport-tumblr ([#517](https://github.com/GluuFederation/gluu-passport/issues/517)) ([04fdda0](https://github.com/GluuFederation/gluu-passport/commit/04fdda08bd38139400cb42ce219843f34e843110)), closes [#515](https://github.com/GluuFederation/gluu-passport/issues/515)
+
 ## [5.4.2](https://github.com/GluuFederation/gluu-passport/compare/v5.4.1...v5.4.2) (2022-12-30)
 
 
