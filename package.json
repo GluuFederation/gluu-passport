@@ -10,7 +10,7 @@
     ]
   },
   "engines": {
-    "node": ">=12.19.0 <=16"
+    "node": ">=14 <=16"
   },
   "scripts": {
     "start": "NODE_ENV=production node server/app.js",
@@ -101,7 +101,7 @@
     "type": "git",
     "url": "git+https://github.com/GluuFederation/gluu-passport.git"
   },
-  "author": "",
+  "author": "Christian Eland",
   "license": "Apache2",
   "bugs": {
     "url": "https://github.com/GluuFederation/gluu-passport/issues"
