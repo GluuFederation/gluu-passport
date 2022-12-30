@@ -37,5 +37,5 @@ function retrieve (cfgEndpoint) {
 }
 
 module.exports = {
-  retrieve: retrieve
+  retrieve
 }

@@ -94,5 +94,5 @@ function get (strategyId, paramName) {
 }
 
 module.exports = {
-  get: get
+  get
 }

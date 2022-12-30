@@ -107,7 +107,7 @@ describe('app.init() - Initialization', () => {
         'JWhgkK5mj2akDuAUrhH3ixoYaFohLzFe86-WXJRbzwBaHpAI-eSr4lo3Wj' +
         '3Trqv2tG02VC_SUZVTILc0By5pbkHYs5Vh4wH1Awq1yrIE8WlJoA',
       client_id: '1502.b857b415-7c23-4d98-bb18-b8d19e70be74',
-      ticket: ticket
+      ticket
     }
 
     chai.request(gluuUrl)
@@ -160,7 +160,7 @@ describe('app.init() - Initialization', () => {
     // Authorized (second UMA request already w/ token and pct)
     const passportConfigAuthorizedRequestHeaders = {
       authorization: `Bearer ${accessToken}`,
-      pct: pct,
+      pct,
       host: gluuHostName,
       Connection: 'close'
     }

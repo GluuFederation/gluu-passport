@@ -133,16 +133,16 @@ function encrypt (obj) {
 }
 
 module.exports = {
-  isObject: isObject,
-  hash: hash,
-  pathsHaveData: pathsHaveData,
-  hasData: hasData,
-  pipePromise: pipePromise,
-  curry2AndFlip: curry2AndFlip,
-  arrify: arrify,
-  getRpJWT: getRpJWT,
-  getJWT: getJWT,
-  verifyJWT: verifyJWT,
-  encrypt: encrypt,
-  randomSecret: randomSecret
+  isObject,
+  hash,
+  pathsHaveData,
+  hasData,
+  pipePromise,
+  curry2AndFlip,
+  arrify,
+  getRpJWT,
+  getJWT,
+  verifyJWT,
+  encrypt,
+  randomSecret
 }
