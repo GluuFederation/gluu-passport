@@ -59,7 +59,7 @@
     "passport-twitter": "git+https://github.com/GluuFederation/passport-twitter.git",
     "passport-windowslive": "^1.0.2",
     "prom-client": "^14.0.1",
-    "ramda": "^0.27.1",
+    "ramda": "^0.28.0",
     "redis": "^3.1.2",
     "sha1": "^1.1.1",
     "stomp-client": "^0.9.0",
