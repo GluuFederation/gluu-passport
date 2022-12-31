@@ -190,7 +190,10 @@ describe('app.init() - Initialization', () => {
         'serverURI',
         'serverWebPort',
         'spTLSCert',
-        'spTLSKey'
+        'spTLSKey',
+        'rateLimit',
+        'session',
+        'proxy'
       )
     })
 

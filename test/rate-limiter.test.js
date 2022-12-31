@@ -1,49 +1,48 @@
-
 const chai = require('chai')
-const assert = chai.assert
 const rewire = require('rewire')
-const rateLimiterRewire = rewire('../server/utils/rate-limiter')
-const config = require('config')
-const rateLimit = require('express-rate-limit')
+const sinon = require('sinon')
+
+const logger = require('../server/utils/logging')
+const rateLimiter = rewire('../server/utils/rate-limiter')
+const assert = chai.assert
 
 describe('rate-limiter.js test', () => {
-  const windowMs = rateLimiterRewire.__get__('windowMs')
-  const max = rateLimiterRewire.__get__('max')
-  const rateLimiter = rateLimiterRewire.__get__('rateLimiter')
-
-  it('windowMs should exist', () => {
-    assert.exists(windowMs)
+  const configure = rateLimiter.__get__('configure')
+  it('configure should be exist', () => {
+    assert.exists(configure)
   })
 
-  it('windowMs should be number', () => {
-    assert.isNumber(windowMs)
+  it('configure should be function', () => {
+    assert.isFunction(configure)
   })
 
-  it('windowMs should be equals to config value', () => {
-    assert.equal(windowMs, config.get('rateLimitWindowMs'))
+  it('configure should init a express-rate-limit with resetKey function', () => {
+    const app = {}
+    configure(app, 10000, 10)
+    assert.exists(app.rateLimiter)
+    assert.isDefined(app.rateLimiter.resetKey)
   })
 
-  it('max should exist', () => {
-    assert.exists(max)
+  it('configure should configure with correct values', () => {
+    const checkWindowMs = rateLimiter.__get__('checkWindowMs')
+    const checkMax = rateLimiter.__get__('checkMax')
+    assert.equal(checkWindowMs, 10000)
+    assert.equal(checkMax, 10)
   })
 
-  it('max should be number', () => {
-    assert.isNumber(max)
+  it('configure should not reconfigure express-rate-limit once values are same', () => {
+    const sinonSpy = sinon.spy(logger, 'log2')
+    configure({}, 10000, 10)
+    assert.isTrue(sinonSpy.calledOnceWith('debug', 'Skip ratelimit config, already config with same values'))
+    sinonSpy.restore()
   })
 
-  it('max should be equals to config value', () => {
-    assert.equal(max, config.get('rateLimitMaxRequestAllow'))
+  const rateLimit = rateLimiter.__get__('rateLimit')
+  it('rateLimit should be exist', () => {
+    assert.exists(rateLimit)
   })
 
-  it('rateLimiter should exist', () => {
-    assert.exists(rateLimiter)
-  })
-
-  it('rateLimiter should be function', () => {
-    assert.isFunction(rateLimiter)
-  })
-
-  it('rateLimiter should be equals to express-rate-limit module', () => {
-    assert.isFunction(rateLimiter, rateLimit())
+  it('rateLimit should be function', () => {
+    assert.isFunction(rateLimit)
   })
 })
