@@ -10,7 +10,7 @@
     ]
   },
   "engines": {
-    "node": ">=12.19.0 <=15.11.0"
+    "node": ">=12.19.0 <=16"
   },
   "scripts": {
     "start": "NODE_ENV=production node server/app.js",
@@ -27,9 +27,7 @@
     "generate-coverage": "NODE_ENV=test nyc report --reporter=text-lcov > coverage.lcov"
   },
   "dependencies": {
-    "@nicokaiser/passport-apple": "^0.2.1",
     "@sic/passport-saml": "^3.2.7",
-    "@sokratis/passport-linkedin-oauth2": "^2.1.0",
     "applicationinsights": "^2.3.6",
     "base64url": "^3.0.1",
     "bluebird": "^3.5.3",
@@ -45,17 +43,12 @@
     "global-agent": "^3.0.0",
     "got": "^11.8.5",
     "jose": "^2.0.6",
-    "jsonwebtoken": "^8.4.0",
+    "jsonwebtoken": "^9.0.0",
     "memcached": "^2.2.2",
     "memorystore": "^1.6.6",
     "morgan": "^1.9.1",
     "openid-client": "^4.9.1",
     "passport": "^0.5.3",
-    "passport-dropbox-oauth2": "^1.1.0",
-    "passport-facebook": "^3.0.0",
-    "passport-github": "^1.1.0",
-    "passport-google-oauth2": "^0.2.0",
-    "passport-windowslive": "^1.0.2",
     "prom-client": "^13.2.0",
     "ramda": "^0.27.2",
     "redis": "^3.1.2",
