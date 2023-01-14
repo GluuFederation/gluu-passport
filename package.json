@@ -42,7 +42,7 @@
     "express-session": "^1.15.6",
     "global-agent": "^3.0.0",
     "got": "^11.8.2",
-    "jsonwebtoken": "^8.4.0",
+    "jsonwebtoken": "^9.0.0",
     "memcached": "^2.2.2",
     "memorystore": "^1.6.5",
     "morgan": "^1.9.1",
