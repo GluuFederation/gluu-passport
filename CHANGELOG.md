@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.7.1](https://github.com/GluuFederation/gluu-passport/compare/v4.7.0...v4.7.1) (2023-01-25)
+
+
+### Bug Fixes
+
+* **security:** bump jsonwebtoken 9 backwards v4 ([9619635](https://github.com/GluuFederation/gluu-passport/commit/96196359502ae2c9fad2e0e4dc4c0df30bf153ce))
+* **security:** bump passport-apple v2 ([01752cd](https://github.com/GluuFederation/gluu-passport/commit/01752cd75ab036efa31ba83d22ed010114fa8f23))
+
 ## [4.7.0](https://github.com/GluuFederation/gluu-passport/compare/v4.6.1...v4.7.0) (2021-11-15)
 
 
