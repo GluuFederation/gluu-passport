@@ -27,7 +27,7 @@
     "generate-coverage": "NODE_ENV=test nyc report --reporter=text-lcov > coverage.lcov"
   },
   "dependencies": {
-    "@nicokaiser/passport-apple": "^0.2.1",
+    "@nicokaiser/passport-apple": "^2.0.0",
     "@sokratis/passport-linkedin-oauth2": "^2.1.0",
     "base64url": "^3.0.1",
     "bluebird": "^3.5.3",
