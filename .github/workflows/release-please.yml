@@ -2,6 +2,9 @@ on:
   push:
     branches:
       - master
+      - v4_backwards
+      - v5_backwards
+      - v6_backwards
 name: release-please
 jobs:
   release-please:
