@@ -1,4 +1,6 @@
-# Inbound identity using Passport
+# Gluu Passport
+
+## Inbound identity using Passport
 
 
 [![codecov](https://codecov.io/gh/GluuFederation/gluu-passport/branch/master/graph/badge.svg)](https://codecov.io/gh/GluuFederation/gluu-passport)
