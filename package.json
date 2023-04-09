@@ -27,8 +27,8 @@
     "generate-coverage": "NODE_ENV=test nyc report --reporter=text-lcov > coverage.lcov"
   },
   "dependencies": {
-    "@sic/passport-saml": "^3.2.7",
-    "applicationinsights": "^2.3.6",
+    "@sic/passport-saml": "^3.2.8",
+    "applicationinsights": "^2.5.1",
     "base64url": "^3.0.1",
     "bluebird": "^3.5.3",
     "body-parser": "^1.20.1",
