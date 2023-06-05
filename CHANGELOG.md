@@ -155,7 +155,7 @@ required at oxTrust.
 * **session:** ensure cookies settings are correct ([7c24b83](https://github.com/GluuFederation/gluu-passport/commit/7c24b835c0580aa3a09c16486edb9045d88eca36))
 * package.json & package-lock.json to reduce vulnerabilities ([218b7ce](https://github.com/GluuFederation/gluu-passport/commit/218b7cef7f8b2cf465d0b059246fabc3da4458e4))
 
-## [4.5.0](https://github.com/GluuFederation/gluu-passport/compare/v4.4.0...v4.5.0) (2021-03-30)
+## [4.5.1](https://github.com/GluuFederation/gluu-passport/compare/v4.4.0...v4.5.1) (2021-03-30)
 
 
 ### Features
