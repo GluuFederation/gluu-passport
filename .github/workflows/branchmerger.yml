@@ -2,16 +2,16 @@ name: Merge master to other branches
 on:
   push:
     branches:
-      - 'master'
+      - "master"
 jobs:
   sync-branch:
     runs-on: ubuntu-latest
     steps:
-        - uses: actions/checkout@master
-        - name: Merge master -> version_4.5.1
-          uses: devmasx/merge-branch@v1.3.0
-          with:
-              type: now
-              head_to_merge: ${{ github.ref }}
-              target_branch: version_4.5.1
-              github_token: ${{ github.token }}
+      - uses: actions/checkout@master
+      - name: Merge master -> version_4.5.1
+        uses: devmasx/merge-branch@v1.3.0
+        with:
+          type: now
+          head_to_merge: ${{ github.ref }}
+          target_branch: version_4.5.1
+          github_token: ${{ github.token }}

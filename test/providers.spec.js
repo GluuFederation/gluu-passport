@@ -58,5 +58,20 @@ describe('provider.js', () => {
       assert.match(response.headers.location, /preselectedExternalProvider=tEmp/)
       assert.match(response.headers.location, /acr_values=duo/)
     })
+
+    it('should generate auth request with all configured scope in openid-client', async () => {
+      const tokenResponse = await got(
+        'http://127.0.0.1:8090/passport/token',
+        { responseType: 'json' }
+      )
+      const token = tokenResponse.body.token_
+      const oidcProviderId = 'oidccedev6_scope_test'
+      const response = await got(
+          `http://127.0.0.1:8090/passport/auth/${oidcProviderId}/${token}`,
+          { throwHttpErrors: false, followRedirect: false }
+      )
+      assertResponse(response)
+      assert.match(response.headers.location, /scope=openid%20email%20profile%20custom_scope/)
+    })
   })
 })

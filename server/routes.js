@@ -99,6 +99,10 @@ function validateProvider (req, res, next) {
 
   if (providerConfData) {
     // Attach some info for later use
+    if (providerConfData.type === 'openid-client') {
+      const scope = providerConfData.options.scope
+      providerConfData.passportAuthnParams.scope = scope && scope.length > 1 && scope.join(' ')
+    }
     req.passportAuthenticateParams = providerConfData.passportAuthnParams
     next()
   } else {
