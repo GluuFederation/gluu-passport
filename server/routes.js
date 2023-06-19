@@ -157,6 +157,10 @@ function validateProvider (req, res, next) {
 
   if (providerConfData) {
     // Attach some info for later use
+    if (providerConfData.type === 'openid-client') {
+      const scope = providerConfData.options.scope
+      providerConfData.passportAuthnParams.scope = scope && scope.length > 1 && scope.join(' ')
+    }
     req.passportAuthenticateParams = providerConfData.passportAuthnParams
     next()
   } else {
@@ -251,7 +255,7 @@ function callbackResponse (req, res) {
   const now = new Date().getTime()
   const jwt = misc.getRpJWT({
     iss: postUrl,
-    sub: sub,
+    sub,
     aud: global.basicConfig.clientId,
     jti: uuidv4(),
     exp: now / 1000 + 30,

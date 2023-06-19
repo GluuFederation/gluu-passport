@@ -24,13 +24,6 @@ const params = R.once(() => [
     }
   },
   {
-    strategy: 'passport-oxd',
-    passportAuthnParams: {
-      scope: ['openid', 'email', 'profile']
-    },
-    options: {}
-  },
-  {
     strategy: 'openid-client',
     passportAuthnParams: {
       scope: 'openid'
@@ -101,5 +94,5 @@ function get (strategyId, paramName) {
 }
 
 module.exports = {
-  get: get
+  get
 }

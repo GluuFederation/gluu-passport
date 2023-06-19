@@ -20,5 +20,5 @@ function generate (provider, samlStrategy) {
 }
 
 module.exports = {
-  generate: generate
+  generate
 }

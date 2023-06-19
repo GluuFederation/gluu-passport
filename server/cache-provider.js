@@ -4,7 +4,7 @@ const Promise = require('bluebird')
 const logger = require('./utils/logging')
 const OPERATION_NO_CONN = 'Attempt to operate on cache provider but connection has not been established'
 
-const promisify = (context, methodName) => Promise.promisify(context[methodName], { context: context })
+const promisify = (context, methodName) => Promise.promisify(context[methodName], { context })
 
 const retryStrategy = (options) => {
   if (options.error && options.error.code === 'ECONNREFUSED') {
@@ -113,5 +113,5 @@ function get (type, options, expiration) {
 }
 
 module.exports = {
-  get: get
+  get
 }

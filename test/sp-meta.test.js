@@ -34,7 +34,7 @@ describe('Test SP Meta Helper', () => {
     })
 
     it('should generate metafile for provider in idp-metadata folder', async () => {
-      const oPassportSAMLStrategy = new PassportSAMLStrategy(testSAMLProvider, () => { /* */ })
+      const oPassportSAMLStrategy = new PassportSAMLStrategy(testSAMLProvider.options, () => { /* */ })
 
       await generate(testSAMLProvider, oPassportSAMLStrategy)
       assert.exists(metaFile, `${metaFile} file not found`)

@@ -160,7 +160,7 @@ describe('uma.js test', () => {
             'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
           client_assertion: clientAssertionToken,
           client_id: clientId,
-          ticket: ticket
+          ticket
         }
       }))
       assert.isNotNull(rptToken)

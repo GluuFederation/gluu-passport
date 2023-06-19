@@ -29,7 +29,9 @@ const logger = winston.createLogger({
   format: format.combine(
     format.splat(),
     format.padLevels(),
-    format.timestamp(),
+    format.timestamp({
+      format: 'YYYY-MM-DD HH:mm:ss.SSSZZ'
+    }),
     format.printf(info => `${info.timestamp} [${info.level.toUpperCase()}] ${info.message}`)
   )
 })
@@ -65,7 +67,7 @@ function configure (cfg) {
     R.forEach(l => logger.remove(l), R.filter(R.complement(R.isNil), [transport, consoleTransport]))
 
     if (R.propEq('consoleLogOnly', true, cfg)) {
-      consoleTransport = new winston.transports.Console({ level: level })
+      consoleTransport = new winston.transports.Console({ level })
       logger.add(consoleTransport, {}, true)
 
       if (fileTransport) {
@@ -153,8 +155,8 @@ function log2 (level, msg) {
 }
 
 module.exports = {
-  logger: logger,
-  configure: configure,
-  log2: log2,
-  sendMQMessage: sendMQMessage
+  logger,
+  configure,
+  log2,
+  sendMQMessage
 }
