@@ -1,14 +1,13 @@
-const jose = require('jose')
-const { JWK: { generateSync, asKey }, JWKS: { KeyStore } } = require('jose')
+const { JWK: { generateSync, asKey }, JWKS: { KeyStore } } = require('jose_v2')
 const { Issuer } = require('openid-client')
 const path = require('path')
 const fs = require('fs')
 const fileUtils = require('../utils/file-utils')
 const { logger } = require('./logging')
 const clientJWKSFilePath = path.join(`${process.cwd()}/server`, 'jwks')
-const secretKey = require('./misc').secretKey();
-let ks = new KeyStore();
-const keysPath = "/run/keyvault/keys/";
+const secretKey = require('./misc').secretKey()
+let ks = new KeyStore()
+const keysPath = '/run/keyvault/keys/'
 
 /**
  * generate jwks and store it in file. file name will be like [provider.id].json
@@ -16,31 +15,26 @@ const keysPath = "/run/keyvault/keys/";
  * @returns undefined
  */
 async function generateJWKS (provider) {
+  const keyType = generateSync('RSA')
+  const keyStore = new KeyStore(keyType)
   const fileName = path.join(fileUtils.makeDir(clientJWKSFilePath), provider.id + '.json')
-  if (fs.existsSync(fileName)) {
-    return
+  if (!fs.existsSync(fileName)) {
+    await fileUtils.writeDataToFile(fileName, JSON.stringify(keyStore.toJWKS(true)))
   }
-
-  const { privateKey, publicKey } = await jose.generateKeyPair('RS256')
-  const privateJwk = await jose.exportJWK(privateKey)
-  const publicJwk = await jose.exportJWK(publicKey)
-  const kid = await jose.calculateJwkThumbprint(publicJwk)
-  privateJwk.kid = kid
-  await fileUtils.writeDataToFile(fileName, JSON.stringify({ keys: [privateJwk] }))
 }
 
 /**
  * get keystore after creating and adding private keys
  * @returns keystore
  */
- async function getKeystore () {
+async function getKeystore () {
   logger.log('verbose', 'Importing private keys into the keystore')
 
   fs.readdirSync(keysPath).forEach(file => {
-    const akeyPath = path.resolve(keysPath, file);
+    const akeyPath = path.resolve(keysPath, file)
     if (fs.lstatSync(akeyPath).isFile()) {
-      const fileNameRegExp = /(.*?)_(.*?)_(.*?)\.pem/;
-      const matches = file.match(fileNameRegExp);
+      const fileNameRegExp = /(.*?)_(.*?)_(.*?)\.pem/
+      const matches = file.match(fileNameRegExp)
 
       if (matches.length == 4) { // file naming: keydId_use_alg.pem
         try {
@@ -48,15 +42,15 @@ async function generateJWKS (provider) {
             key: fs.readFileSync(akeyPath, 'utf8'),
             passphrase: secretKey
           }
-    
+
           const opts = {
             kid: `${matches[1]}_${matches[2]}_${matches[3]}`,
             use: matches[2],
             alg: matches[3].toUpperCase()
           }
-    
+
           // Create the key and add it to the keystore
-          const key = asKey(keyObj, opts)                    
+          const key = asKey(keyObj, opts)
           ks.add(key)
         } catch (err) {
           const msg = 'Private key was not successfully added to the keystore.'
@@ -64,47 +58,7 @@ async function generateJWKS (provider) {
         }
       }
     }
-  });
-
-  return ks
-}
-
-/**
- * get keystore after creating and adding private keys
- * @returns keystore
- */
- async function getKeystore () {
-  logger.log('verbose', 'Importing private keys into the keystore')
-
-  fs.readdirSync(keysPath).forEach(file => {
-    const akeyPath = path.resolve(keysPath, file);
-    if (fs.lstatSync(akeyPath).isFile()) {
-      const fileNameRegExp = /(.*?)_(.*?)_(.*?)\.pem/;
-      const matches = file.match(fileNameRegExp);
-
-      if (matches.length == 4) { // file naming: keydId_use_alg.pem
-        try {
-          const keyObj = {
-            key: fs.readFileSync(akeyPath, 'utf8'),
-            passphrase: secretKey
-          }
-    
-          const opts = {
-            kid: `${matches[1]}_${matches[2]}_${matches[3]}`,
-            use: matches[2],
-            alg: matches[3].toUpperCase()
-          }
-    
-          // Create the key and add it to the keystore
-          const key = asKey(keyObj, opts)                    
-          ks.add(key)
-        } catch (err) {
-          const msg = 'Private key was not successfully added to the keystore.'
-          logger.log('error', `${msg} key: ${file}, error: ${err}`)
-        }
-      }
-    }
-  });
+  })
 
   return ks
 }
@@ -139,12 +93,10 @@ async function getClient (provider) {
   }
 
   const issuer = await getIssuer(options)
-
-  if (options.token_endpoint_auth_method && options.token_endpoint_auth_method === 'private_key_jwt') {
-    // generate jwks
-    await generateJWKS(provider)
-    const jwks = require(path.join(fileUtils.makeDir(clientJWKSFilePath), `${provider.id}.json`))
-    client = new issuer.Client(options, jwks)
+  if (options.token_endpoint_auth_method && options.token_endpoint_auth_method === 'private_key_jwt' && options.use_request_object && options.use_request_object.toString() === 'true') {
+    // getKeystore with private keys
+    if (ks.size === 0) ks = await getKeystore()
+    client = new issuer.Client(options, ks.toJWKS(true))
   } else {
     client = new issuer.Client(options)
   }
