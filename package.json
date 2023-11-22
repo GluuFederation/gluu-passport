@@ -10,7 +10,7 @@
     ]
   },
   "engines": {
-    "node": ">=14 <=16"
+    "node": ">=14 <=18"
   },
   "scripts": {
     "start": "NODE_ENV=production node server/app.js",
