@@ -16,8 +16,6 @@ function generate (provider, samlStrategy) {
   )
 
   logger.log2('info', `Generating XML metadata for ${provider.displayName}`)
-  logger.log2('info', `decryptionCert ${opts.decryptionCert}`)
-  logger.log2('info', `signingCert ${opts.signingCert}`)
   chain(opts.decryptionCert).catch(err => logger.log2('error', `An error occurred: ${err}`))
 }
 
