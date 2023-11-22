@@ -79,7 +79,7 @@ async function setupStrategy (provider) {
   }
 
   const providerOptions = provider.options
-  const isSaml = strategyModule === 'passport-saml'
+  const isSaml = strategyModule === '@node-saml/passport-saml'
   const verify = getVerifyFunction(provider)
 
   // Create strategy
@@ -191,7 +191,7 @@ function fillMissingData (providers) {
   for (const provider of providers) {
     const options = provider.options
     const strategyId = provider.passportStrategyId
-    const isSaml = strategyId === 'passport-saml'
+    const isSaml = strategyId === '@node-saml/passport-saml'
     const callbackUrl = R.defaultTo(options.callbackUrl, options.callbackURL)
     const prefix = global.config.serverURI + '/passport/auth'
 
