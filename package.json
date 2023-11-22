@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "@nicokaiser/passport-apple": "^2.0.0",
+    "@node-saml/passport-saml": "^4.0.4",
     "@sokratis/passport-linkedin-oauth2": "^2.1.0",
     "base64url": "^3.0.1",
     "bluebird": "^3.5.3",
@@ -55,7 +56,6 @@
     "passport-facebook": "^3.0.0",
     "passport-github": "^1.1.0",
     "passport-google-oauth2": "^0.2.0",
-    "passport-saml": "^3.2.4",
     "passport-twitter": "git+https://github.com/GluuFederation/passport-twitter.git",
     "passport-windowslive": "^1.0.2",
     "prom-client": "^14.0.1",
