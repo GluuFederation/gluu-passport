@@ -20,7 +20,7 @@ describe('cache provider test', () => {
       assert.fail('redis connection should not work')
     })
     client.on('error', actualError => {
-      const expectedError = new Error('Redis connection in broken state: retry aborted.')
+      const expectedError = new Error('Ready check failed: NOAUTH Authentication required.')
       assert.equal(actualError.message, expectedError.message)
     })
   })

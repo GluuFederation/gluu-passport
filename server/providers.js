@@ -74,6 +74,7 @@ async function setupStrategy (provider) {
       Strategy = Strategy.Strategy
     }
 
+    logger.log2('info', `Adding to list of known strategies ${id} ${Strategy}`)
     logger.log2('verbose', 'Adding to list of known strategies')
     passportStrategies.push({ id, Strategy })
   }
