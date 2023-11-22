@@ -13,15 +13,14 @@ describe('cache provider test', () => {
   const testProvider = testConfig.passportConfigAuthorizedResponse.providers.find(provider => provider.id === 'saml-redis-test')
   testProvider.options.retry_strategy = retryStrategy
 
-  it('redis is not live so we should get connection error response.', () => {
+  it('redis is not live so we should get connection error response', () => {
     const client = redis.createClient(testProvider.options)
 
     client.on('ready', () => {
       assert.fail('redis connection should not work')
     })
     client.on('error', actualError => {
-      console.log('testing redis test...')
-      const expectedError = new Error('Ready check failed: NOAUTH Authentication required.')
+      const expectedError = new Error('Redis connection in broken state: retry aborted.')
       assert.equal(actualError.message, expectedError.message)
     })
   })
