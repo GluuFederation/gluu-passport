@@ -79,6 +79,8 @@ async function setupStrategy (provider) {
   }
 
   const providerOptions = provider.options
+
+  // check saml strategy
   const isSaml = strategyModule === '@node-saml/passport-saml'
   const verify = getVerifyFunction(provider)
 
