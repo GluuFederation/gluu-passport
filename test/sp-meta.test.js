@@ -1,6 +1,6 @@
 const chai = require('chai')
 const rewire = require('rewire')
-const PassportSAMLStrategy = require('passport-saml').Strategy
+const PassportSAMLStrategy = require('@node-saml/passport-saml').Strategy
 const rewireSPMeta = rewire('../server/sp-meta')
 const config = require('config')
 

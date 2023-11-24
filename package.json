@@ -10,7 +10,7 @@
     ]
   },
   "engines": {
-    "node": ">=14 <=16"
+    "node": ">=14 <=18"
   },
   "scripts": {
     "start": "NODE_ENV=production node server/app.js",
@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "@nicokaiser/passport-apple": "^2.0.0",
+    "@node-saml/passport-saml": "^4.0.4",
     "@sokratis/passport-linkedin-oauth2": "^2.1.0",
     "base64url": "^3.0.1",
     "bluebird": "^3.5.3",
@@ -43,7 +44,8 @@
     "express-rate-limit": "^5.2.3",
     "express-session": "^1.17.3",
     "global-agent": "^3.0.0",
-    "got": "^11.8.1",
+    "got": "^11.8.6",
+    "http-cache-semantics": "^4.1.1",
     "jose": "^4.8.1",
     "jsonwebtoken": "^9.0.0",
     "memcached": "^2.2.2",
@@ -55,7 +57,6 @@
     "passport-facebook": "^3.0.0",
     "passport-github": "^1.1.0",
     "passport-google-oauth2": "^0.2.0",
-    "passport-saml": "^3.2.4",
     "passport-twitter": "git+https://github.com/GluuFederation/passport-twitter.git",
     "passport-windowslive": "^1.0.2",
     "prom-client": "^14.0.1",
