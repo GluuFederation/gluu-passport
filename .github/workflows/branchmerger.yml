@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - name: Merge master -> version_4.5.1
+      - name: Merge master -> version_4.5.4
         uses: devmasx/merge-branch@v1.3.0
         with:
           type: now
