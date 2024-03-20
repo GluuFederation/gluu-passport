@@ -2,31 +2,30 @@ name: Code Linting
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [14.x, 16.x
+        node-version: [18.x, 20.x]
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-    
-    # due to bug in npm we have to add this config
-    # bugs https://github.com/actions/setup-node/issues/214 https://github.com/npm/cli/issues/2610
-    - name: Reconfigure git to use HTTP authentication
-      run: git config --global url."https://github.com/".insteadOf ssh://git@github.com/
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
 
-    - run: npm ci
-    - run: npm run build --if-present
-    - run: npm run lint
+      # due to bug in npm we have to add this config
+      # bugs https://github.com/actions/setup-node/issues/214 https://github.com/npm/cli/issues/2610
+      - name: Reconfigure git to use HTTP authentication
+        run: git config --global url."https://github.com/".insteadOf ssh://git@github.com/
+
+      - run: npm ci
+      - run: npm run build --if-present
+      - run: npm run lint
