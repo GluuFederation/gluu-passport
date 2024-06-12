@@ -39,6 +39,19 @@ const passportConfigAuthorizedResponse = {
         password: '',
         port: 0
       }
+    },
+    rateLimit: {
+      windowMs: 24 * 60 * 60 * 1000,
+      max: 100
+    },
+    session: {
+      cookieSameSite: 'none',
+      cookieSecure: true
+    },
+    proxy: {
+      HTTP_PROXY: 'http://localhost:3128',
+      HTTPS_PROXY: 'http://localhost:3129',
+      NO_PROXY: 'localhost,127.0.0.1'
     }
   },
   idpInitiated: {
@@ -257,10 +270,6 @@ const rateLimitMaxRequestAllow = 100
 const cookieSameSite = 'none'
 const cookieSecure = true
 
-const HTTP_PROXY = 'http://localhost:3128'
-const HTTPS_PROXY = 'http://localhost:3129'
-const NO_PROXY = 'localhost,127.0.0.1'
-
 module.exports = {
   saltFile,
   passportConfig,
@@ -270,8 +279,5 @@ module.exports = {
   passportFile,
   passportConfigAuthorizedResponse,
   cookieSameSite,
-  cookieSecure,
-  HTTP_PROXY,
-  NO_PROXY,
-  HTTPS_PROXY
+  cookieSecure
 }

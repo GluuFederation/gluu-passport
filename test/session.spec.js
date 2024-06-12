@@ -18,16 +18,16 @@ describe('/passport/metrics - metrics endpoint (integration)', () => {
   // server should be up and running, integration test
   // health check used to inspect req.session.cookie
   it('Health check - GET /passport/health-check', (done) => {
-    const sameSiteConfig = config.get('cookieSameSite')
-    const secureConfig = config.get('cookieSecure')
+    const { cookieSameSite, cookieSecure } = config.get('passportConfigAuthorizedResponse').conf.session
+
     chai.request(gluuBasePath)
       .get('/passport/health-check')
       .set('Cookie', 'SameSite=None')
       .end((_err, res) => {
         res.body.sessionCookie.should.include(
           {
-            sameSite: sameSiteConfig,
-            secure: secureConfig
+            sameSite: cookieSameSite,
+            secure: cookieSecure
           }
         )
         done()
