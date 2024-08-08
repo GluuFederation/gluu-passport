@@ -2,6 +2,33 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [7.0.0](https://github.com/GluuFederation/gluu-passport/compare/v6.0.0...v7.0.0) (2024-08-08)
+
+
+### ⚠ BREAKING CHANGES
+
+* **saml:** update saml strategy name
+
+### Features
+
+* **passport:** update express ([852f263](https://github.com/GluuFederation/gluu-passport/commit/852f2630677a5b752d9255f0d08b9c64157de6ee))
+* **passport:** update express ([d7537d7](https://github.com/GluuFederation/gluu-passport/commit/d7537d71f2451f56ba2dcbc8a1bcc44a99660cb3))
+* **passport:** update express ([dee43a7](https://github.com/GluuFederation/gluu-passport/commit/dee43a7731b372bbe35199356a7688e065bed302))
+* **passport:** update express ([b75ed78](https://github.com/GluuFederation/gluu-passport/commit/b75ed78dc28a441f64bde41aba1879bd2c13ed0b))
+* **saml:** update saml strategy name ([7fc4ee2](https://github.com/GluuFederation/gluu-passport/commit/7fc4ee2d872f298c9eee2488b498599d3ecc5ed3))
+* update branch merger ([19ab971](https://github.com/GluuFederation/gluu-passport/commit/19ab971187b1fd50fc2ea41eeec0dcc2cd56b2cb))
+* update git flows and add node 20 for test ([6d9863b](https://github.com/GluuFederation/gluu-passport/commit/6d9863b932c778f38a9d533bb084ddc1007e5acf))
+
+
+### Bug Fixes
+
+* **openid-client:** pass provided scope in auth request ([#539](https://github.com/GluuFederation/gluu-passport/issues/539)) ([68342bd](https://github.com/GluuFederation/gluu-passport/commit/68342bd26663b5f0c7fff35e9497ebec91eede79))
+* **package-lock:** update package lock json ([78b6de5](https://github.com/GluuFederation/gluu-passport/commit/78b6de51623c2e82370280a115d8ff26e967e81d))
+* **test:** fixing cache provide test cases ([a9f2329](https://github.com/GluuFederation/gluu-passport/commit/a9f2329e4724833b2c5f9376a8c0615e477c7ee1))
+* **test:** fixing cache provide test cases ([eef75fb](https://github.com/GluuFederation/gluu-passport/commit/eef75fbe33d5651e16e36305a7047b1d1280f418))
+* update branch merger action ([d29cece](https://github.com/GluuFederation/gluu-passport/commit/d29cece95ce066e077c649d3fa4648c232041e8e))
+* update jose package fix vulnerabilities ([32f94e7](https://github.com/GluuFederation/gluu-passport/commit/32f94e7e0982ce1c897fdb9ec94f382c026af152))
+
 ## [6.0.0](https://github.com/GluuFederation/gluu-passport/compare/v5.4.2...v6.0.0) (2022-12-30)
 
 
