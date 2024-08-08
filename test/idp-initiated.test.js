@@ -1,4 +1,3 @@
-
 const chai = require('chai')
 const rewire = require('rewire')
 const idpInitiated = rewire('../server/idp-initiated.js')
