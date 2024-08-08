@@ -1,4 +1,3 @@
-
 const logger = require('./logging')
 const misc = require('./misc')
 const fs = require('fs')
