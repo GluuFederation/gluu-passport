@@ -1,6 +1,6 @@
 {
   "name": "passport",
-  "version": "6.0.0",
+  "version": "7.0.0",
   "private": true,
   "nyc": {
     "all": true,
@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "@nicokaiser/passport-apple": "^2.0.0",
-    "@node-saml/passport-saml": "^4.0.4",
+    "@node-saml/passport-saml": "^5.0.0",
     "@sokratis/passport-linkedin-oauth2": "^2.1.0",
     "base64url": "^3.0.1",
     "bluebird": "^3.5.3",

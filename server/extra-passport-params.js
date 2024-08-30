@@ -10,7 +10,7 @@ const params = R.once(() => [
     strategy: '@node-saml/passport-saml',
     passportAuthnParams: {},
     options: {
-      validateInResponseTo: true,
+      validateInResponseTo: 'always',
       requestIdExpirationPeriodMs: 3600000,
       decryptionPvk: fs.readFileSync(global.config.spTLSKey, 'utf-8'),
       decryptionCert: fs.readFileSync(global.config.spTLSCert, 'utf-8')
