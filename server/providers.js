@@ -108,7 +108,7 @@ async function setupStrategy (provider) {
         )
       }
     }
-    providerOptions.idpCert = providerOptions.idpCert.replace(/\n| /g, '')
+    providerOptions.idpCert = providerOptions.idpCert.replace(/[\n ]/g, '')
     const samlStrategy = new Strategy(providerOptions, verify)
     passport.use(id, samlStrategy)
     spMetadata.generate(provider, samlStrategy)
