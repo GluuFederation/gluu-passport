@@ -90,11 +90,11 @@ async function setupStrategy (provider) {
     // "an IDP would never do both IDP initiated and SP initiated..."
     if (global.iiconfig.authorizationParams.find(
       authorizationParam => authorizationParam.provider === id)) {
-      providerOptions.validateInResponseTo = false
+      providerOptions.validateInResponseTo = 'never'
     }
 
     // Instantiate custom cache provider if required
-    if (providerOptions.validateInResponseTo) {
+    if (providerOptions.validateInResponseTo === 'always') {
       const f = R.anyPass([R.isNil, R.isEmpty])
       const exp = providerOptions.requestIdExpirationPeriodMs / 1000
 
@@ -108,7 +108,7 @@ async function setupStrategy (provider) {
         )
       }
     }
-
+    providerOptions.idpCert = providerOptions.idpCert.replace(/[\n ]/g, '')
     const samlStrategy = new Strategy(providerOptions, verify)
     passport.use(id, samlStrategy)
     spMetadata.generate(provider, samlStrategy)
