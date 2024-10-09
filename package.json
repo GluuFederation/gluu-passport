@@ -44,7 +44,7 @@
     "express-rate-limit": "^5.2.3",
     "express-session": "^1.17.3",
     "global-agent": "^3.0.0",
-    "got": "^11.8.6",
+    "got": "^14.4.3",
     "http-cache-semantics": "^4.1.1",
     "jose": "^4.15.5",
     "jsonwebtoken": "^9.0.0",
