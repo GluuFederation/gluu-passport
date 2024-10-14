@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [7.0.1](https://github.com/GluuFederation/gluu-passport/compare/v7.0.0...v7.0.1) (2024-10-14)
+
+
+### Bug Fixes
+
+* idpCert must be valid PEM or BASE64 ([9b8fb0c](https://github.com/GluuFederation/gluu-passport/commit/9b8fb0ca0bc524aafdb2992921b31f538f2fccb2))
+
 ## [7.0.0](https://github.com/GluuFederation/gluu-passport/compare/v6.0.0...v7.0.0) (2024-08-08)
 
 
