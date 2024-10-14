@@ -1,3 +1,5 @@
+# Moved to [Gluu4 monorepo](https://github.com/GluuFederation/gluu4/tree/main/gluu-passport)
+
 # Gluu Passport
 
 ## Inbound identity using Passport
