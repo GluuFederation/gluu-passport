@@ -4,9 +4,10 @@ const http = require('http')
 const https = require('https')
 
 const assert = chai.assert
-const HTTP_PROXY = config.get('HTTP_PROXY')
-const HTTPS_PROXY = config.get('HTTPS_PROXY')
-const NO_PROXY = config.get('NO_PROXY')
+
+const passportConfigAuthorizedResponse = config.get('passportConfigAuthorizedResponse')
+const proxy = passportConfigAuthorizedResponse.conf.proxy
+const { HTTP_PROXY, HTTPS_PROXY, NO_PROXY } = proxy
 
 describe('global agent proxy setup', () => {
   it('global agent object should have global agent', async () => {
